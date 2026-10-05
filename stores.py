@@ -235,12 +235,16 @@ class Vtex:
     def _normalizar(p):
         disponibles, todos = [], []
         imagen = None
+        eans = []         # códigos de barras (iguales en todas las tiendas)
         talles = {}       # talle -> [talle, disponible, precio]
         cuotas = None     # mejor plan sin interés de un talle con stock
         for it in p.get("items") or []:
             if not imagen and it.get("images"):
                 imagen = it["images"][0].get("imageUrl")
             nombre_talle = Vtex._talle(it)
+            ean = str(it.get("ean") or "").strip()
+            if len(ean) >= 8 and ean.isdigit() and ean not in eans:
+                eans.append(ean)
             for s in it.get("sellers") or []:
                 o = s.get("commertialOffer") or {}
                 precio = o.get("Price") or 0
@@ -272,6 +276,7 @@ class Vtex:
             "available": bool(disponibles),
             "tipo": Vtex._tipo(p),
             "ref": (p.get("productReference") or p.get("productReferenceCode") or "").strip(),
+            "eans": eans[:12],
             "talles": list(talles.values()),
             "cuotas": cuotas,
             "cats_nombres": [c.strip("/").replace("/", " › ") for c in (p.get("categories") or [])[:1]],
@@ -325,6 +330,21 @@ class Vtex:
                 if it:
                     out.append(it)
         return out
+
+    @staticmethod
+    def buscar_ean(base, eans):
+        """Busca por código de barras: sirve para cualquier rubro (perfumes, electro, súper…)."""
+        out = {}
+        for e in list(eans or [])[:4]:
+            r = _get(f"{base}/api/catalog_system/pub/products/search?fq=alternateIds_Ean:{urllib.parse.quote(e)}",
+                     timeout=20, intentos=1)
+            for p in r or []:
+                it = Vtex._con_cats(p)
+                if it and e in (it.get("eans") or []):
+                    out[it["pid"]] = it
+            if out:
+                break
+        return list(out.values())
 
     @staticmethod
     def _con_cats(p):
@@ -437,6 +457,9 @@ class Shopify:
             "available": bool(disp),
             "tipo": (p.get("product_type") or "Otros").strip().capitalize(),
             "ref": "",
+            "eans": list(dict.fromkeys(str(v.get("barcode")).strip() for v in p.get("variants") or []
+                                       if str(v.get("barcode") or "").strip().isdigit()
+                                       and len(str(v.get("barcode")).strip()) >= 8))[:12],
             "talles": list(talles.values()),
             "cuotas": None,
         }

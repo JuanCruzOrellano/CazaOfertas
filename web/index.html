@@ -300,8 +300,11 @@ label.f span.h{font-weight:400;color:var(--mute);font-size:12px}
     <div class="sec" id="aTg"></div>
     <div class="sec">
       <h4>🏬 Tiendas para comparar</h4>
-      <div class="h">Donde la app busca el mismo producto (por su código de modelo). Una por línea. Tus marcas se suman solas.</div>
+      <div class="h">Donde la app busca el mismo producto (por su código de modelo o su código de barras). Una por línea. Tus marcas se suman solas.</div>
       <textarea id="aTiendas" rows="5" class="search" style="font:inherit;font-size:13px;resize:vertical"></textarea>
+      <label style="display:flex;gap:8px;align-items:flex-start;margin-top:10px;font-size:14px"><input type="checkbox" id="aAuto" style="margin-top:3px">
+        <span><b>Buscar también en tiendas parecidas automáticamente</b><br><span style="color:var(--mute);font-size:12px">La app mira qué vende cada tienda (sus categorías) y compara con otras del mismo estilo, aunque no estén en esta lista.</span></span></label>
+      <div id="aSug" style="margin-top:10px"></div>
     </div>
     <div class="err" id="aMsg"></div>
     <button class="btn" style="justify-self:start" onclick="probarAviso()">Probar notificación de Windows</button>
@@ -774,8 +777,40 @@ async function abrirAjustes(){
   const d = new Date((ev.hasta ? ev.hasta*1000 : Date.now()+4*86400000));
   $('#aHasta').value = d.toISOString().slice(0,10);
   $('#aTiendas').value = (AJ.tiendas_comparar||[]).join('\n');
+  $('#aAuto').checked = AJ.comparar_auto !== false;
+  sugerirTiendas();
   pintarTg();
   $('#mAjustes').classList.add('on');
+}
+let SUG = [];
+async function sugerirTiendas(){
+  const box = $('#aSug');
+  box.innerHTML = '<span style="color:var(--mute);font-size:13px">Buscando tiendas parecidas a tus marcas… (la primera vez tarda un poco)</span>';
+  try {
+    const j = await api('/api/sugerir_tiendas');
+    pintarSug(j.sugeridas || []);
+  } catch(e) { box.innerHTML = ''; }
+}
+function pintarSug(lista){
+  const ya = new Set($('#aTiendas').value.split('\n').map(s=>s.trim().replace(/\/$/,'')));
+  SUG = lista.filter(t=>!ya.has(t.base.replace(/\/$/,'')));
+  const box = $('#aSug');
+  if (!SUG.length) { box.innerHTML = ''; return; }
+  const porRubro = {};
+  SUG.forEach((t,i)=>{ (porRubro[t.rubro] = porRubro[t.rubro] || []).push(i); });
+  box.innerHTML = '<div style="font-size:13px;font-weight:700;margin-bottom:6px">Tiendas parecidas a tus marcas <span style="font-weight:400;color:var(--mute)">(si querés tenerlas siempre en la lista)</span></div>' +
+    Object.entries(porRubro).map(([r, idx]) => `<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px">
+      <span style="color:var(--mute);font-size:12px;min-width:150px">${esc(r)}</span>
+      ${idx.map(i=>`<button class="btn" style="padding:4px 10px;font-size:13px" onclick="agregarSug([${i}])">+ ${esc(SUG[i].tienda)}</button>`).join('')}
+    </div>`).join('') +
+    `<button class="btn pri" style="padding:5px 12px;font-size:13px;margin-top:2px" onclick="agregarSug(SUG.map((_,i)=>i))">Agregar todas</button>
+     <span style="color:var(--mute);font-size:12px;margin-left:6px">Después tocá Guardar.</span>`;
+}
+function agregarSug(idx){
+  const ta = $('#aTiendas');
+  const extra = idx.map(i=>SUG[i].base);
+  ta.value = (ta.value.trim() ? ta.value.trim() + '\n' : '') + extra.join('\n');
+  pintarSug(SUG.filter((_,i)=>!idx.includes(i)));
 }
 async function eqCalzado(){
   const v = $('#tVal').value.trim();
@@ -806,6 +841,7 @@ async function guardarAjustes(){
   const body = {horas:Number($('#aHoras').value),
     evento:{activo:$('#aEvento').checked, hasta},
     talles:{calzado:{sistema:$('#tSis').value, valor:$('#tVal').value.trim().replace(',','.')}, ropa_sup:$('#tSup').value, ropa_inf:$('#tInf').value.trim().toUpperCase()},
+    comparar_auto:$('#aAuto').checked,
     tiendas_comparar:$('#aTiendas').value.split('\n').map(s=>s.trim()).filter(Boolean)};
   const j = await api('/api/ajustes',{method:'POST',body}).catch(e=>({ok:false,mensaje:e.message}));
   $('#aMsg').textContent = j.ok ? '' : j.mensaje;
@@ -858,7 +894,7 @@ function pintarDetalle(){
     </div></div>
     <div class="blk"><h4>Historial de precio</h4>${grafico(p.historial, precio)}</div>
     ${talles?`<div class="blk"><h4>Talles</h4><div class="tl">${talles}</div><div class="h" style="font-size:12px;color:var(--mute)">Tachado: sin stock. Remarcado: tu talle.${mt?'':' Configurá tus talles en Ajustes ⚙.'}</div></div>`:''}
-    <div class="blk"><h4>Comparar en otras tiendas</h4><div id="dCmp">${p.ref?`<button class="btn" onclick="compararAhora()">🔎 Buscar ${esc(p.ref)} en otras tiendas</button>`:'<span style="color:var(--mute)">Este producto no tiene código de modelo para comparar.</span>'}</div></div>
+    <div class="blk"><h4>Comparar en otras tiendas</h4><div id="dCmp"><button class="btn" onclick="compararAhora()">🔎 Buscar ${p.ref?esc(p.ref)+' ':'este producto '}en otras tiendas</button></div></div>
     <div class="blk"><h4>Seguir este producto</h4><div id="dSeg">${segHtml()}</div></div>
     <div class="blk"><h4>Compartir</h4><div class="row2">
       <button class="btn" onclick="compartir('wa')">WhatsApp</button><button class="btn" onclick="compartir('copiar')">Copiar texto</button>
@@ -885,19 +921,19 @@ async function dejarDeSeguir(id){ await api('/api/dejar_de_seguir',{method:'POST
 async function compararAhora(){
   $('#dCmp').innerHTML = '<span style="color:var(--mute)">Buscando en otras tiendas… (puede tardar unos segundos)</span>';
   try {
-    const {filas} = await api('/api/comparar',{method:'POST',body:{ref:D.ref, tienda:D.tienda}});
+    const {filas} = await api('/api/comparar',{method:'POST',body:{ref:D.ref, tienda:D.tienda, pid:D.pid, link:D.link}});
     const yo = precioDe(D);
     const ok = filas.filter(f=>f.estado==='ok');
     const mejor = ok.find(f=>f.disponible);
     let h = `<table class="cmp"><tr><td class="n">Esta tienda</td><td>${pesos(yo)}</td><td>${D.mi_talle?(D.mi_talle.disponible?'✓ tu talle':'✗ sin tu talle'):''}</td><td></td></tr>`;
     for (const f of ok) {
       const dif = f.precio - yo;
-      h += `<tr class="${f===mejor && f.precio<yo?'mejor':''}"><td class="n">${esc(f.tienda)}</td><td>${pesos(f.precio)} <span style="color:${dif<0?'var(--ok)':'var(--mute)'};font-size:12px">${dif<0?'('+pesos(-dif)+' menos)':dif>0?'(+'+pesos(dif)+')':''}</span></td>
+      h += `<tr class="${f===mejor && f.precio<yo?'mejor':''}"><td class="n">${esc(f.tienda)}${f.auto?' <span class="chip" title="Tienda parecida encontrada automáticamente">parecida</span>':''}</td><td>${pesos(f.precio)} <span style="color:${dif<0?'var(--ok)':'var(--mute)'};font-size:12px">${dif<0?'('+pesos(-dif)+' menos)':dif>0?'(+'+pesos(dif)+')':''}</span></td>
         <td>${f.mi_talle?(f.mi_talle.disponible?'✓ tu talle':'✗ sin tu talle'):(f.disponible?'Con stock':'Sin stock')}</td><td><a href="${esc(f.link)}" target="_blank" rel="noopener">Ver</a></td></tr>`;
     }
     h += '</table>';
     const no = filas.filter(f=>f.estado!=='ok').map(f=>f.tienda);
-    if (!ok.length) h = '<div style="color:var(--mute)">No lo encontré en otras tiendas.</div>';
+    if (!ok.length) h = '<div style="color:var(--mute)">No lo encontré en otras tiendas (busqué por código de modelo y de barras). Podés sumar más tiendas en Ajustes.</div>';
     if (no.length) h += `<div style="color:var(--mute);font-size:12px;margin-top:6px">Sin resultados en: ${esc(no.join(', '))}</div>`;
     $('#dCmp').innerHTML = h;
   } catch(e){ $('#dCmp').innerHTML = `<div class="alert">${esc(e.message)}</div>`; }

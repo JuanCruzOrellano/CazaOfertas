@@ -1,0 +1,216 @@
+{
+ "version": 1,
+ "nota": "Tiendas VTEX que CazaOfertas usa para buscar tiendas parecidas. Se puede editar en GitHub y le llega a todos.",
+ "tiendas": [
+  {
+   "base": "https://www.grid.com.ar",
+   "nombre": "Grid",
+   "rubro": "deportes"
+  },
+  {
+   "base": "https://www.dexter.com.ar",
+   "nombre": "Dexter",
+   "rubro": "deportes"
+  },
+  {
+   "base": "https://www.moov.com.ar",
+   "nombre": "Moov",
+   "rubro": "deportes"
+  },
+  {
+   "base": "https://www.stockcenter.com.ar",
+   "nombre": "Stock Center",
+   "rubro": "deportes"
+  },
+  {
+   "base": "https://www.sporting.com.ar",
+   "nombre": "Sporting",
+   "rubro": "deportes"
+  },
+  {
+   "base": "https://www.newsport.com.ar",
+   "nombre": "Newsport",
+   "rubro": "deportes"
+  },
+  {
+   "base": "https://www.solodeportes.com.ar",
+   "nombre": "Solo Deportes",
+   "rubro": "deportes"
+  },
+  {
+   "base": "https://www.nike.com.ar",
+   "nombre": "Nike",
+   "rubro": "deportes"
+  },
+  {
+   "base": "https://www.topper.com.ar",
+   "nombre": "Topper",
+   "rubro": "deportes"
+  },
+  {
+   "base": "https://tienda.fila.com.ar",
+   "nombre": "Fila",
+   "rubro": "deportes"
+  },
+  {
+   "base": "https://www.asics.com.ar",
+   "nombre": "Asics",
+   "rubro": "deportes"
+  },
+  {
+   "base": "https://www.newbalance.com.ar",
+   "nombre": "New Balance",
+   "rubro": "deportes"
+  },
+  {
+   "base": "https://www.rickysarkany.com",
+   "nombre": "Ricky Sarkany",
+   "rubro": "calzado"
+  },
+  {
+   "base": "https://www.viamo.com",
+   "nombre": "Viamo",
+   "rubro": "calzado"
+  },
+  {
+   "base": "https://www.febo.com.ar",
+   "nombre": "Febo",
+   "rubro": "calzado"
+  },
+  {
+   "base": "https://www.johnlcook.com.ar",
+   "nombre": "John L. Cook",
+   "rubro": "calzado"
+  },
+  {
+   "base": "https://www.mimo.com.ar",
+   "nombre": "Mimo",
+   "rubro": "moda"
+  },
+  {
+   "base": "https://www.ayres.com.ar",
+   "nombre": "Ayres",
+   "rubro": "moda"
+  },
+  {
+   "base": "https://www.legacy.com.ar",
+   "nombre": "Legacy",
+   "rubro": "moda"
+  },
+  {
+   "base": "https://www.juleriaque.com.ar",
+   "nombre": "Juleriaque",
+   "rubro": "belleza"
+  },
+  {
+   "base": "https://www.perfumeriasrouge.com",
+   "nombre": "Rouge",
+   "rubro": "belleza"
+  },
+  {
+   "base": "https://www.simplicity.com.ar",
+   "nombre": "Simplicity",
+   "rubro": "belleza"
+  },
+  {
+   "base": "https://www.farmacity.com",
+   "nombre": "Farmacity",
+   "rubro": "farmacia"
+  },
+  {
+   "base": "https://www.farmaonline.com",
+   "nombre": "Farmaonline",
+   "rubro": "farmacia"
+  },
+  {
+   "base": "https://www.pigmento.com.ar",
+   "nombre": "Pigmento",
+   "rubro": "belleza"
+  },
+  {
+   "base": "https://www.fravega.com",
+   "nombre": "Frávega",
+   "rubro": "electro"
+  },
+  {
+   "base": "https://www.oncity.com",
+   "nombre": "On City",
+   "rubro": "electro"
+  },
+  {
+   "base": "https://www.naldo.com.ar",
+   "nombre": "Naldo",
+   "rubro": "electro"
+  },
+  {
+   "base": "https://www.megatone.net",
+   "nombre": "Megatone",
+   "rubro": "electro"
+  },
+  {
+   "base": "https://www.cetrogar.com.ar",
+   "nombre": "Cetrogar",
+   "rubro": "electro"
+  },
+  {
+   "base": "https://www.whirlpool.com.ar",
+   "nombre": "Whirlpool",
+   "rubro": "electro"
+  },
+  {
+   "base": "https://www.garbarino.com",
+   "nombre": "Garbarino",
+   "rubro": "electro"
+  },
+  {
+   "base": "https://www.easy.com.ar",
+   "nombre": "Easy",
+   "rubro": "hogar"
+  },
+  {
+   "base": "https://www.blaisten.com.ar",
+   "nombre": "Blaisten",
+   "rubro": "hogar"
+  },
+  {
+   "base": "https://www.puppis.com.ar",
+   "nombre": "Puppis",
+   "rubro": "mascotas"
+  },
+  {
+   "base": "https://www.cebra.com.ar",
+   "nombre": "Cebra",
+   "rubro": "juguetes"
+  },
+  {
+   "base": "https://www.carrefour.com.ar",
+   "nombre": "Carrefour",
+   "rubro": "general"
+  },
+  {
+   "base": "https://www.jumbo.com.ar",
+   "nombre": "Jumbo",
+   "rubro": "general"
+  },
+  {
+   "base": "https://www.masonline.com.ar",
+   "nombre": "Más Online",
+   "rubro": "general"
+  },
+  {
+   "base": "https://www.disco.com.ar",
+   "nombre": "Disco",
+   "rubro": "super"
+  },
+  {
+   "base": "https://www.vea.com.ar",
+   "nombre": "Vea",
+   "rubro": "super"
+  },
+  {
+   "base": "https://diaonline.supermercadosdia.com.ar",
+   "nombre": "Día",
+   "rubro": "super"
+  }
+ ]
+}

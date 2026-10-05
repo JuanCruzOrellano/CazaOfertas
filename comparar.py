@@ -1,4 +1,5 @@
-"""Busca el mismo producto (por su código de modelo) en otras tiendas VTEX."""
+"""Busca el mismo producto en otras tiendas VTEX: por su código de modelo o por su
+código de barras (EAN), que es igual en todas las tiendas y sirve para cualquier rubro."""
 import time
 from concurrent.futures import ThreadPoolExecutor
 
@@ -21,23 +22,34 @@ TIENDAS_DEFECTO = [
 _cache = {}  # (tienda, codigo) -> (ts, resultado)
 
 
+NOMBRES = {"perfumeriasrouge": "Rouge", "stockcenter": "Stock Center", "solodeportes": "Solo Deportes",
+           "newsport": "Newsport", "masonline": "Más Online", "oncity": "On City", "fravega": "Frávega"}
+
+
 def nombre_tienda(base):
+    clave = base.split("://")[-1].replace("www.", "").split(".")[0].lower()
+    if clave in NOMBRES:
+        return NOMBRES[clave]
     return base.split("://")[-1].replace("www.", "").split(".")[0].capitalize()
 
 
-def comparar(codigo, tiendas, cfg, excluir=None):
-    """Devuelve una fila por tienda: precio, si está tu talle, link… ordenado de más barato a más caro."""
+def comparar(codigo, tiendas, cfg, excluir=None, eans=None):
+    """Devuelve una fila por tienda: precio, si está tu talle, link… ordenado de más barato a más caro.
+    Busca por código de modelo y, si no aparece, por código de barras."""
     codigo = (codigo or "").strip()
-    if len(codigo) < 4:
+    eans = [e for e in (eans or []) if e]
+    if len(codigo) < 4 and not eans:
         return []
 
     def una(base):
-        clave = (base, codigo.lower())
+        clave = (base, codigo.lower(), tuple(eans[:4]))
         if clave in _cache and time.time() - _cache[clave][0] < 1800:
             return _cache[clave][1]
         fila = {"tienda": nombre_tienda(base), "base": base}
         try:
-            encontrados = stores.Vtex.buscar_codigo(base, codigo)
+            encontrados = stores.Vtex.buscar_codigo(base, codigo) if len(codigo) >= 4 else []
+            if not encontrados and eans:
+                encontrados = stores.Vtex.buscar_ean(base, eans)
             if not encontrados:
                 fila["estado"] = "no_esta"
             else:

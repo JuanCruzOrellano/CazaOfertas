@@ -24,6 +24,7 @@ import comparar  # noqa: E402
 import talles  # noqa: E402
 import telegram  # noqa: E402
 import ventana  # noqa: E402
+import parecidas  # noqa: E402
 from version import APP_VERSION  # noqa: E402
 
 PUERTO = int(os.environ.get("CAZAOFERTAS_PUERTO", "8767"))
@@ -92,7 +93,8 @@ def ajustes():
             "sistemas": talles.SISTEMAS_CALZADO,
             "telegram": {"conectado": bool(tg.get("chat_id")), "nombre": tg.get("nombre"),
                          "bot": tg.get("bot"), "activo": tg.get("activo", True)},
-            "tiendas_comparar": db.get_setting("tiendas_comparar") or comparar.TIENDAS_DEFECTO}
+            "tiendas_comparar": db.get_setting("tiendas_comparar") or comparar.TIENDAS_DEFECTO,
+            "comparar_auto": db.get_setting("comparar_auto", True)}
 
 
 def detalle_producto(q):
@@ -119,6 +121,43 @@ def detalle_producto(q):
     d["seguido"] = {"id": s["id"], "objetivo": s["objetivo"]} if s else None
     d["tiene_telegram"] = bool((db.get_setting("telegram") or {}).get("chat_id"))
     return d
+
+
+def eans_de(tienda, pid, link=None):
+    """Códigos de barras de un producto (se consultan a su tienda en el momento)."""
+    if not tienda or not pid:
+        return []
+    plat = next((m["platform"] for m in db.marcas() if m["base_url"].rstrip("/") == tienda.rstrip("/")), None)
+    if not plat:
+        s = db.seguido(tienda, pid)
+        plat = s["platform"] if s else "vtex"
+    try:
+        if plat == "shopify":
+            it = stores.Shopify.por_id(tienda, pid, link=link)
+        else:
+            it = stores.Vtex.por_id(tienda, pid)
+        return (it or {}).get("eans") or []
+    except Exception:  # noqa: BLE001
+        return []
+
+
+def plataforma_de(tienda):
+    m = next((m for m in db.marcas() if m["base_url"].rstrip("/") == (tienda or "").rstrip("/")), None)
+    return m["platform"] if m else "vtex"
+
+
+def sugeridas():
+    """Tiendas parecidas a tus marcas que todavía no están en tu lista para comparar."""
+    actuales = {t.rstrip("/") for t in (db.get_setting("tiendas_comparar") or comparar.TIENDAS_DEFECTO)}
+    actuales |= {m["base_url"].rstrip("/") for m in db.marcas()}
+    out = {}
+    for m in db.marcas():
+        for t in parecidas.similares(m["base_url"], m["platform"]):
+            b = t["base"].rstrip("/")
+            if b not in actuales and b not in out:
+                out[b] = {"base": t["base"], "tienda": t.get("nombre") or comparar.nombre_tienda(t["base"]),
+                          "rubro": f"Parecidas a {m['name']}"}
+    return list(out.values())
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -169,6 +208,8 @@ class Handler(BaseHTTPRequestHandler):
                 actualizador.buscar_en_fondo(si_pasaron=10 * 60)
                 self._json({**actualizador.estado, "es_exe": actualizador.es_exe(),
                             "pagina": actualizador.PAGINA})
+            elif ruta == "/api/sugerir_tiendas":
+                self._json({"sugeridas": sugeridas(), "auto": db.get_setting("comparar_auto", True)})
             elif ruta == "/api/ping":
                 ultimo_ping[0] = time.time()
                 self._json({"ok": True, "app": "cazaofertas", "version": VERSION, "app_version": APP_VERSION})
@@ -217,6 +258,7 @@ class Handler(BaseHTTPRequestHandler):
                     return self._json({"error": "Poné un precio máximo."}, 400)
                 bid, _ = db.guardar_marca(d)
                 revisar_en_fondo(bid)
+                parecidas.precalentar([db.marca(bid)])
                 self._json({"id": bid})
             elif ruta.startswith("/api/marca/") and ruta.endswith("/tipos"):
                 db.ocultar_tipos(int(ruta.split("/")[3]), list(d.get("ocultos") or []))
@@ -232,6 +274,8 @@ class Handler(BaseHTTPRequestHandler):
                 if "talles" in d:
                     db.set_setting("talles", d["talles"] or {})
                     db.recalcular_todo()
+                if "comparar_auto" in d:
+                    db.set_setting("comparar_auto", bool(d["comparar_auto"]))
                 if "tiendas_comparar" in d:
                     lista = [stores.normalizar_url(u) for u in d["tiendas_comparar"] if str(u).strip()]
                     db.set_setting("tiendas_comparar", lista)
@@ -261,8 +305,19 @@ class Handler(BaseHTTPRequestHandler):
                 tiendas = db.get_setting("tiendas_comparar") or comparar.TIENDAS_DEFECTO
                 tiendas = list(dict.fromkeys(tiendas + [m["base_url"] for m in db.marcas()
                                                         if m["platform"] == "vtex"]))
-                filas = comparar.comparar(d.get("ref"), tiendas, db.cfg_talles(), excluir=d.get("tienda"))
-                self._json({"filas": filas})
+                auto = {}
+                if db.get_setting("comparar_auto", True) and d.get("tienda"):
+                    # Tiendas que venden cosas parecidas, aunque no estén agregadas
+                    auto = {t["base"]: t for t in parecidas.similares(d["tienda"], plataforma_de(d["tienda"]))}
+                    tiendas = list(dict.fromkeys(tiendas + list(auto)))
+                eans = d.get("eans") or eans_de(d.get("tienda"), d.get("pid"), d.get("link"))
+                filas = comparar.comparar(d.get("ref"), tiendas, db.cfg_talles(), excluir=d.get("tienda"),
+                                          eans=eans)
+                for f in filas:
+                    if f["base"] in auto:
+                        f["tienda"] = auto[f["base"]].get("nombre") or f["tienda"]
+                        f["auto"] = True
+                self._json({"filas": filas, "buscadas": len(tiendas)})
             elif ruta == "/api/seguir":
                 if d.get("link"):
                     base, it = stores.Vtex.por_link(d["link"])
@@ -443,6 +498,7 @@ def main():
     threading.Thread(target=vigilante, args=(server,), daemon=True).start()
     preparar_windows()
     actualizador.buscar_en_fondo()
+    parecidas.precalentar(db.marcas())
     if windows.ES_WINDOWS and actualizador.es_exe():
         threading.Thread(target=asegurar_accesos, daemon=True).start()
     hilo = threading.Thread(target=server.serve_forever, daemon=True)
