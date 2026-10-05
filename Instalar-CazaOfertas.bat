@@ -45,14 +45,14 @@ if errorlevel 1 (
 )
 
 echo   [3/4] Instalando componentes...
-"%PY%" -m pip install --user --upgrade --disable-pip-version-check -q -r "%APPDIR%\requirements.txt"
+for /f "usebackq eol=# delims=" %%R in ("%APPDIR%\requirements.txt") do "%PY%" -m pip install --user --upgrade --disable-pip-version-check -q %%R
 echo instalado> "%APPDIR%\.instalado"
 
 echo   [4/4] Creando el icono en el Escritorio...
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$w = New-Object -ComObject WScript.Shell; foreach ($d in @([Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('Programs'))) { try { $s = $w.CreateShortcut((Join-Path $d 'CazaOfertas.lnk')); $s.TargetPath = '%PYW%'; $s.Arguments = '\"%APPDIR%\app.py\"'; $s.WorkingDirectory = '%APPDIR%'; $s.IconLocation = '%APPDIR%\app.ico,0'; $s.Description = 'CazaOfertas'; $s.Save() } catch {} }"
+"%PY%" "%APPDIR%\app.py" --accesos
 
 echo.
-echo   Listo. CazaOfertas quedo instalada y tiene su icono en el Escritorio.
+echo   Listo. CazaOfertas quedo instalada.
 echo   Abriendo...
 start "" "%PYW%" "%APPDIR%\app.py"
 timeout /t 4 >nul

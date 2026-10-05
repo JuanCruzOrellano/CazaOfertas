@@ -1,4 +1,5 @@
-Versión 1.4.0
+## Novedades de la 1.5.0
 
-- Nueva forma de instalar, sin .exe propio: "Instalar-CazaOfertas.bat" instala Python oficial (si hace falta), la app y el ícono del águila en el Escritorio. Los antivirus (AVG, Avast, Defender) ya no la bloquean.
-- Las actualizaciones bajan solo el código de la app y se aplican solas.
+- **Ventana propia**: CazaOfertas ahora se abre en su propia ventana, con su nombre y su ícono. Ya no aparece Edge ni la barra del navegador.
+- **Ícono en el Escritorio**: el instalador ahora lo crea de otra forma (y si algo lo bloquea, te dice por qué). La app además lo vuelve a crear sola si falta.
+- Si abrís la app estando ya abierta, se trae al frente la ventana que ya tenías.

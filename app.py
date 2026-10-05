@@ -23,11 +23,12 @@ import actualizador  # noqa: E402
 import comparar  # noqa: E402
 import talles  # noqa: E402
 import telegram  # noqa: E402
+import ventana  # noqa: E402
 from version import APP_VERSION  # noqa: E402
 
 PUERTO = int(os.environ.get("CAZAOFERTAS_PUERTO", "8767"))
 URL = f"http://127.0.0.1:{PUERTO}/"
-VERSION = 20
+VERSION = 21
 # Si corre como .exe (PyInstaller), los archivos vienen empaquetados en sys._MEIPASS
 BASE = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
 WEB = os.path.join(BASE, "web")
@@ -290,7 +291,13 @@ class Handler(BaseHTTPRequestHandler):
                 self._json({**actualizador.estado, "es_exe": actualizador.es_exe()})
             elif ruta == "/api/salir":
                 self._json({"ok": True})
-                threading.Thread(target=self.server.shutdown, daemon=True).start()
+
+                def cerrar():
+                    time.sleep(0.3)
+                    os._exit(0)
+                threading.Thread(target=cerrar, daemon=True).start()
+            elif ruta == "/api/mostrar":
+                self._json({"ok": ventana.mostrar()})
             elif ruta == "/api/probar_aviso":
                 windows.notificar("CazaOfertas", "Así te vas a enterar cuando algo baje de precio.")
                 self._json({"ok": True})
@@ -369,14 +376,53 @@ def preparar_windows():
         threading.Thread(target=programacion, daemon=True).start()
 
 
+def mostrar_abierta():
+    """La app ya está abierta: trae su ventana al frente (o abre una de Edge si es la vieja)."""
+    try:
+        req = urllib.request.Request(URL + "api/mostrar", data=b"{}", method="POST")
+        with urllib.request.urlopen(req, timeout=3) as r:
+            if json.load(r).get("ok"):
+                return
+    except Exception:  # noqa: BLE001
+        pass
+    windows.abrir_ventana(URL)
+
+
+def asegurar_accesos():
+    """Crea el ícono del Escritorio y del menú Inicio una vez por versión."""
+    marca = os.path.join(core.DATA_DIR, "accesos.txt")
+    try:
+        if open(marca).read().strip() == APP_VERSION:
+            return
+    except OSError:
+        pass
+    r = windows.crear_accesos(actualizador.CARPETA)
+    if r.get("escritorio"):
+        try:
+            with open(marca, "w") as f:
+                f.write(APP_VERSION)
+        except OSError:
+            pass
+
+
 def main():
     if "--revisar" in sys.argv:
         windows.copiar_logo(os.path.join(WEB, "logo.png"), core.DATA_DIR)
         modo_revisar()
         return
-    reinicio = "--sin-ventana" in sys.argv  # la abre la versión anterior al actualizarse
+    if "--accesos" in sys.argv:  # lo usa el instalador
+        r = windows.crear_accesos(actualizador.CARPETA)
+        if r.get("escritorio"):
+            print("   Icono creado en el Escritorio:", r["escritorio"])
+        else:
+            print("   No se pudo poner el icono en el Escritorio.")
+            print("   Motivo:", r.get("error") or "desconocido")
+            print("   Igual la encontras en el menu Inicio buscando 'CazaOfertas'.")
+        return
+    # --reinicio: la abre la versión anterior al actualizarse (toma su lugar)
+    reinicio = "--sin-ventana" in sys.argv or "--reinicio" in sys.argv
     if not reinicio and ya_abierta():
-        windows.abrir_ventana(URL)
+        mostrar_abierta()
         return
     server = None
     for _ in range(40 if reinicio else 1):
@@ -393,11 +439,23 @@ def main():
     threading.Thread(target=vigilante, args=(server,), daemon=True).start()
     preparar_windows()
     actualizador.buscar_en_fondo()
-    if "--sin-ventana" not in sys.argv:
-        windows.abrir_ventana(URL)
+    if windows.ES_WINDOWS and actualizador.es_exe():
+        threading.Thread(target=asegurar_accesos, daemon=True).start()
+    hilo = threading.Thread(target=server.serve_forever, daemon=True)
+    hilo.start()
     print(f"CazaOfertas abierto en {URL}")
+
+    con_ventana = "--sin-ventana" not in sys.argv
+    if "--reinicio" in sys.argv and not ventana.disponible():
+        con_ventana = False  # la ventana de Edge de la versión anterior se recarga sola
+    if con_ventana:
+        ico = os.path.join(actualizador.CARPETA, "app.ico")
+        if ventana.abrir(URL, ico=ico, datos=core.DATA_DIR):
+            os._exit(0)  # se cerró la ventana: se cierra la app
+        windows.abrir_ventana(URL)  # sin ventana propia: modo app de Edge
     try:
-        server.serve_forever()
+        while hilo.is_alive():
+            hilo.join(1)
     except KeyboardInterrupt:
         pass
 

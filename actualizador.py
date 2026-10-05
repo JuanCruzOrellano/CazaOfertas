@@ -1,8 +1,8 @@
 """Actualización automática desde GitHub Releases.
 
 Al abrir la app se consulta la última versión publicada. Si es más nueva, la interfaz
-muestra un aviso; al aceptar se descarga el .exe nuevo, se reemplaza el actual y se
-vuelve a abrir.
+muestra un aviso; al aceptar se descarga el .zip con el código nuevo, se copia encima
+y la app se vuelve a abrir.
 """
 import json
 import os
@@ -116,13 +116,17 @@ def actualizar(salir):
             req = os.path.join(CARPETA, "requirements.txt")
             if os.path.exists(req):
                 py = sys.executable.replace("pythonw.exe", "python.exe")
-                subprocess.run([py, "-m", "pip", "install", "--user", "--upgrade", "-q",
-                                "--disable-pip-version-check", "-r", req],
-                               creationflags=sin_ventana, capture_output=True, timeout=300)
+                # De a uno: si un componente opcional falla, los demás se instalan igual
+                for linea in open(req, encoding="utf-8").read().split("\n"):
+                    linea = linea.split("#")[0].strip()
+                    if linea:
+                        subprocess.run([py, "-m", "pip", "install", "--user", "--upgrade", "-q",
+                                        "--disable-pip-version-check", linea],
+                                       creationflags=sin_ventana, capture_output=True, timeout=300)
             estado["progreso"] = 100
-            # La app nueva cierra a esta (tiene otro número de versión) y toma su lugar;
-            # la ventana abierta se recarga sola.
-            subprocess.Popen([sys.executable, os.path.join(CARPETA, "app.py"), "--sin-ventana"],
+            # La app nueva cierra a esta (tiene otro número de versión), toma su lugar
+            # y abre su ventana.
+            subprocess.Popen([sys.executable, os.path.join(CARPETA, "app.py"), "--reinicio"],
                              cwd=CARPETA, close_fds=True, creationflags=sin_ventana)
             salir()
         except Exception as e:  # noqa: BLE001

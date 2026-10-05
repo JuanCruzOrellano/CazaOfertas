@@ -168,71 +168,104 @@ def abrir_ventana(url):
     webbrowser.open(url)
 
 
-# ------------------------------------------------------------- instalación
-CARPETA_APP = os.path.join(os.environ.get("LOCALAPPDATA") or os.path.expanduser("~"), "Programs", "CazaOfertas")
-EXE_INSTALADO = os.path.join(CARPETA_APP, "CazaOfertas.exe")
+# ------------------------------------------------------------- accesos directos
+_PS_ACCESO = r"""
+param([string]$Lnk, [string]$Exe, [string]$App, [string]$Dir, [string]$Ico)
+$ErrorActionPreference = 'Stop'
+$w = New-Object -ComObject WScript.Shell
+$s = $w.CreateShortcut($Lnk)
+$s.TargetPath = $Exe
+$s.Arguments = '"' + $App + '"'
+$s.WorkingDirectory = $Dir
+if (Test-Path $Ico) { $s.IconLocation = $Ico + ',0' }
+$s.Description = 'CazaOfertas'
+$s.Save()
+Write-Output ('ESCRITORIO=' + [Environment]::GetFolderPath('Desktop'))
+Write-Output ('PROGRAMAS=' + [Environment]::GetFolderPath('Programs'))
+"""
 
 
-def _ver(v):
+def _carpeta_escritorio():
+    """Escritorio real del usuario (puede estar dentro de OneDrive, ej. OneDrive\\Escritorio)."""
     try:
-        return tuple(int(x) for x in str(v).split("-")[0].split("."))
-    except ValueError:
-        return (0,)
-
-
-def crear_accesos(destino):
-    """Acceso directo en el Escritorio y en el menú Inicio (con PowerShell, que el
-    antivirus deja escribir en el Escritorio aunque esté en OneDrive)."""
-    ps = (
-        "$w = New-Object -ComObject WScript.Shell;"
-        "foreach ($d in @([Environment]::GetFolderPath('Desktop'), "
-        "(Join-Path ([Environment]::GetFolderPath('Programs')) '')) ) {"
-        "  try { $s = $w.CreateShortcut((Join-Path $d 'CazaOfertas.lnk'));"
-        f"    $s.TargetPath = '{destino}'; $s.WorkingDirectory = '{CARPETA_APP}';"
-        f"    $s.IconLocation = '{destino},0'; $s.Description = 'CazaOfertas'; $s.Save() }} catch {{}} }}"
-    )
-    try:
-        subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", ps],
-                       creationflags=SIN_VENTANA, timeout=30, capture_output=True, env=entorno_limpio())
+        import ctypes
+        from ctypes import wintypes
+        guid = (ctypes.c_ubyte * 16)(*bytes.fromhex("3ACCBFB42CDB4C42B0297FE99A87C641"))  # FOLDERID_Desktop
+        ruta = ctypes.c_wchar_p()
+        if ctypes.windll.shell32.SHGetKnownFolderPath(guid, 0, None, ctypes.byref(ruta)) == 0:
+            r = ruta.value
+            ctypes.windll.ole32.CoTaskMemFree(ruta)
+            return r
     except Exception:  # noqa: BLE001
         pass
+    for c in (os.path.join(os.environ.get("OneDrive", ""), "Escritorio"),
+              os.path.join(os.environ.get("OneDrive", ""), "Desktop"),
+              os.path.join(os.path.expanduser("~"), "Desktop")):
+        if os.path.isdir(c):
+            return c
+    return None
 
 
-def instalar(version):
-    """Si el .exe se abrió desde otro lado (Descargas, Escritorio, OneDrive…), se copia a
-    %LOCALAPPDATA%\\Programs\\CazaOfertas, crea el acceso directo en el Escritorio y abre esa
-    copia. Ahí las actualizaciones automáticas pueden reemplazarlo sin problemas.
+def crear_accesos(carpeta_app):
+    """Ícono de CazaOfertas en el Escritorio y en el menú Inicio.
 
-    Devuelve True si abrió la copia instalada (y esta instancia tiene que cerrarse)."""
-    if not ES_WINDOWS or not getattr(sys, "frozen", False) or "--no-instalar" in sys.argv:
-        return False
-    actual = os.path.abspath(sys.executable)
-    if os.path.normcase(actual) == os.path.normcase(EXE_INSTALADO):
-        # Ya es la instalada: asegurar el acceso directo una sola vez por versión
-        marca = os.path.join(CARPETA_APP, "accesos.txt")
-        if not os.path.exists(marca) or open(marca).read().strip() != version:
-            crear_accesos(EXE_INSTALADO)
+    El acceso se arma primero en la carpeta temporal (ahí nadie bloquea) y después se
+    copia: así, si el antivirus no deja que PowerShell escriba en el Escritorio, lo
+    intenta Python y después cmd. Devuelve {"escritorio": ruta o None, "error": texto}.
+    """
+    res = {"escritorio": None, "inicio": None, "error": None}
+    if not ES_WINDOWS:
+        res["error"] = "Solo en Windows"
+        return res
+    import tempfile
+    tmp = tempfile.mkdtemp(prefix="cazaofertas-")
+    lnk = os.path.join(tmp, "CazaOfertas.lnk")
+    ps1 = os.path.join(tmp, "acceso.ps1")
+    with open(ps1, "w", encoding="utf-8-sig") as f:
+        f.write(_PS_ACCESO)
+    salida = ""
+    try:
+        r = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
+                            "-File", ps1, "-Lnk", lnk, "-Exe", _pythonw(),
+                            "-App", os.path.join(carpeta_app, "app.py"), "-Dir", carpeta_app,
+                            "-Ico", os.path.join(carpeta_app, "app.ico")],
+                           capture_output=True, text=True, timeout=60,
+                           creationflags=SIN_VENTANA, env=entorno_limpio())
+        salida = r.stdout or ""
+        if not os.path.exists(lnk):
+            res["error"] = (r.stderr or "PowerShell no pudo crear el acceso").strip()[:300]
+            return res
+    except Exception as e:  # noqa: BLE001
+        res["error"] = f"PowerShell: {e}"
+        return res
+    rutas = dict(l.strip().split("=", 1) for l in salida.splitlines() if "=" in l)
+    escritorio = rutas.get("ESCRITORIO") or _carpeta_escritorio()
+    programas = rutas.get("PROGRAMAS") or os.path.join(
+        os.environ.get("APPDATA", ""), "Microsoft", "Windows", "Start Menu", "Programs")
+
+    def copiar(destino_dir):
+        if not destino_dir or not os.path.isdir(destino_dir):
+            return None, f"No existe la carpeta {destino_dir}"
+        dest = os.path.join(destino_dir, "CazaOfertas.lnk")
+        errores = []
+        try:
+            shutil.copyfile(lnk, dest)
+        except OSError as e:
+            errores.append(f"Python: {e}")
+        if not os.path.exists(dest):
             try:
-                with open(marca, "w") as f:
-                    f.write(version)
-            except OSError:
-                pass
-        return False
+                subprocess.run(["cmd", "/c", "copy", "/y", lnk, dest], capture_output=True,
+                               timeout=30, creationflags=SIN_VENTANA)
+            except Exception as e:  # noqa: BLE001
+                errores.append(f"cmd: {e}")
+        if os.path.exists(dest):
+            return dest, None
+        return None, "; ".join(errores) or "Windows no dejó guardar el archivo (¿antivirus?)"
+
+    res["inicio"], _ = copiar(programas)
+    res["escritorio"], res["error"] = copiar(escritorio)
     try:
-        os.makedirs(CARPETA_APP, exist_ok=True)
-        vfile = os.path.join(CARPETA_APP, "version.txt")
-        instalada = open(vfile).read().strip() if os.path.exists(vfile) else "0"
-        if not os.path.exists(EXE_INSTALADO) or _ver(version) >= _ver(instalada):
-            shutil.copy2(actual, EXE_INSTALADO)
-            with open(vfile, "w") as f:
-                f.write(version)
-    except OSError:
-        if not os.path.exists(EXE_INSTALADO):
-            return False  # no se pudo instalar: sigue funcionando desde donde está
-    crear_accesos(EXE_INSTALADO)
-    try:
-        subprocess.Popen([EXE_INSTALADO, *[a for a in sys.argv[1:] if a != "--no-instalar"]],
-                         env=entorno_limpio(), close_fds=True)
-        return True
-    except OSError:
-        return False
+        shutil.rmtree(tmp, ignore_errors=True)
+    except Exception:  # noqa: BLE001
+        pass
+    return res
