@@ -415,9 +415,13 @@ def main():
         if r.get("escritorio"):
             print("   Icono creado en el Escritorio:", r["escritorio"])
         else:
-            print("   No se pudo poner el icono en el Escritorio.")
-            print("   Motivo:", r.get("error") or "desconocido")
-            print("   Igual la encontras en el menu Inicio buscando 'CazaOfertas'.")
+            print("   Windows no deja que los programas guarden cosas en tu Escritorio")
+            print("   (lo protege el antivirus o 'Acceso controlado a carpetas').")
+            print("   Se abrio una carpeta con el icono 'CazaOfertas':")
+            print("   ARRASTRALO AL ESCRITORIO para tener el acceso directo.")
+            if r.get("en_carpeta"):
+                import subprocess
+                subprocess.Popen(["explorer", "/select,", r["en_carpeta"]])
         return
     # --reinicio: la abre la versión anterior al actualizarse (toma su lugar)
     reinicio = "--sin-ventana" in sys.argv or "--reinicio" in sys.argv

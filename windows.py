@@ -264,6 +264,7 @@ def crear_accesos(carpeta_app):
 
     res["inicio"], _ = copiar(programas)
     res["escritorio"], res["error"] = copiar(escritorio)
+    res["en_carpeta"], _ = copiar(carpeta_app)  # siempre queda uno junto a la app
     try:
         shutil.rmtree(tmp, ignore_errors=True)
     except Exception:  # noqa: BLE001
