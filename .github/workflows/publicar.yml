@@ -1,5 +1,5 @@
-# Arma CazaOfertas.exe en una compu con Windows y lo publica como "release".
-# Se dispara al subir una etiqueta de versión, por ejemplo v1.0.1.
+# Arma CazaOfertas en una compu con Windows, crea el instalador y lo publica como "release".
+# Se dispara al subir una etiqueta de versión, por ejemplo v1.3.0.
 name: Publicar versión
 
 on:
@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 jobs:
-  exe:
+  instalador:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,22 +21,31 @@ jobs:
           python-version: "3.12"
 
       - name: Instalar herramientas
-        run: python -m pip install --upgrade pip pyinstaller curl_cffi pillow
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip wheel setuptools
+          # PyInstaller con el "arrancador" compilado acá: los antivirus lo conocen menos
+          # y desconfían menos que del que viene armado de fábrica.
+          $env:PYINSTALLER_COMPILE_BOOTLOADER = "1"
+          python -m pip install --no-binary pyinstaller pyinstaller
+          if ($LASTEXITCODE -ne 0) { python -m pip install pyinstaller }
+          python -m pip install curl_cffi pillow
 
       - name: Poner el número de versión
         shell: bash
         run: |
           TAG="${GITHUB_REF_NAME}"
-          [[ "$TAG" == v* ]] || TAG="v0.0.0-dev"
+          [[ "$TAG" == v* ]] || TAG="v0.0.0"
           echo "APP_VERSION = \"${TAG#v}\"" > version.py
+          echo "APP_VERSION=${TAG#v}" >> "$GITHUB_ENV"
           cat version.py
 
       - name: Ícono desde el logo
         run: python -c "from PIL import Image; Image.open('web/logo.png').convert('RGBA').save('app.ico', sizes=[(16,16),(24,24),(32,32),(48,48),(64,64),(128,128),(256,256)])"
 
-      - name: Armar el .exe
+      - name: Armar la app (carpeta, no un solo .exe)
         run: >
-          pyinstaller --noconfirm --clean --onefile --noconsole
+          pyinstaller --noconfirm --clean --onedir --noconsole
           --name CazaOfertas --icon app.ico
           --add-data "web;web" --collect-all curl_cffi
           app.py
@@ -45,20 +54,38 @@ jobs:
         shell: pwsh
         run: |
           $env:CAZAOFERTAS_PUERTO = "8799"
-          $p = Start-Process -FilePath "dist\CazaOfertas.exe" -ArgumentList "--sin-ventana" -PassThru
+          $p = Start-Process -FilePath "dist\CazaOfertas\CazaOfertas.exe" -ArgumentList "--sin-ventana" -PassThru
           $ok = $false
           for ($i = 0; $i -lt 40; $i++) {
             Start-Sleep -Seconds 1
             try { $r = Invoke-RestMethod "http://127.0.0.1:8799/api/ping"; if ($r.app -eq "cazaofertas") { $ok = $true; break } } catch {}
           }
           Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
-          if (-not $ok) { throw "El .exe no respondió" }
+          if (-not $ok) { throw "La app no respondió" }
           Write-Host "OK: versión $($r.app_version)"
+
+      - name: Armar el instalador
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress | Out-Null }
+          & $iscc instalador.iss
+          if (-not (Test-Path "dist\CazaOfertas-Setup.exe")) { throw "No se armó el instalador" }
+
+      - name: Probar el instalador
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath "dist\CazaOfertas-Setup.exe" -ArgumentList "/VERYSILENT","/SUPPRESSMSGBOXES","/NORESTART","/SP-" -PassThru -Wait
+          $exe = Join-Path $env:LOCALAPPDATA "Programs\CazaOfertas\CazaOfertas.exe"
+          if (-not (Test-Path $exe)) { throw "El instalador no dejó la app instalada" }
+          Start-Sleep -Seconds 8
+          try { $r = Invoke-RestMethod "http://127.0.0.1:8767/api/ping"; Write-Host "Instalada y abierta: $($r.app_version)" } catch { Write-Host "Instalada (no se pudo comprobar que abrió)" }
+          Get-Process CazaOfertas -ErrorAction SilentlyContinue | Stop-Process -Force
 
       - name: Publicar
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/CazaOfertas.exe
+          files: dist/CazaOfertas-Setup.exe
           generate_release_notes: false
           body_path: NOVEDADES.md
