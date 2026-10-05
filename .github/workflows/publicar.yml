@@ -1,5 +1,5 @@
-# Arma CazaOfertas en una compu con Windows, crea el instalador y lo publica como "release".
-# Se dispara al subir una etiqueta de versión, por ejemplo v1.3.0.
+# Publica una versión de CazaOfertas: prueba la app, arma el .zip con el código y el
+# instalador (.bat) y los sube como "release". Sin .exe propio: así los antivirus no molestan.
 name: Publicar versión
 
 on:
@@ -11,9 +11,9 @@ permissions:
   contents: write
 
 jobs:
-  instalador:
+  publicar:
     runs-on: windows-latest
-    timeout-minutes: 40
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -22,15 +22,7 @@ jobs:
           python-version: "3.12"
 
       - name: Instalar herramientas
-        shell: pwsh
-        run: |
-          python -m pip install --upgrade pip wheel setuptools
-          # PyInstaller con el "arrancador" compilado acá: los antivirus lo conocen menos
-          # y desconfían menos que del que viene armado de fábrica.
-          $env:PYINSTALLER_COMPILE_BOOTLOADER = "1"
-          python -m pip install --no-binary pyinstaller pyinstaller
-          if ($LASTEXITCODE -ne 0) { python -m pip install pyinstaller }
-          python -m pip install curl_cffi pillow
+        run: python -m pip install -r requirements.txt pillow
 
       - name: Poner el número de versión
         shell: bash
@@ -38,26 +30,18 @@ jobs:
           TAG="${GITHUB_REF_NAME}"
           [[ "$TAG" == v* ]] || TAG="v0.0.0"
           echo "APP_VERSION = \"${TAG#v}\"" > version.py
-          echo "APP_VERSION=${TAG#v}" >> "$GITHUB_ENV"
           cat version.py
 
       - name: Ícono desde el logo
         run: python -c "from PIL import Image; Image.open('web/logo.png').convert('RGBA').save('app.ico', sizes=[(16,16),(24,24),(32,32),(48,48),(64,64),(128,128),(256,256)])"
 
-      - name: Armar la app (carpeta, no un solo .exe)
-        run: >
-          pyinstaller --noconfirm --clean --onedir --noconsole
-          --name CazaOfertas --icon app.ico
-          --add-data "web;web" --collect-all curl_cffi
-          app.py
-
       - name: Probar que arranca
         shell: pwsh
         run: |
           $env:CAZAOFERTAS_PUERTO = "8799"
-          $p = Start-Process -FilePath "dist\CazaOfertas\CazaOfertas.exe" -ArgumentList "--sin-ventana" -PassThru
+          $p = Start-Process -FilePath python -ArgumentList "app.py","--sin-ventana" -PassThru
           $ok = $false
-          for ($i = 0; $i -lt 40; $i++) {
+          for ($i = 0; $i -lt 30; $i++) {
             Start-Sleep -Seconds 1
             try { $r = Invoke-RestMethod "http://127.0.0.1:8799/api/ping"; if ($r.app -eq "cazaofertas") { $ok = $true; break } } catch {}
           }
@@ -65,30 +49,40 @@ jobs:
           if (-not $ok) { throw "La app no respondió" }
           Write-Host "OK: versión $($r.app_version)"
 
-      - name: Armar el instalador
+      - name: Armar el .zip de la app
         shell: pwsh
         run: |
-          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
-          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress | Out-Null }
-          & $iscc instalador.iss
-          if (-not (Test-Path "dist\CazaOfertas-Setup.exe")) { throw "No se armó el instalador" }
+          New-Item -ItemType Directory -Force dist, paquete | Out-Null
+          Copy-Item *.py, requirements.txt, app.ico -Destination paquete
+          Copy-Item web -Destination paquete -Recurse
+          Remove-Item paquete\publicar.ps1 -ErrorAction SilentlyContinue
+          Compress-Archive -Path paquete\* -DestinationPath dist\CazaOfertas-app.zip -Force
+          Copy-Item Instalar-CazaOfertas.bat dist\
+          Get-ChildItem dist
 
       - name: Probar el instalador
         shell: pwsh
         run: |
-          $p = Start-Process -FilePath "dist\CazaOfertas-Setup.exe" -ArgumentList "/VERYSILENT","/SUPPRESSMSGBOXES","/NORESTART","/SP-" -PassThru
-          # Esperar solo al instalador (con -Wait también esperaría a la app que abre al final)
-          if (-not $p.WaitForExit(300000)) { throw "El instalador tardó demasiado" }
-          $exe = Join-Path $env:LOCALAPPDATA "Programs\CazaOfertas\CazaOfertas.exe"
-          if (-not (Test-Path $exe)) { throw "El instalador no dejó la app instalada" }
-          Start-Sleep -Seconds 8
-          try { $r = Invoke-RestMethod "http://127.0.0.1:8767/api/ping"; Write-Host "Instalada y abierta: $($r.app_version)" } catch { Write-Host "Instalada (no se pudo comprobar que abrió)" }
-          Get-Process CazaOfertas -ErrorAction SilentlyContinue | Stop-Process -Force
+          $zip = (Resolve-Path dist\CazaOfertas-app.zip).Path
+          $p = Start-Process -FilePath cmd -ArgumentList "/c","dist\Instalar-CazaOfertas.bat","`"$zip`"" -PassThru -NoNewWindow
+          if (-not $p.WaitForExit(600000)) { throw "El instalador tardó demasiado" }
+          $app = Join-Path $env:LOCALAPPDATA "Programs\CazaOfertas\app.py"
+          if (-not (Test-Path $app)) { throw "El instalador no dejó la app instalada" }
+          $ok = $false
+          for ($i = 0; $i -lt 30; $i++) {
+            Start-Sleep -Seconds 1
+            try { $r = Invoke-RestMethod "http://127.0.0.1:8767/api/ping"; if ($r.app -eq "cazaofertas") { $ok = $true; break } } catch {}
+          }
+          Get-Process python, pythonw -ErrorAction SilentlyContinue | Stop-Process -Force
+          if (-not $ok) { throw "La app instalada no arrancó" }
+          Write-Host "Instalada y funcionando: $($r.app_version)"
 
       - name: Publicar
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/CazaOfertas-Setup.exe
+          files: |
+            dist/CazaOfertas-app.zip
+            dist/Instalar-CazaOfertas.bat
           generate_release_notes: false
           body_path: NOVEDADES.md
