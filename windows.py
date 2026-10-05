@@ -166,3 +166,73 @@ def abrir_ventana(url):
             if shutil.which(b) and _lanzar([b, f"--app={url}"]):
                 return
     webbrowser.open(url)
+
+
+# ------------------------------------------------------------- instalación
+CARPETA_APP = os.path.join(os.environ.get("LOCALAPPDATA") or os.path.expanduser("~"), "Programs", "CazaOfertas")
+EXE_INSTALADO = os.path.join(CARPETA_APP, "CazaOfertas.exe")
+
+
+def _ver(v):
+    try:
+        return tuple(int(x) for x in str(v).split("-")[0].split("."))
+    except ValueError:
+        return (0,)
+
+
+def crear_accesos(destino):
+    """Acceso directo en el Escritorio y en el menú Inicio (con PowerShell, que el
+    antivirus deja escribir en el Escritorio aunque esté en OneDrive)."""
+    ps = (
+        "$w = New-Object -ComObject WScript.Shell;"
+        "foreach ($d in @([Environment]::GetFolderPath('Desktop'), "
+        "(Join-Path ([Environment]::GetFolderPath('Programs')) '')) ) {"
+        "  try { $s = $w.CreateShortcut((Join-Path $d 'CazaOfertas.lnk'));"
+        f"    $s.TargetPath = '{destino}'; $s.WorkingDirectory = '{CARPETA_APP}';"
+        f"    $s.IconLocation = '{destino},0'; $s.Description = 'CazaOfertas'; $s.Save() }} catch {{}} }}"
+    )
+    try:
+        subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", ps],
+                       creationflags=SIN_VENTANA, timeout=30, capture_output=True, env=entorno_limpio())
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def instalar(version):
+    """Si el .exe se abrió desde otro lado (Descargas, Escritorio, OneDrive…), se copia a
+    %LOCALAPPDATA%\\Programs\\CazaOfertas, crea el acceso directo en el Escritorio y abre esa
+    copia. Ahí las actualizaciones automáticas pueden reemplazarlo sin problemas.
+
+    Devuelve True si abrió la copia instalada (y esta instancia tiene que cerrarse)."""
+    if not ES_WINDOWS or not getattr(sys, "frozen", False) or "--no-instalar" in sys.argv:
+        return False
+    actual = os.path.abspath(sys.executable)
+    if os.path.normcase(actual) == os.path.normcase(EXE_INSTALADO):
+        # Ya es la instalada: asegurar el acceso directo una sola vez por versión
+        marca = os.path.join(CARPETA_APP, "accesos.txt")
+        if not os.path.exists(marca) or open(marca).read().strip() != version:
+            crear_accesos(EXE_INSTALADO)
+            try:
+                with open(marca, "w") as f:
+                    f.write(version)
+            except OSError:
+                pass
+        return False
+    try:
+        os.makedirs(CARPETA_APP, exist_ok=True)
+        vfile = os.path.join(CARPETA_APP, "version.txt")
+        instalada = open(vfile).read().strip() if os.path.exists(vfile) else "0"
+        if not os.path.exists(EXE_INSTALADO) or _ver(version) >= _ver(instalada):
+            shutil.copy2(actual, EXE_INSTALADO)
+            with open(vfile, "w") as f:
+                f.write(version)
+    except OSError:
+        if not os.path.exists(EXE_INSTALADO):
+            return False  # no se pudo instalar: sigue funcionando desde donde está
+    crear_accesos(EXE_INSTALADO)
+    try:
+        subprocess.Popen([EXE_INSTALADO, *[a for a in sys.argv[1:] if a != "--no-instalar"]],
+                         env=entorno_limpio(), close_fds=True)
+        return True
+    except OSError:
+        return False

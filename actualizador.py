@@ -135,6 +135,7 @@ set /a N=N+1
 if %N% lss 120 goto copiar
 exit /b 1
 :listo
+echo {estado.get("nueva") or ""}> "{os.path.join(os.path.dirname(actual), "version.txt")}"
 start "" "{actual}" --sin-ventana
 (goto) 2>nul & rmdir /s /q "{carpeta}"
 """)
