@@ -108,11 +108,21 @@ def programar(horas, minutos=None):
     else:
         app = os.path.abspath(os.path.join(os.path.dirname(__file__), "app.py"))
         cmd = f'"{_pythonw()}" "{app}" --revisar'
-    frecuencia = ["/SC", "MINUTE", "/MO", str(int(minutos))] if minutos else ["/SC", "HOURLY", "/MO", str(int(horas))]
+    if minutos:
+        frecuencia = ["/SC", "MINUTE", "/MO", str(int(minutos))]
+    elif int(horas) >= 24:  # HOURLY solo acepta de 1 a 23
+        frecuencia = ["/SC", "DAILY", "/MO", str(max(1, int(horas) // 24))]
+    else:
+        frecuencia = ["/SC", "HOURLY", "/MO", str(int(horas))]
     r = subprocess.run(["schtasks", "/Create", "/F", "/TN", TAREA, *frecuencia, "/TR", cmd],
-                       capture_output=True, text=True, creationflags=SIN_VENTANA)
+                       capture_output=True, creationflags=SIN_VENTANA)
     if r.returncode != 0:
-        return False, (r.stderr or r.stdout or "No se pudo crear la tarea").strip()
+        crudo = r.stderr or r.stdout or b""
+        try:
+            texto = crudo.decode("oem")  # la consola de Windows usa otra codificación
+        except Exception:  # noqa: BLE001
+            texto = crudo.decode("utf-8", "replace")
+        return False, (texto or "No se pudo crear la tarea").strip()
     if minutos:
         return True, f"Modo evento: revisa cada {minutos} minutos."
     return True, f"Revisará los precios cada {horas} h, aunque la app esté cerrada."

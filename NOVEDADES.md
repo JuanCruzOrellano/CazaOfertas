@@ -7,3 +7,7 @@
 ## 1.5.1
 
 - Si Windows o el antivirus no dejan crear el ícono en el Escritorio, el instalador abre una carpeta con el ícono listo para arrastrarlo.
+
+## 1.5.2
+
+- Arreglado: elegir "Una vez por día" en la revisión automática daba error.
