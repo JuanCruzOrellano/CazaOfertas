@@ -1,6 +1,3 @@
-Versión 1.1.1
+Versión 1.1.2
 
-- Las actualizaciones se detectan mejor: la app busca versión nueva cada vez que la abrís.
-- Botón "Buscar actualizaciones" en Ajustes ⚙.
-
-(Incluye todo lo de la 1.1.0: mis talles, historial de precios, comparador de tiendas, seguidos, Telegram, modo evento y cuotas.)
+- Arreglo: al tocar "Actualizar" la app se quedaba esperando y aparecía una ventana negra. Ahora se reemplaza y se vuelve a abrir sola.

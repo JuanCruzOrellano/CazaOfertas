@@ -121,24 +121,26 @@ def actualizar(salir):
             if os.path.getsize(nuevo) < 1_000_000:
                 raise RuntimeError("La descarga quedó incompleta")
             bat = os.path.join(carpeta, "actualizar.bat")
+            # Reintenta reemplazar el .exe hasta que esta app termine de cerrarse (mientras
+            # está abierta Windows no deja pisarlo). Sin tasklist/find ni ventanas.
             with open(bat, "w", encoding="utf-8") as f:
                 f.write(f"""@echo off
 chcp 65001 >nul
-set PID={os.getpid()}
-:esperar
-tasklist /fi "PID eq %PID%" | find "%PID%" >nul && (timeout /t 1 /nobreak >nul & goto esperar)
-set /a N=0
+set N=0
 :copiar
+ping -n 2 127.0.0.1 >nul
 move /y "{nuevo}" "{actual}" >nul 2>nul
-if errorlevel 1 (
-  set /a N+=1
-  if %N% lss 20 (timeout /t 1 /nobreak >nul & goto copiar)
-)
+if not errorlevel 1 goto listo
+set /a N=N+1
+if %N% lss 120 goto copiar
+exit /b 1
+:listo
 start "" "{actual}" --sin-ventana
 (goto) 2>nul & rmdir /s /q "{carpeta}"
 """)
-            subprocess.Popen(["cmd", "/c", bat], creationflags=0x08000000 | 0x00000008,
-                             close_fds=True)
+            subprocess.Popen(["cmd", "/c", bat], creationflags=0x08000000,  # CREATE_NO_WINDOW
+                             stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                             stderr=subprocess.DEVNULL, close_fds=True)
             estado["progreso"] = 100
             salir()
         except Exception as e:  # noqa: BLE001
