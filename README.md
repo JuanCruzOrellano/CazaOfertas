@@ -18,7 +18,9 @@ Tus marcas y precios se guardan en `%APPDATA%\CazaOfertas` y no se pierden al ac
 - **+ Agregar marca**: poné la tienda oficial (ej. `nike.com.ar`) y tu precio máximo.
 - **Casillas**: lo que ves en *En tu rango*.
 - **Campanitas**: de qué te avisa, cada una con su precio.
-- **Ajustes (⚙)**: revisión automática cada X horas, aunque la app esté cerrada.
+- **Ajustes (⚙)**: tus talles, revisión automática (y modo evento cada 15 min), avisos por Telegram y tiendas para comparar.
+- **Tocá un producto** para ver su historial de precio, tus talles, cuotas, compararlo en otras tiendas, seguirlo o compartirlo.
+- **⭐ Seguidos**: productos puntuales con precio objetivo.
 
 Funciona con tiendas VTEX (nike.com.ar, topper.com.ar y muchas tiendas argentinas) y Shopify.
 

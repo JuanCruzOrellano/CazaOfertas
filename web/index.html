@@ -64,6 +64,41 @@ main{flex:1;height:100vh;overflow:auto}
 .upd .bar{width:160px;height:6px;border-radius:99px;background:#cfe3d6;overflow:hidden}
 .upd .bar i{display:block;height:100%;background:#4e8b6f;transition:width .3s}
 .upd .btn{padding:6px 12px}
+.card{cursor:pointer}
+.vd{align-self:flex-start;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px}
+.vd.minimo{background:#e5f1ea;color:#2f6e52}.vd.bueno{background:#eef5e6;color:#56782f}
+.vd.inflado{background:#fbe9e4;color:#b04a33}.vd.ya_estuvo{background:#f8eedb;color:#93651f}
+.mt{font-size:12px;color:var(--ok)}.mt.no{color:var(--warn)}
+.cuo{font-size:11px;color:var(--mute)}
+.det{display:grid;grid-template-columns:260px 1fr;gap:20px}
+.det .foto{background:#fff;border:1px solid var(--line);border-radius:12px;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.det .foto img{width:100%;height:100%;object-fit:contain}
+.det h2{margin:0 0 4px;font-size:20px}
+.det .pr{font-size:28px;font-weight:800;letter-spacing:-.02em}
+.det .pr s{font-size:15px;color:var(--mute);font-weight:400;margin-left:8px}
+.blk{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:8px}
+.blk h4{margin:0;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+.verd{padding:10px 12px;border-radius:10px;font-size:14px}
+.verd.minimo,.verd.bueno{background:#e5f1ea;color:#2f5d47}.verd.inflado{background:#fbe9e4;color:#93402c}
+.verd.ya_estuvo{background:#f8eedb;color:#7a5418}.verd.normal,.verd.nuevo{background:var(--chip);color:var(--mute)}
+.tl{display:flex;flex-wrap:wrap;gap:6px}
+.tl span{border:1px solid var(--line);border-radius:8px;padding:3px 9px;font-size:13px}
+.tl span.no{color:#bbb;text-decoration:line-through}
+.tl span.mio{border-color:var(--accent);background:#fbeee9;font-weight:700}
+.cmp{width:100%;border-collapse:collapse;font-size:13px}
+.cmp td{padding:7px 6px;border-top:1px solid var(--line)}
+.cmp td.n{font-weight:700;white-space:nowrap}
+.cmp tr.mejor td{background:#eef6f0}
+.row2{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row2 input{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px;width:150px}
+.chart text{font-size:10px;fill:var(--mute)}
+.aj h3{margin:6px 0 0;font-size:15px}
+.aj .sec{gap:10px}
+.eq{display:flex;gap:6px;flex-wrap:wrap;font-size:12px}
+.eq span{background:var(--chip);border-radius:6px;padding:2px 8px}
+.paso{font-size:13px;color:var(--mute);line-height:1.6}
+.paso b{color:var(--ink)}
+@media (max-width:760px){.det{grid-template-columns:1fr}}
 .chip.range{background:var(--sun);color:var(--sun-ink);font-weight:700}
 .tabs{display:flex;gap:4px;margin:22px 0 16px;border-bottom:1px solid var(--line)}
 .tab{border:0;background:none;padding:10px 14px;color:var(--mute);font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px}
@@ -93,7 +128,7 @@ main{flex:1;height:100vh;overflow:auto}
 .tag{align-self:flex-start;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px}
 .tag.nuevo{background:var(--new-bg);color:var(--new)}
 .tag.entro_rango,.tag.bajo_mas{background:var(--ok-bg);color:var(--ok)}
-.tag.volvio_stock{background:var(--warn-bg);color:var(--warn)}
+.tag.volvio_stock,.tag.objetivo{background:var(--warn-bg);color:var(--warn)}
 .soldout{font-size:11px;color:var(--warn)}
 .empty{text-align:center;color:var(--mute);padding:70px 20px;background:var(--panel);border-radius:12px;border:1px dashed var(--line)}
 .empty h3{color:var(--ink);margin:0 0 6px}
@@ -216,6 +251,7 @@ label.f span.h{font-weight:400;color:var(--mute);font-size:12px}
           <label class="f">Excluir si el nombre tiene<span class="h">Palabras separadas por coma</span><input type="text" id="fExc" placeholder="ojotas, medias"></label>
         </div>
         <label class="chk"><input type="checkbox" id="fStock" checked> Mostrar solo productos con stock</label>
+        <label class="chk"><input type="checkbox" id="fTalle" checked><span>Usar mis talles: precio, stock y avisos de <b>mi talle</b> (se configuran en Ajustes ⚙)</span></label>
       </div>
     </div>
   </div>
@@ -227,21 +263,57 @@ label.f span.h{font-weight:400;color:var(--mute);font-size:12px}
 </div></div>
 
 <!-- Modal ajustes -->
-<div class="back" id="mAjustes"><div class="modal" style="max-width:460px">
+<div class="back" id="mAjustes"><div class="modal aj" style="max-width:640px">
   <header>Ajustes</header>
   <div class="mb">
-    <label class="f">Revisión automática
-      <span class="h">La app revisa los precios sola, aunque esté cerrada, y te manda una notificación de Windows cuando algo entra en tu rango.</span>
-      <select id="aHoras">
-        <option value="0">Desactivada</option><option value="1">Cada 1 hora</option>
-        <option value="3">Cada 3 horas</option><option value="6">Cada 6 horas</option>
-        <option value="12">Cada 12 horas</option><option value="24">Una vez por día</option>
-      </select>
-    </label>
+    <div class="sec">
+      <h4>👟 Mis talles</h4>
+      <div class="h">La app se fija si hay stock en <b>tu</b> talle y te muestra su precio. Entiende si es calzado, ropa o medias.</div>
+      <div class="row">
+        <label class="f">Calzado — sistema
+          <select id="tSis" onchange="eqCalzado()"></select></label>
+        <label class="f">Calzado — tu número
+          <input type="text" id="tVal" placeholder="ej. 42 o 27,5" oninput="eqCalzado()"></label>
+      </div>
+      <div class="eq" id="tEq"></div>
+      <div class="row">
+        <label class="f">Ropa de arriba<span class="h">Remeras, buzos, camperas</span>
+          <select id="tSup"><option value="">—</option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option><option>XXXL</option></select></label>
+        <label class="f">Ropa de abajo<span class="h">Pantalones, shorts (letra o número)</span>
+          <input type="text" id="tInf" placeholder="ej. L o 32"></label>
+      </div>
+      <div class="h">Las medias se calculan solas a partir de tu calzado.</div>
+    </div>
+    <div class="sec">
+      <h4>⏱ Revisión automática</h4>
+      <label class="f">Frecuencia
+        <span class="h">Revisa aunque la app esté cerrada y te avisa.</span>
+        <select id="aHoras">
+          <option value="0">Desactivada</option><option value="1">Cada 1 hora</option>
+          <option value="3">Cada 3 horas</option><option value="6">Cada 6 horas</option>
+          <option value="12">Cada 12 horas</option><option value="24">Una vez por día</option>
+        </select>
+      </label>
+      <label class="chk"><input type="checkbox" id="aEvento"><span><b>Modo evento</b> (Hot Sale, CyberMonday, Black Friday): revisar cada 15 minutos hasta el día:</span></label>
+      <input type="date" id="aHasta" class="search" style="max-width:200px">
+    </div>
+    <div class="sec" id="aTg"></div>
+    <div class="sec">
+      <h4>🏬 Tiendas para comparar</h4>
+      <div class="h">Donde la app busca el mismo producto (por su código de modelo). Una por línea. Tus marcas se suman solas.</div>
+      <textarea id="aTiendas" rows="5" class="search" style="font:inherit;font-size:13px;resize:vertical"></textarea>
+    </div>
     <div class="err" id="aMsg"></div>
-    <button class="btn" style="justify-self:start" onclick="probarAviso()">Probar notificación</button>
+    <button class="btn" style="justify-self:start" onclick="probarAviso()">Probar notificación de Windows</button>
   </div>
   <footer><span id="aVer" style="margin-right:auto;color:var(--mute);font-size:12px;align-self:center"></span><button class="btn" onclick="cerrar('mAjustes')">Cerrar</button><button class="btn pri" onclick="guardarAjustes()">Guardar</button></footer>
+</div></div>
+
+<!-- Modal detalle de producto -->
+<div class="back" id="mDet"><div class="modal" style="max-width:900px">
+  <header id="dTit">Producto</header>
+  <div class="mb" id="dBody"></div>
+  <footer><button class="btn" onclick="cerrar('mDet')">Cerrar</button><a class="btn pri" id="dIr" target="_blank" rel="noopener" style="text-decoration:none">Ir a la tienda</a></footer>
 </div></div>
 
 <div class="toast" id="toast"></div>
@@ -251,7 +323,8 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const cap = s => { s=String(s||'').replace(/-/g,' ').trim(); return s.charAt(0).toUpperCase()+s.slice(1); };
 const pesos = n => '$' + Math.round(n).toLocaleString('es-AR');
-const ETQ = {nuevo:'Nuevo en tu rango', entro_rango:'Bajó y entró en tu rango', bajo_mas:'Bajó todavía más', volvio_stock:'Volvió el stock'};
+const ETQ = {nuevo:'Nuevo en tu rango', entro_rango:'Bajó y entró en tu rango', bajo_mas:'Bajó todavía más', volvio_stock:'Volvió el stock', objetivo:'🎯 Llegó a tu precio'};
+const VD = {minimo:'🏆 Mínimo histórico', bueno:'👍 Buen precio', inflado:'⚠️ Descuento inflado', ya_estuvo:'↺ Ya estuvo más barato'};
 
 let S = {marcas:[], vista:'todas', tab:'nov', revisando:false, q:'', orden:'precio'};
 let F = {id:null, cats:[], sel:new Set(), platform:null, base_url:null};
@@ -315,6 +388,7 @@ async function cargar() {
   const j = await api('/api/marcas');
   const antes = S.revisando;
   S.marcas = j.marcas; S.revisando = j.revisando;
+  try { S.seguidos = (await api('/api/seguidos')).seguidos; } catch(e) { S.seguidos = []; }
   $('#ultima').textContent = 'Última revisión: ' + hace(j.ultima_revision || Math.max(0,...S.marcas.map(m=>m.last_check||0)));
   $('#btnTodo').disabled = S.revisando;
   $('#btnTodo').textContent = S.revisando ? 'Revisando…' : 'Revisar todo';
@@ -327,6 +401,9 @@ async function cargar() {
 function pintarNav() {
   const tot = S.marcas.reduce((a,m)=>a+m.sin_ver,0);
   let h = `<button class="nav ${S.vista==='todas'?'on':''}" onclick="ir('todas')"><span class="nm">Todas las novedades</span>${tot?`<span class="badge">${tot}</span>`:''}</button>`;
+  const seg = S.seguidos || [];
+  const segSin = seg.reduce((a,s)=>a+(s.sin_ver||0),0);
+  h += `<button class="nav ${S.vista==='seguidos'?'on':''}" onclick="ir('seguidos')"><span class="nm">⭐ Seguidos<div class="sub">${seg.length} producto${seg.length===1?'':'s'}</div></span>${segSin?`<span class="badge">${segSin}</span>`:''}</button>`;
   h += `<div class="sep">Mis marcas</div>`;
   if (!S.marcas.length) h += `<div class="sub" style="padding:4px 10px;color:var(--side-mute)">Todavía no agregaste marcas.</div>`;
   for (const m of S.marcas) {
@@ -341,33 +418,45 @@ function pintarNav() {
 
 function ir(v){ S.vista=v; S.tab='nov'; S.q=''; pintarNav(); pintarMain(); }
 
+function precioDe(p){ return p.precio_ef || p.price; }
 function card(p, ev) {
-  const off = p.list_price > p.price + 1 ? Math.round((1 - p.price/p.list_price)*100) : 0;
-  const old = ev && ev.old_price && ev.old_price > p.price ? ev.old_price : (off ? p.list_price : 0);
-  return `<a class="card ${ev && !ev.seen ? 'unseen':''}" href="${esc(p.link)}" target="_blank" rel="noopener">
+  const precio = precioDe(p);
+  const off = p.list_price > precio + 1 ? Math.round((1 - precio/p.list_price)*100) : 0;
+  const old = ev && ev.old_price && ev.old_price > precio ? ev.old_price : (off ? p.list_price : 0);
+  const v = p.veredicto && VD[p.veredicto.tipo] && !(p.veredicto.tipo==='ya_estuvo' && !(p.veredicto.min < precio - 1)) ? p.veredicto : null;
+  const mt = p.mi_talle;
+  const ref = ev ? (ev.seguido_id ? `{seguido:${ev.seguido_id}}` : `{marca:${ev.brand_id},pid:'${esc(ev.pid)}'}`)
+                 : (p.objetivo !== undefined ? `{seguido:${p.id}}` : `{marca:${p.brand_id},pid:'${esc(p.pid)}'}`);
+  const disp = p.disp_ef ?? p.available;
+  return `<div class="card ${ev && !ev.seen ? 'unseen':''}" onclick="abrirDetalle(${ref})">
     <div class="img">${p.image?`<img loading="lazy" src="${esc(p.image)}" alt="" onerror="this.remove()">`:''}</div>
     ${off>=5?`<span class="off">-${off}%</span>`:''}
     <div class="body">
       ${ev?`<span class="tag ${ev.type}">${ETQ[ev.type]||'Novedad'}</span>`:''}
+      ${v?`<span class="vd ${v.tipo}" title="${esc(v.texto)}">${VD[v.tipo]}</span>`:''}
       ${ev && S.vista==='todas'?`<div class="brand">${esc(ev.brand_name)}</div>`:''}
       <div class="name">${esc(p.name)}</div>
-      <div class="price">${pesos(p.price)}${old?`<span class="old">${pesos(old)}</span>`:''}</div>
+      <div class="price">${pesos(precio)}${old?`<span class="old">${pesos(old)}</span>`:''}</div>
+      ${mt?`<div class="mt ${mt.disponible?'':'no'}">${mt.disponible?'✓ Hay tu talle '+esc(mt.talles.join(', ')):'✗ No hay tu talle'}</div>`:''}
+      ${p.cuotas && p.cuotas.n>1?`<div class="cuo">${p.cuotas.n} cuotas sin interés</div>`:''}
+      ${p.objetivo?`<div class="cuo">🎯 Objetivo: ${pesos(p.objetivo)}</div>`:''}
       ${ev?`<div class="when">${hace(ev.created_at)}${(ev.ok ?? ev.in_range) ? '' : ' · ya no está en tu rango'}</div>`:''}
-      ${!p.available?'<div class="soldout">Sin stock</div>':''}
-    </div></a>`;
+      ${!disp && !mt?'<div class="soldout">Sin stock</div>':''}
+    </div></div>`;
 }
 
 async function pintarMain(refrescar) {
   const m = S.marcas.find(x=>x.id===S.vista);
-  if (S.vista !== 'todas' && !m) { S.vista='todas'; }
+  if (S.vista !== 'todas' && S.vista !== 'seguidos' && !m) { S.vista='todas'; }
   const main = $('#main');
-  if (!S.marcas.length) {
+  if (!S.marcas.length && S.vista !== 'seguidos') {
     main.innerHTML = `<div class="empty" style="margin-top:60px"><img src="/logo.png" alt="" style="width:120px;margin-bottom:10px"><h3>Agregá tu primera marca</h3>
       Poné la tienda oficial (por ejemplo <b>nike.com.ar</b>), elegí la categoría y tu precio máximo.<br>
       La app te va a mostrar todo lo que entra en tu rango y te avisa cuando algo baja.<br><br>
       <button class="btn pri" onclick="abrirMarca()">+ Agregar marca</button></div>`;
     return;
   }
+  if (S.vista === 'seguidos') { return pintarSeguidos(); }
   let head;
   if (S.vista === 'todas') {
     head = `<div class="head"><div><h1>Novedades</h1><div class="meta">Lo que se puso en oferta o entró en tu rango, en todas tus marcas.</div></div>
@@ -413,13 +502,17 @@ async function pintarMain(refrescar) {
     const {productos} = await api(`/api/marca/${m.id}/rango`);
     const q = S.q.toLowerCase();
     let lista = productos.filter(p=>!q || p.name.toLowerCase().includes(q));
-    if (S.orden==='desc') lista.sort((a,b)=>(b.list_price-b.price)/b.list_price-(a.list_price-a.price)/a.list_price);
-    if (S.orden==='precio_desc') lista.sort((a,b)=>b.price-a.price);
+    if (S.orden==='desc') lista.sort((a,b)=>(b.list_price-precioDe(b))/b.list_price-(a.list_price-precioDe(a))/a.list_price);
+    if (S.orden==='precio_desc') lista.sort((a,b)=>precioDe(b)-precioDe(a));
+    if (S.orden==='minimo') lista = lista.filter(p=>p.veredicto && ['minimo','bueno'].includes(p.veredicto.tipo));
+    if (S.orden==='talle') lista = lista.filter(p=>p.mi_talle && p.mi_talle.disponible);
     body = `<div class="tools"><input id="q" placeholder="Buscar en ${productos.length} productos…" value="${esc(S.q)}" oninput="S.q=this.value;pintarMain()">
       <select onchange="S.orden=this.value;pintarMain()">
         <option value="precio" ${S.orden==='precio'?'selected':''}>Más baratos primero</option>
         <option value="precio_desc" ${S.orden==='precio_desc'?'selected':''}>Más caros primero</option>
-        <option value="desc" ${S.orden==='desc'?'selected':''}>Mayor descuento</option></select></div>`
+        <option value="desc" ${S.orden==='desc'?'selected':''}>Mayor descuento</option>
+        <option value="minimo" ${S.orden==='minimo'?'selected':''}>Solo buenos precios (historial)</option>
+        <option value="talle" ${S.orden==='talle'?'selected':''}>Solo con mi talle</option></select></div>`
       + (lista.length ? `<div class="grid">${lista.map(p=>card(p)).join('')}</div>`
         : `<div class="empty"><h3>Nada en tu rango ${m.last_check?'':'todavía'}</h3>${m.last_check?'Probá subir el precio máximo o revisar las categorías.':'La primera revisión está en curso.'}</div>`);
   }
@@ -439,13 +532,13 @@ function abrirMarca(id) {
   $('#fErr').textContent=''; $('#fResto').style.display='none'; $('#btnGuardar').disabled=true;
   $('#btnBorrar').style.display = id?'':'none';
   ['fUrl','fNombre','fMax','fMin','fInc','fExc','fCatQ'].forEach(k=>$('#'+k).value='');
-  $('#fStock').checked = true;
+  $('#fStock').checked = true; $('#fTalle').checked = true;
   $('#mMarca').classList.add('on');
   if (id) {
     const m = S.marcas.find(x=>x.id===id);
     $('#fUrl').value = m.base_url;
     $('#fNombre').value = m.name; $('#fMax').value = m.max_price; $('#fMin').value = m.min_price||'';
-    $('#fInc').value = m.include_kw; $('#fExc').value = m.exclude_kw; $('#fStock').checked = !!m.only_stock;
+    $('#fInc').value = m.include_kw; $('#fExc').value = m.exclude_kw; $('#fStock').checked = !!m.only_stock; $('#fTalle').checked = m.solo_mi_talle !== 0;
     F.sel = new Set(m.categories.map(c=>c.id));
     F.avisar = m.avisar ? new Set(m.avisar.map(x => typeof x === 'string' ? x : x.id)) : null;
     (m.avisar||[]).forEach(x => { if (x && x.max_price) F.precios[x.id] = x.max_price; });
@@ -641,7 +734,7 @@ async function guardarMarca() {
     categories: sel.map(s => ({id:s, name: F.byId[s].name})),
     avisar: (F.avisar || Object.keys(F.precios).length) ? [...avisos()].filter(s => F.byId[s]).map(s => ({id:s, name: s ? F.byId[s].name : '', ...(F.precios[s] ? {max_price:F.precios[s]} : {})})) : null,
     max_price:Number($('#fMax').value), min_price:Number($('#fMin').value)||0,
-    include_kw:$('#fInc').value, exclude_kw:$('#fExc').value, only_stock:$('#fStock').checked};
+    include_kw:$('#fInc').value, exclude_kw:$('#fExc').value, only_stock:$('#fStock').checked, solo_mi_talle:$('#fTalle').checked};
   if (!datos.max_price) { $('#fErr').textContent='Poné un precio máximo.'; return; }
   try {
     const j = F.id ? await api('/api/marca/'+F.id,{method:'PUT',body:datos}) : await api('/api/marca',{method:'POST',body:datos});
@@ -656,10 +749,187 @@ async function borrarMarca() {
 }
 
 /* ---------- ajustes */
-async function abrirAjustes(){ const j=await api('/api/ajustes'); $('#aHoras').value=String(j.horas); $('#aMsg').textContent=j.es_windows?'':'La revisión automática solo funciona en Windows.'; $('#mAjustes').classList.add('on'); }
-async function guardarAjustes(){ const j=await api('/api/ajustes',{method:'POST',body:{horas:Number($('#aHoras').value)}}).catch(e=>({ok:false,mensaje:e.message}));
-  $('#aMsg').textContent=j.mensaje; if(j.ok){toast(j.mensaje);cerrar('mAjustes');} }
+let AJ = null;
+async function abrirAjustes(){
+  AJ = await api('/api/ajustes');
+  $('#aHoras').value = String(AJ.horas);
+  $('#aMsg').textContent = AJ.es_windows ? '' : 'La revisión automática solo funciona en Windows.';
+  $('#tSis').innerHTML = Object.entries(AJ.sistemas).map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join('');
+  const tl = AJ.talles || {};
+  $('#tSis').value = (tl.calzado && tl.calzado.sistema) || 'AR';
+  $('#tVal').value = (tl.calzado && tl.calzado.valor) || '';
+  $('#tSup').value = tl.ropa_sup || ''; $('#tInf').value = tl.ropa_inf || '';
+  eqCalzado();
+  const ev = AJ.evento || {};
+  $('#aEvento').checked = !!ev.activo;
+  const d = new Date((ev.hasta ? ev.hasta*1000 : Date.now()+4*86400000));
+  $('#aHasta').value = d.toISOString().slice(0,10);
+  $('#aTiendas').value = (AJ.tiendas_comparar||[]).join('\n');
+  pintarTg();
+  $('#mAjustes').classList.add('on');
+}
+async function eqCalzado(){
+  const v = $('#tVal').value.trim();
+  if (!v) { $('#tEq').innerHTML = ''; return; }
+  const e = await api(`/api/equivalencias?sistema=${$('#tSis').value}&valor=${encodeURIComponent(v.replace(',','.'))}`).catch(()=>({}));
+  const n = x => String(x).replace('.',',');
+  $('#tEq').innerHTML = e.AR ? `<span>AR ${n(e.AR)}</span><span>EU ${n(e.EU)}</span><span>US hombre ${n(e.USH)}</span><span>US mujer ${n(e.USM)}</span><span>${n(e.CM)} cm</span>` : '<span>Número no válido</span>';
+}
+function pintarTg(){
+  const tg = AJ.telegram || {};
+  $('#aTg').innerHTML = tg.conectado ? `<h4>📱 Avisos al celular (Telegram)</h4>
+      <div>Conectado con <b>${esc(tg.nombre||'')}</b> por el bot @${esc(tg.bot||'')}. Te llega cada novedad con foto, precio y link.</div>
+      <div class="row2"><button class="btn" onclick="tgProbar()">Mandar prueba</button><button class="btn danger" onclick="tgDesconectar()">Desconectar</button></div>`
+    : `<h4>📱 Avisos al celular (Telegram)</h4>
+      <div class="paso">1. En Telegram buscá <b>@BotFather</b>, mandale <b>/newbot</b>, elegí un nombre y copiá el <b>token</b> que te da.<br>
+      2. Pegalo acá abajo.<br>3. Abrí tu bot nuevo, tocá <b>Iniciar</b> y después <b>Conectar</b>.</div>
+      <div class="row2"><input id="tgTok" class="search" style="flex:1;width:auto" placeholder="Token del bot (ej. 123456:ABC-...)"><button class="btn pri" onclick="tgConectar()">Conectar</button></div>`;
+}
+async function tgConectar(){
+  try { const j = await api('/api/telegram/conectar',{method:'POST',body:{token:$('#tgTok').value}});
+    AJ.telegram = {conectado:true, nombre:j.nombre, bot:j.bot}; pintarTg(); toast('¡Telegram conectado! Te mandamos un mensaje.'); }
+  catch(e){ $('#aMsg').textContent = e.message; }
+}
+async function tgProbar(){ try{ await api('/api/telegram/probar',{method:'POST'}); toast('Mensaje enviado'); }catch(e){ $('#aMsg').textContent=e.message; } }
+async function tgDesconectar(){ await api('/api/telegram/desconectar',{method:'POST'}); AJ.telegram={}; pintarTg(); }
+async function guardarAjustes(){
+  const hasta = $('#aHasta').value ? new Date($('#aHasta').value+'T23:59:00').getTime()/1000 : 0;
+  const body = {horas:Number($('#aHoras').value),
+    evento:{activo:$('#aEvento').checked, hasta},
+    talles:{calzado:{sistema:$('#tSis').value, valor:$('#tVal').value.trim().replace(',','.')}, ropa_sup:$('#tSup').value, ropa_inf:$('#tInf').value.trim().toUpperCase()},
+    tiendas_comparar:$('#aTiendas').value.split('\n').map(s=>s.trim()).filter(Boolean)};
+  const j = await api('/api/ajustes',{method:'POST',body}).catch(e=>({ok:false,mensaje:e.message}));
+  $('#aMsg').textContent = j.ok ? '' : j.mensaje;
+  if (j.ok) { toast(j.mensaje); cerrar('mAjustes'); cargar(); }
+}
 async function probarAviso(){ await api('/api/probar_aviso',{method:'POST'}); toast('Notificación enviada'); }
+
+/* ---------- seguidos */
+async function pintarSeguidos(){
+  const seg = S.seguidos || [];
+  const sinVer = seg.reduce((a,s)=>a+(s.sin_ver||0),0);
+  let h = `<div class="head"><div><h1>⭐ Seguidos</h1><div class="meta">Productos puntuales que vigilás, con tu precio objetivo. Se revisan junto con tus marcas.</div></div>
+    <div class="acts">${sinVer?`<button class="btn" onclick="vistas('seguidos')">Marcar avisos como vistos</button>`:''}</div></div>
+    <div class="tools" style="margin-top:18px"><input id="segLink" placeholder="Pegá el link de un producto de cualquier tienda VTEX (termina en /p)">
+    <input id="segObj" type="number" placeholder="Precio objetivo" style="max-width:160px;flex:none"><button class="btn pri" onclick="seguirLink()">Seguir</button></div>`;
+  h += seg.length ? `<div class="grid">${seg.map(s=>card(s)).join('')}</div>`
+    : `<div class="empty"><h3>Todavía no seguís ningún producto</h3>Abrí cualquier producto y tocá <b>⭐ Seguir</b>, o pegá un link arriba.<br>Te avisa cuando llega a tu precio objetivo, cuando baja o cuando vuelve tu talle.</div>`;
+  $('#main').innerHTML = h;
+}
+async function seguirLink(){
+  try { await api('/api/seguir',{method:'POST',body:{link:$('#segLink').value.trim(), objetivo:Number($('#segObj').value)||null}});
+    toast('Producto agregado a Seguidos'); cargar(); }
+  catch(e){ toast(e.message); }
+}
+
+/* ---------- detalle de producto */
+let D = null;
+async function abrirDetalle(ref){
+  $('#dBody').innerHTML = '<div style="padding:30px;color:var(--mute)">Cargando…</div>';
+  $('#mDet').classList.add('on');
+  const qs = ref.seguido ? `seguido=${ref.seguido}` : `marca=${ref.marca}&pid=${encodeURIComponent(ref.pid)}`;
+  try { D = await api('/api/producto?'+qs); } catch(e) { $('#dBody').innerHTML = `<div class="alert">${esc(e.message)}</div>`; return; }
+  D._ref = ref; pintarDetalle();
+}
+function pintarDetalle(){
+  const p = D, precio = precioDe(p), mt = p.mi_talle;
+  $('#dTit').textContent = p.marca_nombre ? p.marca_nombre : (p.tienda||'').replace(/^https?:\/\/(www\.)?/,'');
+  $('#dIr').href = p.link;
+  const v = p.veredicto;
+  const talles = (p.talles||[]).map(t=>`<span class="${t[1]?'':'no'} ${mt && mt.talles.includes(t[0])?'mio':''}" title="${t[1]?'Hay stock':'Sin stock'}">${esc(t[0])}</span>`).join('');
+  const off = p.list_price > precio + 1 ? Math.round((1-precio/p.list_price)*100) : 0;
+  $('#dBody').innerHTML = `<div class="det">
+    <div class="foto">${p.image?`<img src="${esc(p.image)}" alt="">`:''}</div>
+    <div style="display:grid;gap:12px;align-content:start">
+      <div><h2>${esc(p.name)}</h2><div style="color:var(--mute);font-size:13px">${esc(cap(p.tipo||''))}${p.ref?' · Código '+esc(p.ref):''}</div></div>
+      <div class="pr">${pesos(precio)}${off?`<s>${pesos(p.list_price)}</s> <span class="off" style="position:static">-${off}%</span>`:''}</div>
+      ${mt?`<div class="mt ${mt.disponible?'':'no'}" style="font-size:14px">${mt.disponible?'✓ Hay stock en tu talle ('+esc(mt.talles.join(', '))+')':'✗ No hay stock en tu talle'+(mt.talles.length?' ('+esc(mt.talles.join(', '))+')':'')}${p.precio_ef && p.precio_ef!==p.price?' · precio de tu talle':''}</div>`:''}
+      ${p.cuotas && p.cuotas.n>1?`<div>💳 <b>${p.cuotas.n} cuotas sin interés</b> de ${pesos(p.cuotas.valor)}</div>`:''}
+      ${v?`<div class="verd ${v.tipo}">${VD[v.tipo]?'<b>'+VD[v.tipo]+'</b> · ':''}${esc(v.texto)}</div>`:''}
+    </div></div>
+    <div class="blk"><h4>Historial de precio</h4>${grafico(p.historial, precio)}</div>
+    ${talles?`<div class="blk"><h4>Talles</h4><div class="tl">${talles}</div><div class="h" style="font-size:12px;color:var(--mute)">Tachado: sin stock. Remarcado: tu talle.${mt?'':' Configurá tus talles en Ajustes ⚙.'}</div></div>`:''}
+    <div class="blk"><h4>Comparar en otras tiendas</h4><div id="dCmp">${p.ref?`<button class="btn" onclick="compararAhora()">🔎 Buscar ${esc(p.ref)} en otras tiendas</button>`:'<span style="color:var(--mute)">Este producto no tiene código de modelo para comparar.</span>'}</div></div>
+    <div class="blk"><h4>Seguir este producto</h4><div id="dSeg">${segHtml()}</div></div>
+    <div class="blk"><h4>Compartir</h4><div class="row2">
+      <button class="btn" onclick="compartir('wa')">WhatsApp</button><button class="btn" onclick="compartir('copiar')">Copiar texto</button>
+      ${p.tiene_telegram?`<button class="btn" onclick="compartir('tg')">Mandar a mi Telegram</button>`:''}</div></div>`;
+}
+function segHtml(){
+  const s = D.seguido;
+  if (s) return `<div class="row2">⭐ Lo seguís${s.objetivo?` · objetivo ${pesos(s.objetivo)}`:''}.
+    <input id="dObj" type="number" placeholder="Nuevo objetivo" value="${s.objetivo||''}"><button class="btn" onclick="seguirDet()">Cambiar</button>
+    <button class="btn danger" onclick="dejarDeSeguir(${s.id})">Dejar de seguir</button></div>`;
+  return `<div class="row2"><input id="dObj" type="number" placeholder="Precio objetivo (opcional)"><button class="btn pri" onclick="seguirDet()">⭐ Seguir</button>
+    <span style="color:var(--mute);font-size:13px">Te avisa si llega a ese precio, si baja o si vuelve tu talle.</span></div>`;
+}
+async function seguirDet(){
+  const obj = Number($('#dObj').value) || null;
+  const body = D._ref.seguido ? {link:D.link, objetivo:obj} : {marca:D._ref.marca, pid:D._ref.pid, objetivo:obj};
+  try {
+    if (D._ref.seguido && D.platform !== 'vtex') throw new Error('Para cambiar el objetivo, dejá de seguirlo y volvé a seguirlo.');
+    const j = await api('/api/seguir',{method:'POST',body}); D.seguido = {id:j.id, objetivo:obj};
+    $('#dSeg').innerHTML = segHtml(); toast('Guardado en Seguidos'); cargar();
+  } catch(e){ toast(e.message); }
+}
+async function dejarDeSeguir(id){ await api('/api/dejar_de_seguir',{method:'POST',body:{id}}); D.seguido=null; $('#dSeg').innerHTML=segHtml(); cargar(); if (D._ref.seguido) cerrar('mDet'); }
+async function compararAhora(){
+  $('#dCmp').innerHTML = '<span style="color:var(--mute)">Buscando en otras tiendas… (puede tardar unos segundos)</span>';
+  try {
+    const {filas} = await api('/api/comparar',{method:'POST',body:{ref:D.ref, tienda:D.tienda}});
+    const yo = precioDe(D);
+    const ok = filas.filter(f=>f.estado==='ok');
+    const mejor = ok.find(f=>f.disponible);
+    let h = `<table class="cmp"><tr><td class="n">Esta tienda</td><td>${pesos(yo)}</td><td>${D.mi_talle?(D.mi_talle.disponible?'✓ tu talle':'✗ sin tu talle'):''}</td><td></td></tr>`;
+    for (const f of ok) {
+      const dif = f.precio - yo;
+      h += `<tr class="${f===mejor && f.precio<yo?'mejor':''}"><td class="n">${esc(f.tienda)}</td><td>${pesos(f.precio)} <span style="color:${dif<0?'var(--ok)':'var(--mute)'};font-size:12px">${dif<0?'('+pesos(-dif)+' menos)':dif>0?'(+'+pesos(dif)+')':''}</span></td>
+        <td>${f.mi_talle?(f.mi_talle.disponible?'✓ tu talle':'✗ sin tu talle'):(f.disponible?'Con stock':'Sin stock')}</td><td><a href="${esc(f.link)}" target="_blank" rel="noopener">Ver</a></td></tr>`;
+    }
+    h += '</table>';
+    const no = filas.filter(f=>f.estado!=='ok').map(f=>f.tienda);
+    if (!ok.length) h = '<div style="color:var(--mute)">No lo encontré en otras tiendas.</div>';
+    if (no.length) h += `<div style="color:var(--mute);font-size:12px;margin-top:6px">Sin resultados en: ${esc(no.join(', '))}</div>`;
+    $('#dCmp').innerHTML = h;
+  } catch(e){ $('#dCmp').innerHTML = `<div class="alert">${esc(e.message)}</div>`; }
+}
+function textoCompartir(){
+  const p = D, precio = precioDe(p);
+  let t = `🦅 ${p.name} a ${pesos(precio)}`;
+  if (p.list_price > precio + 1) t += ` (antes ${pesos(p.list_price)})`;
+  if (p.cuotas && p.cuotas.n>1) t += ` · ${p.cuotas.n} cuotas sin interés`;
+  return t + `\n${p.link}`;
+}
+async function compartir(como){
+  const t = textoCompartir();
+  if (como==='wa') window.open('https://wa.me/?text='+encodeURIComponent(t), '_blank');
+  if (como==='copiar') { try { await navigator.clipboard.writeText(t); toast('Copiado'); } catch(e) { prompt('Copiá el texto:', t); } }
+  if (como==='tg') { try { await api('/api/telegram/compartir',{method:'POST',body:{texto:t, foto:D.image}}); toast('Enviado a tu Telegram'); } catch(e){ toast(e.message); } }
+}
+function grafico(hist, actual){
+  const pts = (hist||[]).filter(h=>h.price).map(h=>({t:h.ts, p:h.price}));
+  if (!pts.length) return '<div style="color:var(--mute)">Todavía no hay datos. Se va armando con cada revisión.</div>';
+  const ahora = Date.now()/1000;
+  pts.push({t:Math.max(ahora, pts[pts.length-1].t), p:pts[pts.length-1].p});
+  const W=820, H=170, L=70, R=12, T=12, B=26;
+  const t0 = pts[0].t, t1 = Math.max(pts[pts.length-1].t, t0+86400);
+  let lo = Math.min(...pts.map(x=>x.p)), hi = Math.max(...pts.map(x=>x.p));
+  if (hi-lo < hi*0.05) { lo = lo*0.95; hi = hi*1.05; }
+  const X = t => L + (t-t0)/(t1-t0)*(W-L-R), Y = p => T + (hi-p)/(hi-lo)*(H-T-B);
+  let d = `M${X(pts[0].t)},${Y(pts[0].p)}`;
+  for (let i=1;i<pts.length;i++) d += ` H${X(pts[i].t)} V${Y(pts[i].p)}`;
+  const minP = Math.min(...pts.map(x=>x.p)), minPt = pts.find(x=>x.p===minP);
+  const fecha = ts => new Date(ts*1000).toLocaleDateString('es-AR',{day:'numeric',month:'short'});
+  const dias = Math.round((t1-t0)/86400);
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Historial de precio">
+    <line x1="${L}" x2="${W-R}" y1="${Y(hi)}" y2="${Y(hi)}" stroke="var(--line)"/><line x1="${L}" x2="${W-R}" y1="${Y(lo)}" y2="${Y(lo)}" stroke="var(--line)"/>
+    <text x="${L-8}" y="${Y(hi)+4}" text-anchor="end">${pesos(hi)}</text><text x="${L-8}" y="${Y(lo)+4}" text-anchor="end">${pesos(lo)}</text>
+    <path d="${d}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="${X(minPt.t)}" cy="${Y(minP)}" r="5" fill="var(--ok)"/><text x="${X(minPt.t)+8}" y="${Y(minP)-6}" style="fill:var(--ok);font-weight:700">mín ${pesos(minP)}</text>
+    <circle cx="${X(pts[pts.length-1].t)}" cy="${Y(pts[pts.length-1].p)}" r="4" fill="var(--accent)"/>
+    <text x="${L}" y="${H-6}">${fecha(t0)}</text><text x="${W-R}" y="${H-6}" text-anchor="end">hoy · ${dias} día${dias===1?'':'s'} de historial</text>
+  </svg>`;
+}
 
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.back.on').forEach(b=>b.classList.remove('on'));
   if(e.key==='Enter' && document.activeElement.id==='fUrl') detectar(); });

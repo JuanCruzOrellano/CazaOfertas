@@ -7,6 +7,7 @@ Cada adaptador devuelve productos normalizados:
     {"pid", "name", "link", "image", "price", "list_price", "available"}
 """
 import json
+import re
 import time
 import urllib.error
 import urllib.parse
@@ -234,9 +235,12 @@ class Vtex:
     def _normalizar(p):
         disponibles, todos = [], []
         imagen = None
+        talles = {}       # talle -> [talle, disponible, precio]
+        cuotas = None     # mejor plan sin interés de un talle con stock
         for it in p.get("items") or []:
             if not imagen and it.get("images"):
                 imagen = it["images"][0].get("imageUrl")
+            nombre_talle = Vtex._talle(it)
             for s in it.get("sellers") or []:
                 o = s.get("commertialOffer") or {}
                 precio = o.get("Price") or 0
@@ -244,8 +248,16 @@ class Vtex:
                     continue
                 par = (precio, o.get("ListPrice") or precio)
                 todos.append(par)
-                if (o.get("AvailableQuantity") or 0) > 0:
+                hay = (o.get("AvailableQuantity") or 0) > 0
+                if hay:
                     disponibles.append(par)
+                    for c in o.get("Installments") or []:
+                        if c.get("InterestRate") == 0 and (not cuotas or c["NumberOfInstallments"] > cuotas["n"]):
+                            cuotas = {"n": c["NumberOfInstallments"], "valor": c.get("Value")}
+                if nombre_talle:
+                    prev = talles.get(nombre_talle)
+                    if not prev or (hay and not prev[1]) or (hay == prev[1] and precio < prev[2]):
+                        talles[nombre_talle] = [nombre_talle, hay, float(precio)]
         base = disponibles or todos
         if not base:
             return None
@@ -259,7 +271,67 @@ class Vtex:
             "list_price": float(max(lista, precio)),
             "available": bool(disponibles),
             "tipo": Vtex._tipo(p),
+            "ref": (p.get("productReference") or p.get("productReferenceCode") or "").strip(),
+            "talles": list(talles.values()),
+            "cuotas": cuotas,
+            "cats_nombres": [c.strip("/").replace("/", " › ") for c in (p.get("categories") or [])[:1]],
         }
+
+    @staticmethod
+    def _talle(it):
+        for campo in ("Talle", "talle", "TALLE", "Size", "Tamaño", "Talla", "Numero", "Número"):
+            v = it.get(campo)
+            if isinstance(v, list) and v:
+                return str(v[0]).strip()
+        for v in it.get("variations") or []:
+            nombre = v.get("name") if isinstance(v, dict) else v
+            if str(nombre).lower() in ("talle", "size", "talla", "numero", "número") and isinstance(v, dict):
+                vals = v.get("values") or []
+                if vals:
+                    return str(vals[0]).strip()
+        m = re.search(r"(?:Talle|Size|Talla)\s*:\s*([^\s]+(?:\s?[YC])?)", it.get("name") or "", re.I)
+        return m.group(1) if m else None
+
+    # --- búsquedas puntuales (seguidos y comparador)
+    @staticmethod
+    def por_id(base, pid):
+        r = _get(f"{base}/api/catalog_system/pub/products/search?fq=productId:{urllib.parse.quote(str(pid))}")
+        return Vtex._con_cats(r[0]) if r else None
+
+    @staticmethod
+    def por_link(url):
+        """Link de un producto (…/algo/p) -> (base, producto)."""
+        p = urllib.parse.urlparse(url if url.startswith("http") else "https://" + url)
+        base = f"{p.scheme}://{p.netloc}"
+        partes = [x for x in p.path.split("/") if x]
+        if len(partes) < 2 or partes[-1] != "p":
+            raise StoreError("Ese link no parece de un producto (tiene que terminar en /p).")
+        r = _get(f"{base}/api/catalog_system/pub/products/search/{urllib.parse.quote(partes[-2])}/p")
+        if not r:
+            raise StoreError("No encontré ese producto en la tienda.")
+        return base, Vtex._con_cats(r[0])
+
+    @staticmethod
+    def buscar_codigo(base, codigo):
+        """Busca un código de modelo (ej. CW2288-111) en otra tienda."""
+        r = _get(f"{base}/api/catalog_system/pub/products/search?ft={urllib.parse.quote(codigo)}&_from=0&_to=9",
+                 timeout=20, intentos=1)
+        cod = codigo.lower().replace(" ", "")
+        out = []
+        for p in r or []:
+            texto = json.dumps(p, ensure_ascii=False).lower().replace(" ", "")
+            if cod in texto:
+                it = Vtex._con_cats(p)
+                if it:
+                    out.append(it)
+        return out
+
+    @staticmethod
+    def _con_cats(p):
+        it = Vtex._normalizar(p)
+        if it:
+            it["cats"] = [x for x in (p.get("categoriesIds") or []) if isinstance(x, str)]
+        return it
 
     @staticmethod
     def _tipo(p):
@@ -343,6 +415,18 @@ class Shopify:
             return None
         precio, lista = min(b)
         imgs = p.get("images") or []
+        idx = next((i for i, o in enumerate(p.get("options") or [])
+                    if str(o.get("name", "")).lower() in ("talle", "size", "talla", "numero", "número")), None)
+        talles = {}
+        if idx is not None:
+            for v in p.get("variants") or []:
+                n = v.get(f"option{idx + 1}")
+                if n:
+                    hay = bool(v.get("available", True))
+                    pr = float(v.get("price") or 0)
+                    prev = talles.get(n)
+                    if not prev or (hay and not prev[1]):
+                        talles[n] = [n, hay, pr]
         return {
             "pid": str(p.get("id")),
             "name": p.get("title", "").strip(),
@@ -352,7 +436,20 @@ class Shopify:
             "list_price": max(lista, precio),
             "available": bool(disp),
             "tipo": (p.get("product_type") or "Otros").strip().capitalize(),
+            "ref": "",
+            "talles": list(talles.values()),
+            "cuotas": None,
         }
+
+    @staticmethod
+    def por_id(base, pid, link=None):
+        if not link:
+            return None
+        data = _get(link.rstrip("/") + ".json")
+        it = Shopify._normalizar(base, data.get("product") or {})
+        if it:
+            it["cats"] = []
+        return it
 
 
 PLATAFORMAS = {"vtex": Vtex, "shopify": Shopify}

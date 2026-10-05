@@ -20,11 +20,14 @@ import core  # noqa: E402
 import stores  # noqa: E402
 import windows  # noqa: E402
 import actualizador  # noqa: E402
+import comparar  # noqa: E402
+import talles  # noqa: E402
+import telegram  # noqa: E402
 from version import APP_VERSION  # noqa: E402
 
 PUERTO = int(os.environ.get("CAZAOFERTAS_PUERTO", "8767"))
 URL = f"http://127.0.0.1:{PUERTO}/"
-VERSION = 13
+VERSION = 14
 # Si corre como .exe (PyInstaller), los archivos vienen empaquetados en sys._MEIPASS
 BASE = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
 WEB = os.path.join(BASE, "web")
@@ -42,18 +45,79 @@ def revisar_en_fondo(bid=None):
     def tarea():
         revisando.set()
         try:
+            nuevas = []
             if bid:
                 try:
-                    db.revisar(bid)
+                    nuevas = db.revisar(bid)
                 except Exception:  # noqa: BLE001
                     pass
             else:
-                db.revisar_todas()
+                nuevas = db.revisar_todas()
+            avisar(nuevas, toast=False)
         finally:
             revisando.clear()
 
     threading.Thread(target=tarea, daemon=True).start()
     return True
+
+
+def avisar(novedades, toast=True):
+    """Manda las novedades: notificación de Windows y/o Telegram."""
+    if not novedades:
+        return
+    if toast:
+        windows.avisar_novedades(novedades, URL)
+    telegram.avisar_novedades(db.get_setting("telegram"), novedades)
+
+
+def programacion():
+    """Deja la tarea de Windows según los ajustes (modo evento o cada X horas)."""
+    ev = db.get_setting("evento") or {}
+    horas = db.get_setting("horas", 0)
+    if ev.get("activo") and ev.get("hasta", 0) > time.time():
+        return windows.programar(horas, minutos=15)
+    if ev.get("activo"):  # el evento terminó: volver a lo normal
+        db.set_setting("evento", {**ev, "activo": False})
+    return windows.programar(horas)
+
+
+def ajustes():
+    tg = db.get_setting("telegram") or {}
+    cfg = db.cfg_talles()
+    return {"horas": db.get_setting("horas", 0), "es_windows": windows.ES_WINDOWS,
+            "evento": db.get_setting("evento") or {"activo": False},
+            "talles": db.get_setting("talles", {}),
+            "equivalencias": talles.equivalencias(cfg.get("calzado_cm")),
+            "sistemas": talles.SISTEMAS_CALZADO,
+            "telegram": {"conectado": bool(tg.get("chat_id")), "nombre": tg.get("nombre"),
+                         "bot": tg.get("bot"), "activo": tg.get("activo", True)},
+            "tiendas_comparar": db.get_setting("tiendas_comparar") or comparar.TIENDAS_DEFECTO}
+
+
+def detalle_producto(q):
+    if q.get("seguido"):
+        with core._lock:
+            r = db.con.execute("SELECT * FROM seguidos WHERE id=?", (int(q["seguido"]),)).fetchone()
+        if not r:
+            raise ValueError("Ese producto ya no está en seguidos")
+        d = db._para_ui(dict(r), r["base_url"])
+        d["platform"] = r["platform"]
+    else:
+        b = db.marca(int(q["marca"]))
+        with core._lock:
+            r = db.con.execute("SELECT * FROM products WHERE brand_id=? AND pid=?",
+                               (b["id"], q["pid"])).fetchone()
+        if not r:
+            raise ValueError("No encontré ese producto")
+        d = db._para_ui(dict(r), b["base_url"])
+        d["platform"] = b["platform"]
+        d["marca_nombre"] = b["name"]
+        d["solo_mi_talle"] = b.get("solo_mi_talle", 1)
+    d["historial"] = db.historial(d["tienda"], d["pid"])
+    s = db.seguido(d["tienda"], d["pid"])
+    d["seguido"] = {"id": s["id"], "objetivo": s["objetivo"]} if s else None
+    d["tiene_telegram"] = bool((db.get_setting("telegram") or {}).get("chat_id"))
+    return d
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -121,8 +185,13 @@ class Handler(BaseHTTPRequestHandler):
                 bid = int(q["marca"]) if q.get("marca") else None
                 self._json({"novedades": db.novedades(bid)})
             elif ruta == "/api/ajustes":
-                self._json({"horas": db.get_setting("horas", 0),
-                            "es_windows": windows.ES_WINDOWS})
+                self._json(ajustes())
+            elif ruta == "/api/producto":
+                self._json(detalle_producto(q))
+            elif ruta == "/api/seguidos":
+                self._json({"seguidos": db.seguidos()})
+            elif ruta == "/api/equivalencias":
+                self._json(talles.equivalencias(talles.cm_desde(q.get("sistema", "AR"), q.get("valor"))))
             else:
                 self._json({"error": "No encontrado"}, 404)
         except Exception as e:  # noqa: BLE001
@@ -158,11 +227,58 @@ class Handler(BaseHTTPRequestHandler):
                 db.marcar_vistas(d.get("marca"))
                 self._json({"ok": True})
             elif ruta == "/api/ajustes":
-                horas = int(d.get("horas") or 0)
-                ok, msg = windows.programar(horas)
-                if ok:
-                    db.set_setting("horas", horas)
-                self._json({"ok": ok, "mensaje": msg})
+                msg, ok = "Ajustes guardados", True
+                if "talles" in d:
+                    db.set_setting("talles", d["talles"] or {})
+                    db.recalcular_todo()
+                if "tiendas_comparar" in d:
+                    lista = [stores.normalizar_url(u) for u in d["tiendas_comparar"] if str(u).strip()]
+                    db.set_setting("tiendas_comparar", lista)
+                if "horas" in d or "evento" in d:
+                    if "horas" in d:
+                        db.set_setting("horas", int(d.get("horas") or 0))
+                    if "evento" in d:
+                        db.set_setting("evento", d["evento"])
+                    ok, msg = programacion()
+                self._json({"ok": ok, "mensaje": msg, "ajustes": ajustes()})
+            elif ruta == "/api/telegram/conectar":
+                info = telegram.conectar(d.get("token", ""))
+                db.set_setting("telegram", {"token": d["token"].strip(), **info, "activo": True})
+                telegram.enviar(db.get_setting("telegram"),
+                                "🦅 <b>CazaOfertas conectado.</b> Acá te van a llegar las ofertas.")
+                self._json({"ok": True, **info})
+            elif ruta == "/api/telegram/probar":
+                telegram.enviar(db.get_setting("telegram"), "🦅 Prueba de CazaOfertas: ¡funciona!")
+                self._json({"ok": True})
+            elif ruta == "/api/telegram/desconectar":
+                db.set_setting("telegram", {})
+                self._json({"ok": True})
+            elif ruta == "/api/telegram/compartir":
+                telegram.enviar(db.get_setting("telegram"), d.get("texto", ""), d.get("foto"))
+                self._json({"ok": True})
+            elif ruta == "/api/comparar":
+                tiendas = db.get_setting("tiendas_comparar") or comparar.TIENDAS_DEFECTO
+                tiendas = list(dict.fromkeys(tiendas + [m["base_url"] for m in db.marcas()
+                                                        if m["platform"] == "vtex"]))
+                filas = comparar.comparar(d.get("ref"), tiendas, db.cfg_talles(), excluir=d.get("tienda"))
+                self._json({"filas": filas})
+            elif ruta == "/api/seguir":
+                if d.get("link"):
+                    base, it = stores.Vtex.por_link(d["link"])
+                    plat = "vtex"
+                else:
+                    b = db.marca(int(d["marca"]))
+                    with core._lock:
+                        r = db.con.execute("SELECT * FROM products WHERE brand_id=? AND pid=?",
+                                           (b["id"], d["pid"])).fetchone()
+                    it = core._fila_a_item(dict(r))
+                    base, plat = b["base_url"], b["platform"]
+                obj = float(d["objetivo"]) if d.get("objetivo") else None
+                sid = db.seguir(plat, base, it, obj, d.get("solo_mi_talle", True))
+                self._json({"ok": True, "id": sid})
+            elif ruta == "/api/dejar_de_seguir":
+                db.dejar_de_seguir(int(d["id"]))
+                self._json({"ok": True})
             elif ruta == "/api/actualizar":
                 def salir():
                     time.sleep(0.5)
@@ -177,7 +293,7 @@ class Handler(BaseHTTPRequestHandler):
                 self._json({"ok": True})
             else:
                 self._json({"error": "No encontrado"}, 404)
-        except stores.StoreError as e:
+        except (stores.StoreError, telegram.TelegramError, ValueError) as e:
             self._json({"error": str(e)}, 400)
         except Exception as e:  # noqa: BLE001
             self._json({"error": str(e)}, 500)
@@ -236,17 +352,18 @@ def vigilante(server):
 
 
 def modo_revisar():
-    def avisar(nov):
-        windows.avisar_novedades(nov, URL)
+    ev = db.get_setting("evento") or {}
+    if ev.get("activo") and ev.get("hasta", 0) <= time.time():
+        programacion()  # terminó el evento: vuelve a la frecuencia normal
     db.revisar_todas(avisar)
 
 
 def preparar_windows():
     """Copia el logo para las notificaciones y actualiza la tarea programada si la app cambió de lugar."""
     windows.copiar_logo(os.path.join(WEB, "logo.png"), core.DATA_DIR)
-    horas = db.get_setting("horas", 0)
-    if horas and windows.ES_WINDOWS:
-        threading.Thread(target=windows.programar, args=(horas,), daemon=True).start()
+    ev = db.get_setting("evento") or {}
+    if (db.get_setting("horas", 0) or ev.get("activo")) and windows.ES_WINDOWS:
+        threading.Thread(target=programacion, daemon=True).start()
 
 
 def main():

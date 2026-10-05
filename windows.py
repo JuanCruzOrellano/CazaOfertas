@@ -94,11 +94,12 @@ def _pythonw():
     return w if os.path.exists(w) else exe
 
 
-def programar(horas):
-    """Crea (o borra si horas=0) la tarea de Windows que revisa precios en segundo plano."""
+def programar(horas, minutos=None):
+    """Crea (o borra si horas=0) la tarea de Windows que revisa precios en segundo plano.
+    Con `minutos` (modo evento) revisa cada esa cantidad de minutos."""
     if not ES_WINDOWS:
         return False, "Solo disponible en Windows."
-    if not horas:
+    if not horas and not minutos:
         subprocess.run(["schtasks", "/Delete", "/TN", TAREA, "/F"],
                        capture_output=True, creationflags=SIN_VENTANA)
         return True, "Revisión automática desactivada."
@@ -107,11 +108,13 @@ def programar(horas):
     else:
         app = os.path.abspath(os.path.join(os.path.dirname(__file__), "app.py"))
         cmd = f'"{_pythonw()}" "{app}" --revisar'
-    r = subprocess.run(["schtasks", "/Create", "/F", "/TN", TAREA, "/SC", "HOURLY",
-                        "/MO", str(int(horas)), "/TR", cmd],
+    frecuencia = ["/SC", "MINUTE", "/MO", str(int(minutos))] if minutos else ["/SC", "HOURLY", "/MO", str(int(horas))]
+    r = subprocess.run(["schtasks", "/Create", "/F", "/TN", TAREA, *frecuencia, "/TR", cmd],
                        capture_output=True, text=True, creationflags=SIN_VENTANA)
     if r.returncode != 0:
         return False, (r.stderr or r.stdout or "No se pudo crear la tarea").strip()
+    if minutos:
+        return True, f"Modo evento: revisa cada {minutos} minutos."
     return True, f"Revisará los precios cada {horas} h, aunque la app esté cerrada."
 
 

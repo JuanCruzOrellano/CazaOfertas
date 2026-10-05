@@ -56,7 +56,8 @@ foreach ($f in $Archivos) {
   $Tree += @{ path = $rel; mode = '100644'; type = 'blob'; sha = $blob.sha }
   Write-Host "  subido $rel"
 }
-$t = GH POST '/git/trees' @{ tree = $Tree }
+$BaseTree = (GH GET "/git/commits/$Head").tree.sha   # conserva lo que ya esta en GitHub (ej. .github)
+$t = GH POST '/git/trees' @{ base_tree = $BaseTree; tree = $Tree }
 $c = GH POST '/git/commits' @{ message = "Version $Ver"; tree = $t.sha; parents = @($Head) }
 GH PATCH '/git/refs/heads/main' @{ sha = $c.sha; force = $true } | Out-Null
 GH POST '/git/refs' @{ ref = "refs/tags/$Tag"; sha = $c.sha } | Out-Null
