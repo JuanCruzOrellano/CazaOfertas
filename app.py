@@ -27,7 +27,7 @@ from version import APP_VERSION  # noqa: E402
 
 PUERTO = int(os.environ.get("CAZAOFERTAS_PUERTO", "8767"))
 URL = f"http://127.0.0.1:{PUERTO}/"
-VERSION = 19
+VERSION = 20
 # Si corre como .exe (PyInstaller), los archivos vienen empaquetados en sys._MEIPASS
 BASE = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
 WEB = os.path.join(BASE, "web")
@@ -374,12 +374,20 @@ def main():
         windows.copiar_logo(os.path.join(WEB, "logo.png"), core.DATA_DIR)
         modo_revisar()
         return
-    if ya_abierta():
+    reinicio = "--sin-ventana" in sys.argv  # la abre la versión anterior al actualizarse
+    if not reinicio and ya_abierta():
         windows.abrir_ventana(URL)
         return
-    try:
-        server = ThreadingHTTPServer(("127.0.0.1", PUERTO), Handler)
-    except OSError:
+    server = None
+    for _ in range(40 if reinicio else 1):
+        try:
+            server = ThreadingHTTPServer(("127.0.0.1", PUERTO), Handler)
+            break
+        except OSError:
+            if reinicio:
+                ya_abierta()  # le pide a la versión vieja que se cierre
+                time.sleep(0.5)
+    if server is None:
         print(f"El puerto {PUERTO} está ocupado por otro programa.")
         return
     threading.Thread(target=vigilante, args=(server,), daemon=True).start()

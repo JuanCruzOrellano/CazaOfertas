@@ -17,7 +17,7 @@ from version import APP_VERSION
 REPO = "JuanCruzOrellano/CazaOfertas"
 API = f"https://api.github.com/repos/{REPO}/releases/latest"
 PAGINA = f"https://github.com/{REPO}/releases/latest"
-EXE = "CazaOfertas-Setup.exe"   # instalador que arma GitHub
+EXE = "CazaOfertas-app.zip"   # archivos de la app (código), sin .exe
 
 estado = {"actual": APP_VERSION, "nueva": None, "notas": "", "url": None,
           "descargando": False, "progreso": 0, "error": None, "error_busqueda": None, "buscado": None}
@@ -33,8 +33,12 @@ def _num(v):
     return tuple(partes + [0] * (3 - len(partes)))
 
 
+CARPETA = os.path.dirname(os.path.abspath(__file__))
+
+
 def es_exe():
-    return bool(getattr(sys, "frozen", False))
+    """¿Se puede actualizar sola? Solo si fue instalada con el instalador (no en desarrollo)."""
+    return os.path.exists(os.path.join(CARPETA, ".instalado"))
 
 
 _ultima = [0.0]
@@ -89,8 +93,8 @@ def buscar_en_fondo(si_pasaron=0):
 
 
 def actualizar(salir):
-    """Descarga el instalador nuevo y lo ejecuta en modo silencioso: cierra esta app,
-    reemplaza los archivos y vuelve a abrirla (el instalador se encarga de todo)."""
+    """Baja los archivos nuevos de la app (un .zip con el código), los copia encima de los
+    actuales y la vuelve a abrir. No hay ningún .exe que el antivirus tenga que analizar."""
     if not es_exe() or not estado["url"]:
         return False, "Descargá la versión nueva desde " + PAGINA
     if estado["descargando"]:
@@ -98,32 +102,28 @@ def actualizar(salir):
     estado.update(descargando=True, progreso=0, error=None)
 
     def tarea():
+        import io
+        import zipfile
         try:
-            carpeta = tempfile.mkdtemp(prefix="cazaofertas-update-")
-            nuevo = os.path.join(carpeta, EXE)
-            try:
-                req = urllib.request.Request(estado["url"], headers={"User-Agent": "CazaOfertas"})
-                with urllib.request.urlopen(req, timeout=60) as r, open(nuevo, "wb") as f:
-                    total = int(r.headers.get("Content-Length") or 0)
-                    bajado = 0
-                    while True:
-                        trozo = r.read(256 * 1024)
-                        if not trozo:
-                            break
-                        f.write(trozo)
-                        bajado += len(trozo)
-                        if total:
-                            estado["progreso"] = int(bajado * 100 / total)
-            except Exception:  # noqa: BLE001 — plan B: curl_cffi
-                estado["progreso"] = 50
-                with open(nuevo, "wb") as f:
-                    f.write(_bajar(estado["url"], timeout=180))
-            if os.path.getsize(nuevo) < 1_000_000:
-                raise RuntimeError("La descarga quedó incompleta")
-            import windows
-            subprocess.Popen([nuevo, "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-"],
-                             env=windows.entorno_limpio(), close_fds=True)
+            datos = _bajar(estado["url"], timeout=120)
+            estado["progreso"] = 60
+            z = zipfile.ZipFile(io.BytesIO(datos))
+            if "app.py" not in z.namelist():
+                raise RuntimeError("El archivo descargado no es de CazaOfertas")
+            z.extractall(CARPETA)
+            estado["progreso"] = 80
+            sin_ventana = 0x08000000 if os.name == "nt" else 0
+            req = os.path.join(CARPETA, "requirements.txt")
+            if os.path.exists(req):
+                py = sys.executable.replace("pythonw.exe", "python.exe")
+                subprocess.run([py, "-m", "pip", "install", "--user", "--upgrade", "-q",
+                                "--disable-pip-version-check", "-r", req],
+                               creationflags=sin_ventana, capture_output=True, timeout=300)
             estado["progreso"] = 100
+            # La app nueva cierra a esta (tiene otro número de versión) y toma su lugar;
+            # la ventana abierta se recarga sola.
+            subprocess.Popen([sys.executable, os.path.join(CARPETA, "app.py"), "--sin-ventana"],
+                             cwd=CARPETA, close_fds=True, creationflags=sin_ventana)
             salir()
         except Exception as e:  # noqa: BLE001
             estado.update(descargando=False, error=f"No se pudo actualizar: {e}")
