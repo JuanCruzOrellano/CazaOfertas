@@ -13,6 +13,7 @@ permissions:
 jobs:
   instalador:
     runs-on: windows-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
 
@@ -75,7 +76,9 @@ jobs:
       - name: Probar el instalador
         shell: pwsh
         run: |
-          $p = Start-Process -FilePath "dist\CazaOfertas-Setup.exe" -ArgumentList "/VERYSILENT","/SUPPRESSMSGBOXES","/NORESTART","/SP-" -PassThru -Wait
+          $p = Start-Process -FilePath "dist\CazaOfertas-Setup.exe" -ArgumentList "/VERYSILENT","/SUPPRESSMSGBOXES","/NORESTART","/SP-" -PassThru
+          # Esperar solo al instalador (con -Wait también esperaría a la app que abre al final)
+          if (-not $p.WaitForExit(300000)) { throw "El instalador tardó demasiado" }
           $exe = Join-Path $env:LOCALAPPDATA "Programs\CazaOfertas\CazaOfertas.exe"
           if (-not (Test-Path $exe)) { throw "El instalador no dejó la app instalada" }
           Start-Sleep -Seconds 8
