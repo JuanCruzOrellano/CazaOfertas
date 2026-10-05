@@ -20,7 +20,7 @@ PAGINA = f"https://github.com/{REPO}/releases/latest"
 EXE = "CazaOfertas.exe"
 
 estado = {"actual": APP_VERSION, "nueva": None, "notas": "", "url": None,
-          "descargando": False, "progreso": 0, "error": None}
+          "descargando": False, "progreso": 0, "error": None, "error_busqueda": None, "buscado": None}
 
 
 def _num(v):
@@ -40,19 +40,42 @@ def es_exe():
 _ultima = [0.0]
 
 
+def _bajar(url, timeout=20):
+    """GET que prueba con curl_cffi (trae sus propios certificados) y si no con urllib."""
+    errores = []
+    try:
+        from curl_cffi import requests as creq
+        r = creq.get(url, headers={"User-Agent": "CazaOfertas", "Accept": "application/vnd.github+json"},
+                     impersonate="chrome", timeout=timeout)
+        if r.status_code < 400:
+            return r.content
+        errores.append(f"GitHub respondió {r.status_code}")
+    except Exception as e:  # noqa: BLE001
+        errores.append(str(e))
+    try:
+        req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json",
+                                                   "User-Agent": "CazaOfertas"})
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return r.read()
+    except Exception as e:  # noqa: BLE001
+        errores.append(str(e))
+    raise RuntimeError("; ".join(errores))
+
+
 def buscar():
-    """Consulta GitHub. No hace nada si no hay internet."""
+    """Consulta GitHub. Deja el resultado (o el error) en `estado`."""
     import time
     _ultima[0] = time.time()
     try:
-        req = urllib.request.Request(API, headers={"Accept": "application/vnd.github+json",
-                                                   "User-Agent": "CazaOfertas"})
-        with urllib.request.urlopen(req, timeout=15) as r:
-            data = json.load(r)
-    except Exception:  # noqa: BLE001
+        data = json.loads(_bajar(API))
+    except Exception as e:  # noqa: BLE001
+        estado["error_busqueda"] = f"No se pudo consultar GitHub ({e})"
         return
+    estado["error_busqueda"] = None
+    estado["buscado"] = time.time()
     tag = data.get("tag_name") or ""
     if _num(tag) <= _num(APP_VERSION):
+        estado.update(nueva=None)
         return
     url = next((a["browser_download_url"] for a in data.get("assets") or []
                 if a.get("name", "").lower() == EXE.lower()), None)
@@ -78,18 +101,23 @@ def actualizar(salir):
             actual = sys.executable
             carpeta = tempfile.mkdtemp(prefix="cazaofertas-update-")
             nuevo = os.path.join(carpeta, EXE)
-            req = urllib.request.Request(estado["url"], headers={"User-Agent": "CazaOfertas"})
-            with urllib.request.urlopen(req, timeout=60) as r, open(nuevo, "wb") as f:
-                total = int(r.headers.get("Content-Length") or 0)
-                bajado = 0
-                while True:
-                    trozo = r.read(256 * 1024)
-                    if not trozo:
-                        break
-                    f.write(trozo)
-                    bajado += len(trozo)
-                    if total:
-                        estado["progreso"] = int(bajado * 100 / total)
+            try:
+                req = urllib.request.Request(estado["url"], headers={"User-Agent": "CazaOfertas"})
+                with urllib.request.urlopen(req, timeout=60) as r, open(nuevo, "wb") as f:
+                    total = int(r.headers.get("Content-Length") or 0)
+                    bajado = 0
+                    while True:
+                        trozo = r.read(256 * 1024)
+                        if not trozo:
+                            break
+                        f.write(trozo)
+                        bajado += len(trozo)
+                        if total:
+                            estado["progreso"] = int(bajado * 100 / total)
+            except Exception:  # noqa: BLE001 — plan B: curl_cffi
+                estado["progreso"] = 50
+                with open(nuevo, "wb") as f:
+                    f.write(_bajar(estado["url"], timeout=180))
             if os.path.getsize(nuevo) < 1_000_000:
                 raise RuntimeError("La descarga quedó incompleta")
             bat = os.path.join(carpeta, "actualizar.bat")

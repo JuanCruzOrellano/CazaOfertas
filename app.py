@@ -27,7 +27,7 @@ from version import APP_VERSION  # noqa: E402
 
 PUERTO = int(os.environ.get("CAZAOFERTAS_PUERTO", "8767"))
 URL = f"http://127.0.0.1:{PUERTO}/"
-VERSION = 14
+VERSION = 15
 # Si corre como .exe (PyInstaller), los archivos vienen empaquetados en sys._MEIPASS
 BASE = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
 WEB = os.path.join(BASE, "web")
@@ -165,7 +165,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(body)
             elif ruta == "/api/actualizacion":
-                actualizador.buscar_en_fondo(si_pasaron=6 * 3600)
+                actualizador.buscar_en_fondo(si_pasaron=10 * 60)
                 self._json({**actualizador.estado, "es_exe": actualizador.es_exe(),
                             "pagina": actualizador.PAGINA})
             elif ruta == "/api/ping":
@@ -285,6 +285,9 @@ class Handler(BaseHTTPRequestHandler):
                     os._exit(0)
                 ok, msg = actualizador.actualizar(salir)
                 self._json({"ok": ok, "mensaje": msg})
+            elif ruta == "/api/buscar_actualizacion":
+                actualizador.buscar()
+                self._json({**actualizador.estado, "es_exe": actualizador.es_exe()})
             elif ruta == "/api/salir":
                 self._json({"ok": True})
                 threading.Thread(target=self.server.shutdown, daemon=True).start()

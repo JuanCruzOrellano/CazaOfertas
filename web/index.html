@@ -306,7 +306,7 @@ label.f span.h{font-weight:400;color:var(--mute);font-size:12px}
     <div class="err" id="aMsg"></div>
     <button class="btn" style="justify-self:start" onclick="probarAviso()">Probar notificación de Windows</button>
   </div>
-  <footer><span id="aVer" style="margin-right:auto;color:var(--mute);font-size:12px;align-self:center"></span><button class="btn" onclick="cerrar('mAjustes')">Cerrar</button><button class="btn pri" onclick="guardarAjustes()">Guardar</button></footer>
+  <footer><span style="margin-right:auto;color:var(--mute);font-size:12px;align-self:center;display:flex;gap:8px;align-items:center"><span id="aVer"></span><button class="linkbtn" style="font-size:12px" onclick="buscarAct()">Buscar actualizaciones</button><span id="aAct"></span></span><button class="btn" onclick="cerrar('mAjustes')">Cerrar</button><button class="btn pri" onclick="guardarAjustes()">Guardar</button></footer>
 </div></div>
 
 <!-- Modal detalle de producto -->
@@ -381,8 +381,17 @@ async function esperarReinicio() {
   setTimeout(tick, 2000);
 }
 fetch('/api/ping').then(r=>r.json()).then(r=>{ _verInicial = r.app_version; const v=$('#aVer'); if (v) v.textContent = 'Versión ' + (r.app_version||''); }).catch(()=>{});
-setTimeout(revisarActualizacion, 3000);
-setInterval(revisarActualizacion, 6*3600*1000);
+setTimeout(revisarActualizacion, 4000);
+setInterval(revisarActualizacion, 30*60*1000);
+async function buscarAct(){
+  $('#aAct').textContent = 'Buscando…';
+  try {
+    const j = await api('/api/buscar_actualizacion',{method:'POST'});
+    U = {...j, pagina:'https://github.com/JuanCruzOrellano/CazaOfertas/releases/latest'};
+    $('#aAct').textContent = j.error_busqueda ? j.error_busqueda : (j.nueva ? 'Hay una versión nueva: '+j.nueva : 'Estás al día ✓');
+    pintarUpd();
+  } catch(e){ $('#aAct').textContent = e.message; }
+}
 
 async function cargar() {
   const j = await api('/api/marcas');
