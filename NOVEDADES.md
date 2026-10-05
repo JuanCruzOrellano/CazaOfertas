@@ -1,4 +1,5 @@
-Versión 1.2.0
+Versión 1.3.0
 
-- La app se instala sola: la primera vez que la abrís (desde Descargas, el Escritorio o donde sea) se copia a una carpeta propia de Windows y deja el ícono de CazaOfertas en el Escritorio y en el menú Inicio.
-- Así las actualizaciones automáticas funcionan siempre, aunque el Escritorio esté en OneDrive o el antivirus lo proteja.
+- Nuevo instalador (CazaOfertas-Setup.exe): instala la app como cualquier programa, con ícono en el Escritorio y en el menú Inicio, y aparece en "Agregar o quitar programas".
+- Los antivirus (Avast, AVG, Windows Defender) desconfían mucho menos que del .exe único de antes.
+- Las actualizaciones automáticas usan el instalador: se descargan, se instalan solas y la app se vuelve a abrir.

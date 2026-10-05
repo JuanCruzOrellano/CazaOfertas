@@ -17,7 +17,7 @@ from version import APP_VERSION
 REPO = "JuanCruzOrellano/CazaOfertas"
 API = f"https://api.github.com/repos/{REPO}/releases/latest"
 PAGINA = f"https://github.com/{REPO}/releases/latest"
-EXE = "CazaOfertas.exe"
+EXE = "CazaOfertas-Setup.exe"   # instalador que arma GitHub
 
 estado = {"actual": APP_VERSION, "nueva": None, "notas": "", "url": None,
           "descargando": False, "progreso": 0, "error": None, "error_busqueda": None, "buscado": None}
@@ -89,7 +89,8 @@ def buscar_en_fondo(si_pasaron=0):
 
 
 def actualizar(salir):
-    """Descarga el .exe nuevo y deja un script que lo reemplaza cuando esta app se cierra."""
+    """Descarga el instalador nuevo y lo ejecuta en modo silencioso: cierra esta app,
+    reemplaza los archivos y vuelve a abrirla (el instalador se encarga de todo)."""
     if not es_exe() or not estado["url"]:
         return False, "Descargá la versión nueva desde " + PAGINA
     if estado["descargando"]:
@@ -98,7 +99,6 @@ def actualizar(salir):
 
     def tarea():
         try:
-            actual = sys.executable
             carpeta = tempfile.mkdtemp(prefix="cazaofertas-update-")
             nuevo = os.path.join(carpeta, EXE)
             try:
@@ -120,30 +120,9 @@ def actualizar(salir):
                     f.write(_bajar(estado["url"], timeout=180))
             if os.path.getsize(nuevo) < 1_000_000:
                 raise RuntimeError("La descarga quedó incompleta")
-            bat = os.path.join(carpeta, "actualizar.bat")
-            # Reintenta reemplazar el .exe hasta que esta app termine de cerrarse (mientras
-            # está abierta Windows no deja pisarlo). Sin tasklist/find ni ventanas.
-            with open(bat, "w", encoding="utf-8") as f:
-                f.write(f"""@echo off
-chcp 65001 >nul
-set N=0
-:copiar
-ping -n 2 127.0.0.1 >nul
-move /y "{nuevo}" "{actual}" >nul 2>nul
-if not errorlevel 1 goto listo
-set /a N=N+1
-if %N% lss 120 goto copiar
-exit /b 1
-:listo
-echo {estado.get("nueva") or ""}> "{os.path.join(os.path.dirname(actual), "version.txt")}"
-start "" "{actual}" --sin-ventana
-(goto) 2>nul & rmdir /s /q "{carpeta}"
-""")
             import windows
-            subprocess.Popen(["cmd", "/c", bat], creationflags=0x08000000,  # CREATE_NO_WINDOW
-                             stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-                             stderr=subprocess.DEVNULL, close_fds=True,
-                             env=windows.entorno_limpio())  # sin esto el .exe nuevo no arranca
+            subprocess.Popen([nuevo, "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-"],
+                             env=windows.entorno_limpio(), close_fds=True)
             estado["progreso"] = 100
             salir()
         except Exception as e:  # noqa: BLE001

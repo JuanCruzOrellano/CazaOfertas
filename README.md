@@ -4,11 +4,11 @@ App de escritorio para Windows que sigue los precios de tus marcas favoritas y t
 
 ## Descargar
 
-👉 **[Descargar CazaOfertas.exe](https://github.com/JuanCruzOrellano/CazaOfertas/releases/latest/download/CazaOfertas.exe)**
+👉 **[Descargar el instalador de CazaOfertas](https://github.com/JuanCruzOrellano/CazaOfertas/releases/latest/download/CazaOfertas-Setup.exe)**
 
-1. Guardá el archivo en una carpeta fija (por ejemplo `Documentos\CazaOfertas`).
-2. Abrilo. Si Windows muestra *"Windows protegió su PC"*: **Más información → Ejecutar de todas formas**.
-3. Para tener el acceso directo: clic derecho sobre el .exe → *Enviar a* → *Escritorio*.
+1. Abrí el instalador (no pide permisos de administrador). Si Windows muestra *"Windows protegió su PC"*: **Más información → Ejecutar de todas formas**.
+2. Queda el ícono de CazaOfertas en el Escritorio y en el menú Inicio.
+3. Si tu antivirus la frena, agregá como excepción la carpeta `%LOCALAPPDATA%\Programs\CazaOfertas`.
 
 La app se actualiza sola: cuando hay una versión nueva aparece un aviso para instalarla.
 Tus marcas y precios se guardan en `%APPDATA%\CazaOfertas` y no se pierden al actualizar.
