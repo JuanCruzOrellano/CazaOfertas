@@ -119,23 +119,50 @@ def programar(horas, minutos=None):
 
 
 # ------------------------------------------------------------- abrir ventana
+def entorno_limpio():
+    """Variables de entorno sin los rastros de PyInstaller.
+
+    Si un .exe de PyInstaller abre otro (por ejemplo, la versión nueva al actualizar),
+    el nuevo hereda estas variables, intenta usar la carpeta temporal del viejo y falla
+    con "Failed to start embedded python interpreter".
+    """
+    env = os.environ.copy()
+    for k in list(env):
+        if k.startswith(("_MEI", "_PYI")) or k in ("TCL_LIBRARY", "TK_LIBRARY", "SSL_CERT_FILE"):
+            env.pop(k, None)
+    env["PYINSTALLER_RESET_ENVIRONMENT"] = "1"
+    return env
+
+
+def _lanzar(args):
+    try:
+        subprocess.Popen(args, env=entorno_limpio(), close_fds=True,
+                         creationflags=SIN_VENTANA if ES_WINDOWS and args[0] == "cmd" else 0)
+        return True
+    except OSError:
+        return False
+
+
 def abrir_ventana(url):
     """Abre la interfaz como ventana de aplicación (Edge o Chrome en modo app)."""
+    app = [f"--app={url}", "--window-size=1280,850"]
     if ES_WINDOWS:
         rutas = [
             os.path.expandvars(r"%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe"),
             os.path.expandvars(r"%ProgramFiles%\Microsoft\Edge\Application\msedge.exe"),
+            os.path.expandvars(r"%LocalAppData%\Microsoft\Edge\Application\msedge.exe"),
             os.path.expandvars(r"%ProgramFiles%\Google\Chrome\Application\chrome.exe"),
             os.path.expandvars(r"%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe"),
             os.path.expandvars(r"%LocalAppData%\Google\Chrome\Application\chrome.exe"),
         ]
         for r in rutas:
-            if os.path.exists(r):
-                subprocess.Popen([r, f"--app={url}", "--window-size=1280,850"])
+            if os.path.exists(r) and _lanzar([r, *app]):
                 return
+        # Edge registrado en Windows aunque no esté en las rutas de siempre
+        if _lanzar(["cmd", "/c", "start", "", "msedge", *app]):
+            return
     else:
         for b in ("chromium", "google-chrome", "microsoft-edge"):
-            if shutil.which(b):
-                subprocess.Popen([b, f"--app={url}"])
+            if shutil.which(b) and _lanzar([b, f"--app={url}"]):
                 return
     webbrowser.open(url)

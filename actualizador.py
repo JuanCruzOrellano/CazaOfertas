@@ -138,9 +138,11 @@ exit /b 1
 start "" "{actual}" --sin-ventana
 (goto) 2>nul & rmdir /s /q "{carpeta}"
 """)
+            import windows
             subprocess.Popen(["cmd", "/c", bat], creationflags=0x08000000,  # CREATE_NO_WINDOW
                              stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-                             stderr=subprocess.DEVNULL, close_fds=True)
+                             stderr=subprocess.DEVNULL, close_fds=True,
+                             env=windows.entorno_limpio())  # sin esto el .exe nuevo no arranca
             estado["progreso"] = 100
             salir()
         except Exception as e:  # noqa: BLE001

@@ -27,7 +27,7 @@ from version import APP_VERSION  # noqa: E402
 
 PUERTO = int(os.environ.get("CAZAOFERTAS_PUERTO", "8767"))
 URL = f"http://127.0.0.1:{PUERTO}/"
-VERSION = 16
+VERSION = 17
 # Si corre como .exe (PyInstaller), los archivos vienen empaquetados en sys._MEIPASS
 BASE = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
 WEB = os.path.join(BASE, "web")
