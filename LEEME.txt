@@ -1,0 +1,37 @@
+CAZAOFERTAS
+===========
+
+Instalación (una sola vez)
+  1. Descomprimí esta carpeta donde quieras dejarla (por ejemplo en Documentos).
+  2. Doble clic en "Instalar.bat".
+     - Si no tenés Python, lo instala solo. Después volvé a abrir Instalar.bat.
+     - Crea el acceso directo "CazaOfertas" en el Escritorio y abre la app.
+
+Versión .exe (opcional)
+  Después de instalar, doble clic en "Crear EXE.bat". Arma CazaOfertas.exe con el
+  logo y deja el acceso directo del Escritorio apuntando al .exe.
+  Si Windows muestra "Windows protegió su PC": Más información > Ejecutar de todas formas.
+
+Uso
+  - "+ Agregar marca": poné la tienda oficial (ej. nike.com.ar), tocá Buscar,
+    elegí las categorías (ej. Hombre > Calzado), tu precio máximo y Guardar.
+  - La primera revisión guarda cómo está todo hoy. Desde ahí, en "Novedades"
+    aparece lo que:
+      * bajó de precio y entró en tu rango,
+      * ya estaba en tu rango y bajó más,
+      * es nuevo en la tienda y ya entra en tu rango,
+      * volvió a tener stock.
+  - "En tu rango" muestra todo lo que hoy cuesta menos que tu máximo.
+  - En Editar, cada categoría tiene:
+      * la casilla: lo que ves en "En tu rango";
+      * la campanita: de qué te avisa (aunque no esté tildada).
+  - Ajustes (⚙) > Revisión automática: revisa cada X horas aunque la app esté
+    cerrada y te manda una notificación de Windows.
+
+Tiendas compatibles
+  Funciona con tiendas hechas en VTEX (nike.com.ar, topper.com.ar y muchas
+  tiendas argentinas) y en Shopify. Si una tienda no es compatible, la app te
+  lo dice al tocar Buscar.
+
+Tus datos quedan en %APPDATA%\CazaOfertas\datos.db
+Si movés la carpeta de la app, volvé a guardar la revisión automática en Ajustes.

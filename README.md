@@ -1,0 +1,27 @@
+# CazaOfertas
+
+App de escritorio para Windows que sigue los precios de tus marcas favoritas y te avisa cuando algo baja y entra en tu rango.
+
+## Descargar
+
+👉 **[Descargar CazaOfertas.exe](https://github.com/JuanCruzOrellano/CazaOfertas/releases/latest/download/CazaOfertas.exe)**
+
+1. Guardá el archivo en una carpeta fija (por ejemplo `Documentos\CazaOfertas`).
+2. Abrilo. Si Windows muestra *"Windows protegió su PC"*: **Más información → Ejecutar de todas formas**.
+3. Para tener el acceso directo: clic derecho sobre el .exe → *Enviar a* → *Escritorio*.
+
+La app se actualiza sola: cuando hay una versión nueva aparece un aviso para instalarla.
+Tus marcas y precios se guardan en `%APPDATA%\CazaOfertas` y no se pierden al actualizar.
+
+## Cómo se usa
+
+- **+ Agregar marca**: poné la tienda oficial (ej. `nike.com.ar`) y tu precio máximo.
+- **Casillas**: lo que ves en *En tu rango*.
+- **Campanitas**: de qué te avisa, cada una con su precio.
+- **Ajustes (⚙)**: revisión automática cada X horas, aunque la app esté cerrada.
+
+Funciona con tiendas VTEX (nike.com.ar, topper.com.ar y muchas tiendas argentinas) y Shopify.
+
+## Publicar una versión nueva (para el dueño del repo)
+
+Subir los cambios y crear una etiqueta `vX.Y.Z` (ej. `v1.0.1`). GitHub arma el .exe y lo publica solo; las apps instaladas lo detectan y ofrecen actualizar.

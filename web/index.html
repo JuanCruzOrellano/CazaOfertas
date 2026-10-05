@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CazaOfertas</title>
+<link rel="icon" href="/logo.png">
+<style>
+:root{
+  /* Paleta suave: arena, terracota apagado, verde salvia y mostaza claro. Siempre clara. */
+  --bg:#faf7f2; --panel:#ffffff;
+  --side:#f1ebe2; --side-ink:#3d405b; --side-mute:#8b8798;
+  --ink:#3d405b; --mute:#85818f; --line:#ece4d9; --accent:#d9785d; --accent-ink:#fff;
+  --sun:#f2d49b; --sun-ink:#5c4614;
+  --ok:#4e8b6f; --ok-bg:#e5f1ea; --warn:#a8742a; --warn-bg:#f8eedb; --new:#5b74b8; --new-bg:#e8edf8;
+  --chip:#f3eee7; --shadow:0 1px 3px rgba(61,64,91,.05),0 6px 18px rgba(61,64,91,.06);
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:14px/1.45 "Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);display:flex}
+button{font:inherit;cursor:pointer}
+input,select{font:inherit;color:inherit}
+/* ---------- sidebar */
+aside{width:260px;flex:none;background:var(--side);color:var(--side-ink);display:flex;flex-direction:column;height:100vh}
+.logo{padding:20px 20px 14px;font-weight:700;font-size:18px;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.logo b{color:var(--accent)}
+.logo-img{width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(0,0,0,.12))}
+
+.navlist{flex:1;overflow:auto;padding:4px 10px}
+.nav{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;color:inherit;text-align:left;
+  padding:9px 10px;border-radius:8px;margin-bottom:2px}
+.nav:hover{background:rgba(255,255,255,.55)}
+.nav.on{background:#fff;box-shadow:0 1px 4px rgba(61,64,91,.08)}
+.nav .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav .sub{font-size:12px;color:var(--side-mute)}
+.badge{background:var(--accent);color:#fff;font-size:11px;font-weight:700;border-radius:99px;padding:1px 7px;min-width:20px;text-align:center}
+.dot{width:8px;height:8px;border-radius:50%;background:#b9c9b0;flex:none}
+.dot.err{background:#c96a5a}.dot.run{background:#e0b25c;animation:p 1s infinite alternate}
+@keyframes p{to{opacity:.3}}
+.sep{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--side-mute);padding:14px 10px 6px}
+.side-foot{padding:12px;border-top:1px solid var(--line);display:grid;gap:8px}
+.side-foot small{color:var(--side-mute);font-size:12px;padding:0 4px}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 14px;border-radius:10px;font-weight:600;transition:transform .1s,filter .1s}
+.btn:active{transform:scale(.97)}
+.btn:hover{filter:brightness(.97)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 6px rgba(217,120,93,.22)}
+.btn.ghost{background:#fff;border-color:var(--line);color:var(--ink)}
+.btn.ghost:hover{background:#fdfbf8}
+.btn.danger{color:#c0392b}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.side-add{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 6px rgba(217,120,93,.22)}
+/* ---------- main */
+main{flex:1;height:100vh;overflow:auto}
+.wrap{max-width:1180px;margin:0 auto;padding:26px 30px 60px}
+.head{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.head h1{margin:0;font-size:26px;letter-spacing:-.02em}
+.head .meta{color:var(--mute);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.head .acts{margin-left:auto;display:flex;gap:8px}
+.chip{background:var(--chip);border-radius:99px;padding:2px 10px;font-size:12px;color:var(--mute)}
+.upd{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 30px;background:#e8f1ea;color:#2f5d47;border-bottom:1px solid #cfe3d6;font-size:14px}
+.upd b{font-weight:700}
+.upd .sp{flex:1}
+.upd .bar{width:160px;height:6px;border-radius:99px;background:#cfe3d6;overflow:hidden}
+.upd .bar i{display:block;height:100%;background:#4e8b6f;transition:width .3s}
+.upd .btn{padding:6px 12px}
+.chip.range{background:var(--sun);color:var(--sun-ink);font-weight:700}
+.tabs{display:flex;gap:4px;margin:22px 0 16px;border-bottom:1px solid var(--line)}
+.tab{border:0;background:none;padding:10px 14px;color:var(--mute);font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.on{color:var(--ink);border-color:var(--accent)}
+.tab .n{font-weight:500;color:var(--mute);margin-left:4px}
+.tools{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.tools input,.tools select{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
+.tools input{flex:1;min-width:180px}
+.alert{background:var(--warn-bg);color:var(--warn);padding:10px 14px;border-radius:8px;margin-top:14px}
+.status{color:var(--mute);font-size:13px;margin-top:10px}
+/* ---------- cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.card{background:var(--panel);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;
+  text-decoration:none;color:inherit;position:relative;border:1px solid transparent}
+.card:hover{border-color:var(--line);transform:translateY(-2px)}
+.card{transition:transform .15s}
+.card.unseen{border-color:#e9b8a8;box-shadow:0 0 0 2px rgba(217,120,93,.10),var(--shadow)}
+.card .img{aspect-ratio:1/1;background:#fff;display:flex;align-items:center;justify-content:center}
+.card img{width:100%;height:100%;object-fit:contain}
+.card .body{padding:10px 12px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
+.card .name{font-size:13px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:34px}
+.card .price{font-size:18px;font-weight:700;letter-spacing:-.01em;margin-top:auto}
+.card .old{font-size:12px;color:var(--mute);text-decoration:line-through;margin-left:6px;font-weight:400}
+.card .brand{font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em}
+.card .when{font-size:11px;color:var(--mute)}
+.off{position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;font-weight:700;font-size:12px;padding:2px 7px;border-radius:6px}
+.tag{align-self:flex-start;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px}
+.tag.nuevo{background:var(--new-bg);color:var(--new)}
+.tag.entro_rango,.tag.bajo_mas{background:var(--ok-bg);color:var(--ok)}
+.tag.volvio_stock{background:var(--warn-bg);color:var(--warn)}
+.soldout{font-size:11px;color:var(--warn)}
+.empty{text-align:center;color:var(--mute);padding:70px 20px;background:var(--panel);border-radius:12px;border:1px dashed var(--line)}
+.empty h3{color:var(--ink);margin:0 0 6px}
+/* ---------- modal */
+.back{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
+.back.on{display:flex}
+.modal{background:var(--panel);border-radius:14px;width:100%;max-width:720px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal header{padding:18px 22px 4px;font-size:18px;font-weight:700}
+.modal .mb{padding:10px 22px;overflow:auto;display:grid;gap:14px}
+.modal footer{padding:14px 22px 18px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--line)}
+label.f{display:grid;gap:5px;font-weight:600;font-size:13px}
+label.f span.h{font-weight:400;color:var(--mute);font-size:12px}
+.f input[type=text],.f input[type=number],.f select{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 11px;width:100%}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.inl{display:flex;gap:8px}.inl input{flex:1}
+.sec{display:grid;gap:8px;padding:14px;border:1px solid var(--line);border-radius:12px}
+.sec h4{margin:0;font-size:14px}
+.sec .h{font-weight:400;color:var(--mute);font-size:12px;margin-top:-4px}
+.selchips{display:flex;flex-wrap:wrap;gap:6px;min-height:28px;align-items:center}
+.selchip{display:inline-flex;align-items:center;gap:4px;background:var(--accent);color:#fff;border-radius:99px;padding:3px 4px 3px 11px;font-size:13px;font-weight:600}
+.selchip button{border:0;background:rgba(255,255,255,.25);color:#fff;width:20px;height:20px;border-radius:50%;font-size:12px;line-height:1;padding:0}
+.selchip.all{background:var(--chip);color:var(--mute);padding:3px 11px;font-weight:500}
+.search{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 11px;width:100%}
+.tree{border:1px solid var(--line);border-radius:8px;max-height:300px;overflow:auto;padding:4px;background:var(--bg)}
+.tn{display:flex;align-items:center;gap:2px;border-radius:6px}
+.tn:hover{background:var(--chip)}
+.tn.vacia .lb{opacity:.45}
+.tn .car{border:0;background:none;color:var(--mute);width:24px;height:28px;padding:0;font-size:11px;flex:none}
+.tn .car.vac{visibility:hidden}
+.bell{border:0;background:none;width:28px;height:28px;padding:0;border-radius:6px;display:flex;align-items:center;justify-content:center;flex:none;color:var(--mute);opacity:.45}
+.bell svg{fill:none;stroke:currentColor;stroke-width:1.8}
+.bell:hover{opacity:1;background:var(--chip)}
+.bell.on{color:var(--accent);opacity:1}
+.bell.on svg{fill:currentColor;stroke:none}
+.bell.par{color:var(--accent);opacity:.9}
+.sumrow{display:flex;gap:10px;align-items:flex-start}
+.sumlbl{width:70px;flex:none;font-size:12px;font-weight:600;color:var(--mute);padding-top:6px}
+.bellrow{display:flex;align-items:center;gap:8px;border:1.5px solid var(--accent);border-radius:10px;padding:4px 6px 4px 10px;margin-bottom:6px}
+.bellrow .bn{flex:1;min-width:0;display:flex;align-items:center;gap:6px;color:var(--accent);font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bellrow .bn svg{width:13px;height:13px;fill:currentColor;flex:none}
+.bellrow .hasta{font-size:12px;color:var(--mute)}
+.bellrow input{width:150px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 8px;font-size:13px}
+.bellrow .x{border:0;background:var(--accent);color:#fff;width:20px;height:20px;border-radius:50%;font-size:11px;padding:0;flex:none}
+#fBellChips{display:block;flex:1}
+.selchip.bellchip{background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:2px 4px 2px 8px}
+.selchip.bellchip svg{width:13px;height:13px;fill:currentColor;margin-right:2px}
+.selchip.bellchip button{background:var(--accent)}
+.bellinl svg{width:12px;height:12px;fill:var(--accent);vertical-align:-1px}
+.chip.bellc{color:var(--accent);background:transparent;border:1px solid var(--accent)}
+.chip.bellc svg{width:11px;height:11px;fill:currentColor;vertical-align:-1px;margin-right:3px}
+.tn label{display:flex;align-items:center;gap:8px;flex:1;padding:5px 8px 5px 2px;cursor:pointer;font-weight:400;min-width:0}
+.tn label .lb{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tn.sel label .lb{font-weight:600}
+.tn .cnt{color:var(--mute);font-size:12px;font-variant-numeric:tabular-nums}
+.tn input{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.tipogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:2px 10px;max-height:220px;overflow:auto;padding:2px}
+.tipogrid label{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;font-weight:400;cursor:pointer}
+.tipogrid label:hover{background:var(--chip)}
+.tipogrid input{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.tipogrid .cnt{color:var(--mute);font-size:12px;margin-left:auto}
+.linkbtn{border:0;background:none;color:var(--accent);font-weight:600;padding:0;font-size:13px}
+.sec .top{display:flex;align-items:baseline;gap:12px}
+.sec .top .sp{flex:1}
+.nota{font-size:12px;color:var(--mute);background:var(--chip);padding:8px 10px;border-radius:8px}
+.chk{display:flex;gap:8px;align-items:center;font-weight:400}
+.err{color:#c0392b;font-size:13px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;display:none;z-index:20}
+@media (max-width:760px){aside{width:200px}.wrap{padding:18px 16px}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<aside>
+  <div class="logo"><img src="/logo.png" alt="" class="logo-img"><span>Caza<b>Ofertas</b></span></div>
+  <div class="navlist" id="nav"></div>
+  <div class="side-foot">
+    <button class="btn side-add" onclick="abrirMarca()">+ Agregar marca</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn ghost" style="flex:1" id="btnTodo" onclick="revisar()">Revisar todo</button>
+      <button class="btn ghost" title="Ajustes" onclick="abrirAjustes()">⚙</button>
+    </div>
+    <small id="ultima"></small>
+  </div>
+</aside>
+<main><div id="upd" class="upd" style="display:none"></div><div class="wrap" id="main"></div></main>
+
+<!-- Modal marca -->
+<div class="back" id="mMarca"><div class="modal">
+  <header id="mTitulo">Agregar marca</header>
+  <div class="mb">
+    <label class="f">Tienda oficial
+      <span class="h">La dirección de la tienda online de la marca, por ejemplo nike.com.ar</span>
+      <div class="inl"><input type="text" id="fUrl" placeholder="nike.com.ar">
+      <button class="btn" id="btnDet" onclick="detectar()">Buscar</button></div>
+    </label>
+    <div class="err" id="fErr"></div>
+    <div id="fResto" style="display:none;gap:14px" class="mb0">
+      <div style="display:grid;gap:14px">
+        <label class="f">Nombre<input type="text" id="fNombre" placeholder="Nike"></label>
+        <div class="row">
+          <label class="f">Precio máximo general<span class="h">Para "En tu rango" y para las campanitas sin precio propio</span><input type="number" id="fMax" min="0" step="1000" placeholder="150000"></label>
+          <label class="f">Precio mínimo<span class="h">Opcional</span><input type="number" id="fMin" min="0" step="1000" placeholder="0"></label>
+        </div>
+        <div class="sec">
+          <h4>¿Qué productos seguir?</h4>
+          <div class="h">Tildá lo que querés ver en "En tu rango". <span class="bellinl"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2Z"/></svg></span> Activá la campanita en lo que querés que te avise (aunque no esté tildado), y si querés poné un precio máximo distinto para cada una.</div>
+          <div class="sumrow"><span class="sumlbl">Ver</span><div class="selchips" id="fSelChips"></div></div>
+          <div class="sumrow"><span class="sumlbl">Avisarme</span><div class="selchips" id="fBellChips"></div></div>
+          <input type="text" class="search" id="fCatQ" placeholder="Buscar categoría (ej. calzado, remeras)…" oninput="pintarCats()">
+          <div class="tree" id="fCats"></div>
+        </div>
+        <div class="sec" id="fTiposSec">
+          <div class="top"><h4>Tipos de producto</h4><span class="sp"></span>
+            <button class="linkbtn" id="fTodos" onclick="tiposTodos(true)">Marcar todos</button>
+            <button class="linkbtn" id="fNinguno" onclick="tiposTodos(false)">Ninguno</button></div>
+          <div class="h">Tipos que hay en lo que tildaste: <b id="fTiposBase"></b>. Destildá los que no querés ver en "En tu rango". Las campanitas no se ven afectadas: avisan de toda su categoría, con su precio.</div>
+          <div id="fTipos"></div>
+        </div>
+        <div class="row">
+          <label class="f">Solo si el nombre tiene<span class="h">Palabras separadas por coma</span><input type="text" id="fInc" placeholder="air max, dunk"></label>
+          <label class="f">Excluir si el nombre tiene<span class="h">Palabras separadas por coma</span><input type="text" id="fExc" placeholder="ojotas, medias"></label>
+        </div>
+        <label class="chk"><input type="checkbox" id="fStock" checked> Mostrar solo productos con stock</label>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <button class="btn danger" id="btnBorrar" style="margin-right:auto;display:none" onclick="borrarMarca()">Eliminar marca</button>
+    <button class="btn" onclick="cerrar('mMarca')">Cancelar</button>
+    <button class="btn pri" id="btnGuardar" disabled onclick="guardarMarca()">Guardar</button>
+  </footer>
+</div></div>
+
+<!-- Modal ajustes -->
+<div class="back" id="mAjustes"><div class="modal" style="max-width:460px">
+  <header>Ajustes</header>
+  <div class="mb">
+    <label class="f">Revisión automática
+      <span class="h">La app revisa los precios sola, aunque esté cerrada, y te manda una notificación de Windows cuando algo entra en tu rango.</span>
+      <select id="aHoras">
+        <option value="0">Desactivada</option><option value="1">Cada 1 hora</option>
+        <option value="3">Cada 3 horas</option><option value="6">Cada 6 horas</option>
+        <option value="12">Cada 12 horas</option><option value="24">Una vez por día</option>
+      </select>
+    </label>
+    <div class="err" id="aMsg"></div>
+    <button class="btn" style="justify-self:start" onclick="probarAviso()">Probar notificación</button>
+  </div>
+  <footer><span id="aVer" style="margin-right:auto;color:var(--mute);font-size:12px;align-self:center"></span><button class="btn" onclick="cerrar('mAjustes')">Cerrar</button><button class="btn pri" onclick="guardarAjustes()">Guardar</button></footer>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cap = s => { s=String(s||'').replace(/-/g,' ').trim(); return s.charAt(0).toUpperCase()+s.slice(1); };
+const pesos = n => '$' + Math.round(n).toLocaleString('es-AR');
+const ETQ = {nuevo:'Nuevo en tu rango', entro_rango:'Bajó y entró en tu rango', bajo_mas:'Bajó todavía más', volvio_stock:'Volvió el stock'};
+
+let S = {marcas:[], vista:'todas', tab:'nov', revisando:false, q:'', orden:'precio'};
+let F = {id:null, cats:[], sel:new Set(), platform:null, base_url:null};
+
+async function api(path, opt={}) {
+  const r = await fetch(path, {headers:{'Content-Type':'application/json'}, ...opt,
+    body: opt.body ? JSON.stringify(opt.body) : undefined});
+  const j = await r.json().catch(()=>({error:'Respuesta inválida'}));
+  if (!r.ok) throw new Error(j.error || 'Error');
+  return j;
+}
+function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',3200)}
+function hace(ts){ if(!ts) return 'nunca'; const m=Math.round((Date.now()/1000-ts)/60);
+  if(m<1) return 'recién'; if(m<60) return `hace ${m} min`; const h=Math.round(m/60);
+  if(h<24) return `hace ${h} h`; return `hace ${Math.round(h/24)} d`; }
+
+/* ---------- actualizaciones */
+let U = null, _verInicial = null;
+async function revisarActualizacion() {
+  try { U = await api('/api/actualizacion'); } catch(e) { return; }
+  pintarUpd();
+  if (U.descargando) setTimeout(revisarActualizacion, 800);
+}
+function pintarUpd() {
+  const box = $('#upd');
+  if (!U || !U.nueva) { box.style.display = 'none'; return; }
+  box.style.display = 'flex';
+  if (U.descargando) {
+    box.innerHTML = `<span>Descargando la versión <b>${esc(U.nueva)}</b>…</span><span class="bar"><i style="width:${U.progreso||0}%"></i></span><span class="sp"></span><span>La app se va a reiniciar sola.</span>`;
+  } else if (U.error) {
+    box.innerHTML = `<span>${esc(U.error)}</span><span class="sp"></span><button class="btn" onclick="actualizar()">Reintentar</button>`;
+  } else {
+    box.innerHTML = `<span>🎉 Hay una versión nueva: <b>${esc(U.nueva)}</b> (tenés la ${esc(U.actual)})</span><span class="sp"></span>
+      ${U.notas?`<button class="btn" onclick="alert(U.notas)">Qué cambió</button>`:''}
+      <button class="btn pri" onclick="actualizar()">Actualizar</button>`;
+  }
+}
+async function actualizar() {
+  if (!U.es_exe) { window.open(U.pagina, '_blank'); return; }
+  const j = await api('/api/actualizar', {method:'POST'}).catch(e => ({ok:false, mensaje:e.message}));
+  if (!j.ok) { toast(j.mensaje); return; }
+  U.descargando = true; pintarUpd(); revisarActualizacion(); esperarReinicio();
+}
+async function esperarReinicio() {
+  // Cuando la app nueva arranca, esta ventana se recarga sola
+  const t0 = Date.now();
+  const tick = async () => {
+    try {
+      const r = await (await fetch('/api/ping', {cache:'no-store'})).json();
+      if (r.app_version && r.app_version !== _verInicial) { location.reload(); return; }
+    } catch(e) {}
+    if (Date.now() - t0 < 180000) setTimeout(tick, 1500);
+  };
+  setTimeout(tick, 2000);
+}
+fetch('/api/ping').then(r=>r.json()).then(r=>{ _verInicial = r.app_version; const v=$('#aVer'); if (v) v.textContent = 'Versión ' + (r.app_version||''); }).catch(()=>{});
+setTimeout(revisarActualizacion, 3000);
+setInterval(revisarActualizacion, 6*3600*1000);
+
+async function cargar() {
+  const j = await api('/api/marcas');
+  const antes = S.revisando;
+  S.marcas = j.marcas; S.revisando = j.revisando;
+  $('#ultima').textContent = 'Última revisión: ' + hace(j.ultima_revision || Math.max(0,...S.marcas.map(m=>m.last_check||0)));
+  $('#btnTodo').disabled = S.revisando;
+  $('#btnTodo').textContent = S.revisando ? 'Revisando…' : 'Revisar todo';
+  pintarNav();
+  await pintarMain(antes && !S.revisando);
+  clearTimeout(cargar._t);
+  cargar._t = setTimeout(cargar, S.revisando ? 2500 : 30000);
+}
+
+function pintarNav() {
+  const tot = S.marcas.reduce((a,m)=>a+m.sin_ver,0);
+  let h = `<button class="nav ${S.vista==='todas'?'on':''}" onclick="ir('todas')"><span class="nm">Todas las novedades</span>${tot?`<span class="badge">${tot}</span>`:''}</button>`;
+  h += `<div class="sep">Mis marcas</div>`;
+  if (!S.marcas.length) h += `<div class="sub" style="padding:4px 10px;color:var(--side-mute)">Todavía no agregaste marcas.</div>`;
+  for (const m of S.marcas) {
+    const cls = m.estado ? 'run' : (m.last_error ? 'err' : '');
+    h += `<button class="nav ${S.vista===m.id?'on':''}" onclick="ir(${m.id})">
+      <span class="dot ${cls}"></span>
+      <span class="nm">${esc(m.name)}<div class="sub">hasta ${pesos(m.max_price)} · ${m.en_rango} en rango</div></span>
+      ${m.sin_ver?`<span class="badge">${m.sin_ver}</span>`:''}</button>`;
+  }
+  $('#nav').innerHTML = h;
+}
+
+function ir(v){ S.vista=v; S.tab='nov'; S.q=''; pintarNav(); pintarMain(); }
+
+function card(p, ev) {
+  const off = p.list_price > p.price + 1 ? Math.round((1 - p.price/p.list_price)*100) : 0;
+  const old = ev && ev.old_price && ev.old_price > p.price ? ev.old_price : (off ? p.list_price : 0);
+  return `<a class="card ${ev && !ev.seen ? 'unseen':''}" href="${esc(p.link)}" target="_blank" rel="noopener">
+    <div class="img">${p.image?`<img loading="lazy" src="${esc(p.image)}" alt="" onerror="this.remove()">`:''}</div>
+    ${off>=5?`<span class="off">-${off}%</span>`:''}
+    <div class="body">
+      ${ev?`<span class="tag ${ev.type}">${ETQ[ev.type]||'Novedad'}</span>`:''}
+      ${ev && S.vista==='todas'?`<div class="brand">${esc(ev.brand_name)}</div>`:''}
+      <div class="name">${esc(p.name)}</div>
+      <div class="price">${pesos(p.price)}${old?`<span class="old">${pesos(old)}</span>`:''}</div>
+      ${ev?`<div class="when">${hace(ev.created_at)}${(ev.ok ?? ev.in_range) ? '' : ' · ya no está en tu rango'}</div>`:''}
+      ${!p.available?'<div class="soldout">Sin stock</div>':''}
+    </div></a>`;
+}
+
+async function pintarMain(refrescar) {
+  const m = S.marcas.find(x=>x.id===S.vista);
+  if (S.vista !== 'todas' && !m) { S.vista='todas'; }
+  const main = $('#main');
+  if (!S.marcas.length) {
+    main.innerHTML = `<div class="empty" style="margin-top:60px"><img src="/logo.png" alt="" style="width:120px;margin-bottom:10px"><h3>Agregá tu primera marca</h3>
+      Poné la tienda oficial (por ejemplo <b>nike.com.ar</b>), elegí la categoría y tu precio máximo.<br>
+      La app te va a mostrar todo lo que entra en tu rango y te avisa cuando algo baja.<br><br>
+      <button class="btn pri" onclick="abrirMarca()">+ Agregar marca</button></div>`;
+    return;
+  }
+  let head;
+  if (S.vista === 'todas') {
+    head = `<div class="head"><div><h1>Novedades</h1><div class="meta">Lo que se puso en oferta o entró en tu rango, en todas tus marcas.</div></div>
+      <div class="acts"><button class="btn" onclick="vistas()">Marcar todo como visto</button></div></div>`;
+  } else {
+    let tiposChip = '';
+    if ((m.tipos_ocultos||[]).length && m.last_check) {
+      const {tipos} = await api(`/api/marca/${m.id}/tipos`);
+      const vis = tipos.filter(x=>x.visible).map(x=>x.tipo);
+      tiposChip = `<span class="chip">${vis.length<=3 ? 'Solo '+esc(vis.join(', ')||'ningún tipo') : vis.length+' tipos de producto'}</span>`;
+    }
+    const avs = m.avisar == null ? null : m.avisar.map(x => typeof x === 'string' ? {id:x, name:x} : x);
+    const corto = x => x.id ? x.name.split(' › ').slice(-2).map(cap).join(' › ') : 'Toda la tienda';
+    const bellChip = avs == null ? '' : (avs.length
+      ? avs.map(x => `<span class="chip bellc">${BELL}${esc(corto(x))} · hasta ${pesos(x.max_price || m.max_price)}</span>`).join('')
+      : `<span class="chip bellc">${BELL}Sin avisos</span>`);
+    const cats = m.categories.length ? m.categories.map(c=>`<span class="chip">${esc(c.name.split(' › ').slice(-2).map(cap).join(' › '))}</span>`).join('') : '<span class="chip">Toda la tienda</span>';
+    head = `<div class="head"><div><h1>${esc(m.name)}</h1>
+      <div class="meta"><span class="chip range">${m.min_price?pesos(m.min_price)+' a ':'Hasta '}${pesos(m.max_price)}</span>${cats}${tiposChip}${bellChip}
+      <span>${esc(m.base_url.replace(/^https?:\/\//,''))}</span></div></div>
+      <div class="acts"><button class="btn" onclick="abrirMarca(${m.id})">Editar</button>
+      <button class="btn pri" ${S.revisando?'disabled':''} onclick="revisar(${m.id})">${m.estado?'Revisando…':'Revisar ahora'}</button></div></div>
+      ${m.estado?`<div class="status">${esc(m.estado)}</div>`:`<div class="status">Revisado ${hace(m.last_check)}</div>`}
+      ${m.last_error?`<div class="alert">No se pudo revisar: ${esc(m.last_error)}</div>`:''}
+      <div class="tabs"><button class="tab ${S.tab==='nov'?'on':''}" onclick="S.tab='nov';pintarMain()">Novedades<span class="n">${m.sin_ver||''}</span></button>
+      <button class="tab ${S.tab==='rango'?'on':''}" onclick="S.tab='rango';pintarMain()">En tu rango<span class="n">${m.en_rango}</span></button></div>`;
+  }
+  const mantenerFoco = document.activeElement && document.activeElement.id === 'q';
+  let body = '';
+  if (S.vista === 'todas' || S.tab === 'nov') {
+    const {novedades} = await api('/api/novedades' + (S.vista==='todas'?'':'?marca='+m.id));
+    const sinVer = novedades.filter(n=>!n.seen).length;
+    if (!novedades.length) {
+      const primera = m && !m.last_check;
+      body = `<div class="empty"><h3>${primera?'Revisando la tienda por primera vez…':'Sin novedades por ahora'}</h3>
+        ${primera?'Esto tarda un poco. Después vas a ver acá lo que baje de precio o entre en tu rango.':'Cuando algo baje de precio o aparezca un producto nuevo dentro de tu rango, lo vas a ver acá.'}
+        ${m && !primera?`<br><br><button class="btn" onclick="S.tab='rango';pintarMain()">Ver lo que ya está en tu rango (${m.en_rango})</button>`:''}</div>`;
+    } else {
+      body = (S.vista!=='todas' && sinVer?`<div class="tools"><span style="color:var(--mute)">${sinVer} sin ver</span><button class="btn" onclick="vistas(${m.id})">Marcar como vistas</button></div>`:'')
+        + `<div class="grid">${novedades.map(n=>card(n,n)).join('')}</div>`;
+    }
+  } else {
+    const {productos} = await api(`/api/marca/${m.id}/rango`);
+    const q = S.q.toLowerCase();
+    let lista = productos.filter(p=>!q || p.name.toLowerCase().includes(q));
+    if (S.orden==='desc') lista.sort((a,b)=>(b.list_price-b.price)/b.list_price-(a.list_price-a.price)/a.list_price);
+    if (S.orden==='precio_desc') lista.sort((a,b)=>b.price-a.price);
+    body = `<div class="tools"><input id="q" placeholder="Buscar en ${productos.length} productos…" value="${esc(S.q)}" oninput="S.q=this.value;pintarMain()">
+      <select onchange="S.orden=this.value;pintarMain()">
+        <option value="precio" ${S.orden==='precio'?'selected':''}>Más baratos primero</option>
+        <option value="precio_desc" ${S.orden==='precio_desc'?'selected':''}>Más caros primero</option>
+        <option value="desc" ${S.orden==='desc'?'selected':''}>Mayor descuento</option></select></div>`
+      + (lista.length ? `<div class="grid">${lista.map(p=>card(p)).join('')}</div>`
+        : `<div class="empty"><h3>Nada en tu rango ${m.last_check?'':'todavía'}</h3>${m.last_check?'Probá subir el precio máximo o revisar las categorías.':'La primera revisión está en curso.'}</div>`);
+  }
+  main.innerHTML = head + body;
+  if (mantenerFoco) { const i=$('#q'); i.focus(); i.setSelectionRange(i.value.length,i.value.length); }
+}
+
+async function revisar(id){ try{ await api('/api/revisar',{method:'POST',body:{marca:id||null}}); toast('Revisando precios…'); cargar(); }catch(e){toast(e.message)} }
+async function vistas(id){ await api('/api/vistas',{method:'POST',body:{marca:id||null}}); cargar(); }
+
+/* ---------- formulario de marca */
+function cerrar(id){ $('#'+id).classList.remove('on'); }
+function abrirMarca(id) {
+  F = {id:id||null, cats:[], sel:new Set(), selOrig:'', platform:null, base_url:null,
+       byId:{}, roots:[], raiz:null, open:new Set(), conteos:{}, tipos:null, ocultos:new Set(), avisar:null, precios:{}};
+  $('#mTitulo').textContent = id ? 'Editar marca' : 'Agregar marca';
+  $('#fErr').textContent=''; $('#fResto').style.display='none'; $('#btnGuardar').disabled=true;
+  $('#btnBorrar').style.display = id?'':'none';
+  ['fUrl','fNombre','fMax','fMin','fInc','fExc','fCatQ'].forEach(k=>$('#'+k).value='');
+  $('#fStock').checked = true;
+  $('#mMarca').classList.add('on');
+  if (id) {
+    const m = S.marcas.find(x=>x.id===id);
+    $('#fUrl').value = m.base_url;
+    $('#fNombre').value = m.name; $('#fMax').value = m.max_price; $('#fMin').value = m.min_price||'';
+    $('#fInc').value = m.include_kw; $('#fExc').value = m.exclude_kw; $('#fStock').checked = !!m.only_stock;
+    F.sel = new Set(m.categories.map(c=>c.id));
+    F.avisar = m.avisar ? new Set(m.avisar.map(x => typeof x === 'string' ? x : x.id)) : null;
+    (m.avisar||[]).forEach(x => { if (x && x.max_price) F.precios[x.id] = x.max_price; });
+    F.ocultos = new Set(m.tipos_ocultos||[]);
+    F.tieneDatos = !!m.last_check;
+    detectar(true);
+  } else setTimeout(()=>$('#fUrl').focus(),50);
+  pintarTipos();
+}
+async function detectar(editando) {
+  const b = $('#btnDet'); b.disabled=true; b.textContent='Buscando…'; $('#fErr').textContent='';
+  try {
+    const j = await api('/api/detectar',{method:'POST',body:{url:$('#fUrl').value}});
+    F.platform=j.platform; F.base_url=j.base_url; F.cats=j.categories;
+    if (!editando) {
+      F.sel = new Set();
+      if (!$('#fNombre').value) { const h=j.base_url.replace(/^https?:\/\/(www\.)?/,'').split('.')[0]; $('#fNombre').value=h.charAt(0).toUpperCase()+h.slice(1); }
+    }
+    armarArbol();
+    // Al editar, las campanitas quedan fijas: destildar algo para mirar otra cosa no te saca los avisos
+    if (editando && !F.avisar) F.avisar = avisos();
+    F.selOrig = claveDescarga();
+    pintarCats(); pintarTipos();
+    $('#fResto').style.display='block'; $('#btnGuardar').disabled=false;
+    if (!editando) $('#fMax').focus();
+    api('/api/conteos',{method:'POST',body:{platform:F.platform, base_url:F.base_url, ids:Object.keys(F.byId).filter(Boolean)}})
+      .then(r=>{ F.conteos=r.conteos||{}; pintarCats(); }).catch(()=>{});
+  } catch(e){ $('#fErr').textContent = e.message; }
+  b.disabled=false; b.textContent='Buscar';
+}
+
+/* ---- árbol de categorías */
+const BELL = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2Z"/></svg>';
+const padre = id => id.replace(/[^/]+\/$/, '');
+const cubre = (s, c) => s === '' || c === s || (s.endsWith('/') && c.startsWith(s));
+function armarArbol() {
+  const byId = {};
+  F.cats.forEach(c => byId[c.id] = {id:c.id, name:c.name, label:cap(c.name.split(' › ').pop()), kids:[], parent:''});
+  let roots = [];
+  Object.values(byId).forEach(n => { const p = byId[padre(n.id)]; if (p && p!==n) { p.kids.push(n); n.parent = p.id; } else roots.push(n); });
+  roots = roots.filter(r => !(r.kids.length===0 && /^category$/i.test(r.label)));
+  F.raiz = null;
+  if (roots.length===1 && roots[0].kids.length) { F.raiz = roots[0].id; roots = roots[0].kids; roots.forEach(r => r.parent = ''); }
+  byId[''] = {id:'', kids:roots, parent:null, label:'Toda la tienda'};
+  F.byId = byId; F.roots = roots;
+  const limpiar = set => {
+    if (F.raiz && set.has(F.raiz)) { set.clear(); set.add(''); }
+    [...set].forEach(s => { if (!byId[s]) set.delete(s); });
+  };
+  limpiar(F.sel); if (F.sel.has('')) F.sel.clear();
+  if (F.avisar) limpiar(F.avisar);
+  compactar(F.sel, false); if (F.avisar) compactar(F.avisar, true);
+  F.open = new Set();
+  [...F.sel, ...(F.avisar||[])].forEach(s => { let p = byId[s] && byId[s].parent; while (p) { F.open.add(p); p = byId[p].parent; } });
+}
+// Campanitas: si nunca se tocaron, siguen a lo tildado
+const avisos = () => F.avisar || (F.sel.size ? new Set(F.sel) : new Set(['']));
+const en = (set, id) => [...set].some(s => cubre(s, id));
+const parcialEn = (set, id) => !en(set, id) && [...set].some(s => s !== id && cubre(id, s));
+function compactar(set, todo) {
+  let cambio = true;
+  while (cambio) {
+    cambio = false;
+    for (const n of Object.values(F.byId)) {
+      if (n.id==='' || !n.kids.length || en(set, n.id)) continue;
+      if (n.kids.every(k => en(set, k.id))) {
+        [...set].forEach(s => { if (cubre(n.id, s)) set.delete(s); });
+        set.add(n.id); cambio = true;
+      }
+    }
+  }
+  if (F.roots.length && F.roots.every(r => en(set, r.id))) { set.clear(); if (todo) set.add(''); }
+}
+function alternar(set, id, todo, agrupar = true) {
+  if (en(set, id)) {
+    const a = [...set].find(s => cubre(s, id));
+    set.delete(a);
+    let cur = F.byId[a];
+    while (cur && cur.id !== id) {
+      const sig = cur.kids.find(k => cubre(k.id, id));
+      cur.kids.forEach(k => { if (k !== sig) set.add(k.id); });
+      cur = sig;
+    }
+  } else {
+    [...set].forEach(s => { if (cubre(id, s)) set.delete(s); });
+    set.add(id);
+    if (agrupar) compactar(set, todo);
+  }
+}
+function toggleCat(id) { alternar(F.sel, id, false); pintarCats(); pintarTipos(); }
+function toggleBell(id) {
+  if (!F.avisar) F.avisar = avisos();
+  const antes = new Set(F.avisar), precios = {...F.precios};
+  alternar(F.avisar, id, true, false);  // las campanitas no se agrupan solas: cada una puede tener su precio
+  // Si una campanita se divide o se agrupa, el precio pasa de la categoría padre a las hijas
+  F.avisar.forEach(s => {
+    if (F.precios[s] == null) {
+      const padreConPrecio = [...antes].filter(a => a !== s && cubre(a, s) && precios[a] != null).sort((x,y)=>y.length-x.length)[0];
+      if (padreConPrecio) F.precios[s] = precios[padreConPrecio];
+    }
+  });
+  Object.keys(F.precios).forEach(s => { if (!F.avisar.has(s)) delete F.precios[s]; });
+  pintarCats(); pintarTipos();
+}
+function abrirNodo(id){ F.open.has(id) ? F.open.delete(id) : F.open.add(id); pintarCats(); }
+function ruta(id) {
+  if (id === '') return 'Toda la tienda';
+  const partes = []; let n = F.byId[id];
+  while (n && n.id) { partes.unshift(n.label); n = F.byId[n.parent]; }
+  return partes.join(' › ');
+}
+function nodoHtml(n, depth, q, av) {
+  const coincide = !q || ruta(n.id).toLowerCase().includes(q);
+  const abierto = q ? true : F.open.has(n.id);
+  const hijos = abierto ? n.kids.map(k => nodoHtml(k, depth+1, coincide ? '' : q, av)).join('') : '';
+  if (q && !coincide && !hijos) return '';
+  const c = F.conteos[n.id];
+  const bOn = en(av, n.id), bPar = parcialEn(av, n.id);
+  return `<div class="tn ${en(F.sel,n.id)?'sel':''} ${c===0?'vacia':''}" style="padding-left:${depth*20}px">
+      <button class="car ${n.kids.length?'':'vac'}" data-abrir="${esc(n.id)}" title="${abierto?'Cerrar':'Abrir'}">${abierto?'▾':'▸'}</button>
+      <button class="bell ${bOn?'on':''} ${bPar?'par':''}" data-bell="${esc(n.id)}" title="${bOn?'No avisarme de':'Avisarme de'} novedades de ${esc(ruta(n.id))}">${BELL}</button>
+      <label><input type="checkbox" data-cat="${esc(n.id)}" ${en(F.sel,n.id)?'checked':''} ${parcialEn(F.sel,n.id)?'data-parcial="1"':''}>
+      <span class="lb">${esc(n.label)}</span>${c!=null?`<span class="cnt">${c.toLocaleString('es-AR')}</span>`:''}</label></div>` + hijos;
+}
+function chips(set, quitar, vacio, conBell) {
+  const ids = [...set].filter(s => F.byId[s]);
+  if (!ids.length) return `<span class="selchip all">${vacio}</span>`;
+  return ids.map(s => `<span class="selchip ${conBell?'bellchip':''}">${conBell?BELL:''}${esc(ruta(s))}${F.conteos[s]!=null?` <small style="opacity:.8;font-weight:400">${F.conteos[s].toLocaleString('es-AR')}</small>`:''}${quitar?`<button data-${quitar}="${esc(s)}" title="Quitar">✕</button>`:''}</span>`).join('');
+}
+function pintarCats() {
+  const q = $('#fCatQ').value.trim().toLowerCase();
+  const av = avisos();
+  const html = F.roots.map(n => nodoHtml(n, 0, q, av)).join('');
+  $('#fCats').innerHTML = html || '<div style="padding:10px;color:var(--mute)">No hay categorías con ese nombre.</div>';
+  $('#fCats').querySelectorAll('[data-parcial]').forEach(e => e.indeterminate = true);
+  $('#fSelChips').innerHTML = chips(F.sel, 'quitar', 'Toda la tienda', false);
+  const ids = [...av].filter(s => F.byId[s]);
+  const general = Number($('#fMax').value) || 0;
+  $('#fBellChips').innerHTML = ids.length ? ids.map(s => `<div class="bellrow">
+      <span class="bn">${BELL}${esc(ruta(s))}</span>
+      <span class="hasta">hasta $</span>
+      <input type="number" min="0" step="1000" data-precio="${esc(s)}" value="${F.precios[s] ?? ''}" placeholder="${general ? general.toLocaleString('es-AR') + ' (general)' : 'precio'}">
+      <button class="x" data-quitarbell="${esc(s)}" title="Quitar">✕</button></div>`).join('')
+    : '<span class="selchip all">Ninguna: no te va a llegar ningún aviso de esta marca</span>';
+}
+document.addEventListener('click', e => {
+  const ab = e.target.closest('[data-abrir]'); if (ab) { abrirNodo(ab.dataset.abrir); return; }
+  const be = e.target.closest('[data-bell]'); if (be) { toggleBell(be.dataset.bell); return; }
+  const qu = e.target.closest('[data-quitar]'); if (qu) { toggleCat(qu.dataset.quitar); return; }
+  const qb = e.target.closest('[data-quitarbell]'); if (qb) { toggleBell(qb.dataset.quitarbell); return; }
+});
+document.addEventListener('change', e => { if (e.target.dataset && e.target.dataset.cat) toggleCat(e.target.dataset.cat); });
+document.addEventListener('input', e => {
+  const s = e.target.dataset && e.target.dataset.precio;
+  if (s != null) { if (!F.avisar) F.avisar = avisos(); const v = Number(e.target.value); if (v > 0) F.precios[s] = v; else delete F.precios[s]; }
+  if (e.target.id === 'fMax') $('#fBellChips').querySelectorAll('[data-precio]').forEach(i => i.placeholder = (Number(e.target.value)||0).toLocaleString('es-AR') + ' (general)');
+});
+const claveDescarga = () => {
+  const u = new Set([...(F.sel.size ? F.sel : new Set([''])), ...avisos()]);
+  return u.has('') ? '' : [...u].filter(i => ![...u].some(o => o!==i && cubre(o,i))).sort().join('|');
+};
+
+/* ---- tipos de producto */
+// Tipos de producto dentro de lo tildado (se actualiza al cambiar la selección)
+let _tiposPedido = 0;
+async function pintarTipos() {
+  const box = $('#fTipos');
+  const mostrarBotones = v => { $('#fTodos').style.display = $('#fNinguno').style.display = v ? '' : 'none'; };
+  if (!F.id || !F.tieneDatos) {
+    mostrarBotones(false);
+    box.innerHTML = `<div class="nota">Cuando la app termine de revisar la tienda vas a poder elegir los tipos acá (por ejemplo, solo zapatillas).</div>`;
+    return;
+  }
+  const ids = [...(F.sel.size ? F.sel : [''])].filter(s => s === '' || F.byId[s]);  // solo lo tildado
+  const base = ids.includes('') ? 'toda la tienda' : ids.map(ruta).join(', ');
+  $('#fTiposBase').textContent = base;
+  const n = ++_tiposPedido;
+  let j;
+  try { j = await api(`/api/marca/${F.id}/tipos?ids=${encodeURIComponent(JSON.stringify(ids))}`); }
+  catch (e) { return; }
+  if (n !== _tiposPedido) return;  // llegó una respuesta vieja
+  F.tipos = j.tipos;
+  mostrarBotones(F.tipos.length);
+  const falta = j.faltan.length ? `<div class="nota" style="margin-bottom:8px">Todavía no se revisó ${esc(j.faltan.map(ruta).join(', '))}. Guardá y, cuando termine la revisión, vas a ver sus tipos acá.</div>` : '';
+  box.innerHTML = falta + (F.tipos.length ? `<div class="tipogrid">${F.tipos.map(x=>`<label><input type="checkbox" data-tipo="${esc(x.tipo)}" ${F.ocultos.has(x.tipo)?'':'checked'} onchange="this.checked?F.ocultos.delete(this.dataset.tipo):F.ocultos.add(this.dataset.tipo)">
+     <span>${esc(cap(x.tipo))}</span><span class="cnt">${x.n}</span></label>`).join('')}</div>` : (falta ? '' : '<div class="nota">No hay productos en esas categorías.</div>'));
+}
+function tiposTodos(si) { (F.tipos||[]).forEach(x => si ? F.ocultos.delete(x.tipo) : F.ocultos.add(x.tipo)); pintarTipos(); }
+
+async function guardarMarca() {
+  const sel = [...F.sel].filter(s => s && F.byId[s]);
+  const datos = {name:$('#fNombre').value, platform:F.platform, base_url:F.base_url,
+    categories: sel.map(s => ({id:s, name: F.byId[s].name})),
+    avisar: (F.avisar || Object.keys(F.precios).length) ? [...avisos()].filter(s => F.byId[s]).map(s => ({id:s, name: s ? F.byId[s].name : '', ...(F.precios[s] ? {max_price:F.precios[s]} : {})})) : null,
+    max_price:Number($('#fMax').value), min_price:Number($('#fMin').value)||0,
+    include_kw:$('#fInc').value, exclude_kw:$('#fExc').value, only_stock:$('#fStock').checked};
+  if (!datos.max_price) { $('#fErr').textContent='Poné un precio máximo.'; return; }
+  try {
+    const j = F.id ? await api('/api/marca/'+F.id,{method:'PUT',body:datos}) : await api('/api/marca',{method:'POST',body:datos});
+    if (F.id && F.tieneDatos) await api(`/api/marca/${F.id}/tipos`,{method:'POST',body:{ocultos:[...F.ocultos]}});
+    cerrar('mMarca'); S.vista=j.id; S.q=''; S.tab = F.id?S.tab:'rango';
+    toast(F.id?'Cambios guardados':'Marca agregada. Revisando la tienda…'); cargar();
+  } catch(e){ $('#fErr').textContent=e.message; }
+}
+async function borrarMarca() {
+  if (!confirm('¿Eliminar esta marca y su historial de precios?')) return;
+  await api('/api/marca/'+F.id,{method:'DELETE'}); cerrar('mMarca'); S.vista='todas'; cargar();
+}
+
+/* ---------- ajustes */
+async function abrirAjustes(){ const j=await api('/api/ajustes'); $('#aHoras').value=String(j.horas); $('#aMsg').textContent=j.es_windows?'':'La revisión automática solo funciona en Windows.'; $('#mAjustes').classList.add('on'); }
+async function guardarAjustes(){ const j=await api('/api/ajustes',{method:'POST',body:{horas:Number($('#aHoras').value)}}).catch(e=>({ok:false,mensaje:e.message}));
+  $('#aMsg').textContent=j.mensaje; if(j.ok){toast(j.mensaje);cerrar('mAjustes');} }
+async function probarAviso(){ await api('/api/probar_aviso',{method:'POST'}); toast('Notificación enviada'); }
+
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.back.on').forEach(b=>b.classList.remove('on'));
+  if(e.key==='Enter' && document.activeElement.id==='fUrl') detectar(); });
+setInterval(()=>fetch('/api/ping').catch(()=>{}), 20000); fetch('/api/ping');
+cargar();
+</script>
+</body>
+</html>
