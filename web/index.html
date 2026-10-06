@@ -481,7 +481,7 @@ function pintarNav() {
 
 function ir(v){ S.vista=v; S.tab='nov'; S.q=''; pintarNav(); pintarMain(); }
 
-function precioDe(p){ return p.precio_ef || p.price; }
+function precioDe(p){ return (p.mi_talle && !p.mi_talle.disponible) ? p.price : (p.precio_ef || p.price); }
 function card(p, ev) {
   const precio = precioDe(p);
   const off = p.list_price > precio + 1 ? Math.round((1 - precio/p.list_price)*100) : 0;

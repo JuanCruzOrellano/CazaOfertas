@@ -210,7 +210,7 @@ class Store:
             x = efectivo(b, d, cfg)
             sigue = not (b["last_check"] and (d["last_seen"] or 0) < b["last_check"] - 0.001)
             # "En tu rango" muestra todo (haya o no tu talle); el talle solo decide los avisos
-            ver = sigue and pasa_filtros(b, d) and se_ve(b, d["cats"])
+            ver = sigue and pasa_filtros(b, para_vista(d, x)) and se_ve(b, d["cats"])
             aviso = sigue and avisa(b, x)
             self.con.execute("""UPDATE products SET ok=?, in_range=?, precio_ef=?, disp_ef=?
                                 WHERE brand_id=? AND pid=?""",
@@ -381,7 +381,7 @@ class Store:
             for it in items:
                 cats = it.get("cats") or []
                 x = efectivo(b, it, cfg)
-                ver = pasa_filtros(b, it) and se_ve(b, cats)  # se ve aunque no haya tu talle
+                ver = pasa_filtros(b, para_vista(it, x)) and se_ve(b, cats)  # se ve aunque no haya tu talle
                 aviso = avisa(b, x)
                 prev = self.con.execute("SELECT * FROM products WHERE brand_id=? AND pid=?",
                                         (bid, it["pid"])).fetchone()
@@ -661,6 +661,16 @@ def _fila_a_item(d):
         v = d.get(k)
         d[k] = json.loads(v) if isinstance(v, str) and v else (v or [])
     return d
+
+
+def para_vista(it, x):
+    """Lo que se compara contra tu rango en "En tu rango": si hay tu talle, el precio de tu
+    talle; si no hay, el precio del producto (y se muestra igual, marcado "no hay tu talle")."""
+    v = dict(it)
+    mt = x.get("mi_talle")
+    if mt and mt.get("disponible") and mt.get("precio"):
+        v["price"] = mt["precio"]
+    return v
 
 
 def efectivo(b, it, cfg):
