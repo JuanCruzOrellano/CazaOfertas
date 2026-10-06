@@ -146,9 +146,7 @@ def eans_de(tienda, pid, link=None):
 MARCAS_INICIALES = [
     {"name": "Nike", "base_url": "https://www.nike.com.ar", "max_price": 150000},
     {"name": "Juleriaque", "base_url": "https://www.juleriaque.com.ar", "max_price": 90000},
-    {"name": "Ricky Sarkany", "base_url": "https://www.rickysarkany.com", "max_price": 120000},
     {"name": "Frávega", "base_url": "https://www.fravega.com", "max_price": 200000},
-    {"name": "Puppis", "base_url": "https://www.puppis.com.ar", "max_price": 40000},
 ]
 
 
