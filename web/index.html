@@ -284,7 +284,7 @@ label.f span.h{font-weight:400;color:var(--mute);font-size:12px}
           <label class="f">Excluir si el nombre tiene<span class="h">Palabras separadas por coma</span><input type="text" id="fExc" placeholder="ojotas, medias"></label>
         </div>
         <label class="chk"><input type="checkbox" id="fStock" checked> Mostrar solo productos con stock</label>
-        <label class="chk"><input type="checkbox" id="fTalle" checked><span>Usar mis talles: precio, stock y avisos de <b>mi talle</b> (se configuran en Ajustes ⚙)</span></label>
+        <label class="chk"><input type="checkbox" id="fTalle" checked><span>Avisarme solo si hay <b>mi talle</b> (se configuran en Ajustes ⚙). En "En tu rango" igual se ven todos, marcando cuáles tienen tu talle.</span></label>
       </div>
     </div>
   </div>
@@ -363,7 +363,7 @@ const pesos = n => '$' + Math.round(n).toLocaleString('es-AR');
 const ETQ = {nuevo:'Nuevo en tu rango', entro_rango:'Bajó y entró en tu rango', bajo_mas:'Bajó todavía más', volvio_stock:'Volvió el stock', objetivo:'🎯 Llegó a tu precio'};
 const VD = {minimo:'🏆 Mínimo histórico', bueno:'👍 Buen precio', inflado:'⚠️ Descuento inflado', ya_estuvo:'↺ Ya estuvo más barato'};
 
-let S = {marcas:[], vista:'todas', tab:'nov', revisando:false, q:'', orden:'precio'};
+let S = {marcas:[], vista:'todas', tab:'nov', revisando:false, q:'', orden:'precio', soloTalle:false};
 let F = {id:null, cats:[], sel:new Set(), platform:null, base_url:null};
 
 async function api(path, opt={}) {
@@ -567,14 +567,15 @@ async function pintarMain(refrescar) {
     if (S.orden==='desc') lista.sort((a,b)=>(b.list_price-precioDe(b))/b.list_price-(a.list_price-precioDe(a))/a.list_price);
     if (S.orden==='precio_desc') lista.sort((a,b)=>precioDe(b)-precioDe(a));
     if (S.orden==='minimo') lista = lista.filter(p=>p.veredicto && ['minimo','bueno'].includes(p.veredicto.tipo));
-    if (S.orden==='talle') lista = lista.filter(p=>p.mi_talle && p.mi_talle.disponible);
+    if (S.soloTalle) lista = lista.filter(p=>p.mi_talle && p.mi_talle.disponible);
     body = `<div class="tools"><input id="q" placeholder="Buscar en ${productos.length} productos…" value="${esc(S.q)}" oninput="S.q=this.value;pintarMain()">
       <select onchange="S.orden=this.value;pintarMain()">
         <option value="precio" ${S.orden==='precio'?'selected':''}>Más baratos primero</option>
         <option value="precio_desc" ${S.orden==='precio_desc'?'selected':''}>Más caros primero</option>
         <option value="desc" ${S.orden==='desc'?'selected':''}>Mayor descuento</option>
         <option value="minimo" ${S.orden==='minimo'?'selected':''}>Solo buenos precios (historial)</option>
-        <option value="talle" ${S.orden==='talle'?'selected':''}>Solo con mi talle</option></select></div>`
+      </select>
+      ${productos.some(p=>p.mi_talle) ? `<label class="chk" style="white-space:nowrap;margin:0"><input type="checkbox" ${S.soloTalle?'checked':''} onchange="S.soloTalle=this.checked;pintarMain()"><span>Solo con mi talle</span></label>` : ''}</div>`
       + (lista.length ? `<div class="grid">${lista.map(p=>card(p)).join('')}</div>`
         : `<div class="empty"><h3>Nada en tu rango ${m.last_check?'':'todavía'}</h3>${m.last_check?'Probá subir el precio máximo o revisar las categorías.':'La primera revisión está en curso.'}</div>`);
   }

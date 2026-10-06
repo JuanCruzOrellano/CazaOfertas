@@ -529,6 +529,10 @@ def main():
     threading.Thread(target=vigilante, args=(server,), daemon=True).start()
     preparar_windows()
     sembrar_marcas()
+    if not db.get_setting("vista_todos_los_talles"):
+        # 1.6.5: "En tu rango" ahora muestra todos los productos, haya o no tu talle
+        db.set_setting("vista_todos_los_talles", True)
+        threading.Thread(target=db.recalcular_todo, daemon=True).start()
     actualizador.buscar_en_fondo()
     parecidas.precalentar(db.marcas())
     if windows.ES_WINDOWS and actualizador.es_exe():
