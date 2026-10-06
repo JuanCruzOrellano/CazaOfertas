@@ -72,7 +72,7 @@ def _get(url, headers_out=None, timeout=30, intentos=3):
             reintentable = e.codigo in (None, 429, 500, 502, 503, 504) and not e.no_reintentar
             if not reintentable or i == intentos - 1:
                 raise
-            time.sleep(1.5 * (i + 1))
+            time.sleep(2 * (i + 1))  # la tienda está saturada: esperar un poco más cada vez
 
 
 def _sesion():
@@ -176,8 +176,18 @@ class Vtex:
         lock = threading.Lock()
         arbol = []
 
+        errores = []
+
+        def pagina(cid, desde):
+            """Una página; si falla después de reintentar, se anota y se sigue con el resto."""
+            try:
+                return _get(url(cid, desde), intentos=4)
+            except StoreError as e:
+                errores.append(e)
+                return []
+
         def url(cid, desde):
-            q = f"_from={desde}&_to={desde + 49}&O=OrderByPriceASC"
+            q = f"_from={desde}&_to={min(desde + 49, TOPE_VTEX)}&O=OrderByPriceASC"
             if cid:
                 q = "fq=" + urllib.parse.quote("C:" + cid, safe="") + "&" + q
             return f"{base}/api/catalog_system/pub/products/search?{q}"
@@ -209,7 +219,11 @@ class Vtex:
             if len(vistos) >= MAX_PRODUCTOS:
                 return  # tienda enorme sin categorías elegidas: alcanza con lo más barato
             hdr = {}
-            primero = _get(url(cid, 0), hdr)
+            try:
+                primero = _get(url(cid, 0), hdr, intentos=4)
+            except StoreError as e:
+                errores.append(e)
+                return
             minimo = guardar(cid, primero or [])
             total = _total(hdr.get("resources")) or len(primero or [])
             if total > TOPE_VTEX + 50:
@@ -217,19 +231,16 @@ class Vtex:
                 subs = hijos(cid)
                 if subs:
                     for s in subs:
-                        try:
-                            una_categoria(s, ex)
-                        except StoreError:
-                            continue  # una subcategoría rota no frena el resto
+                        una_categoria(s, ex)  # una subcategoría rota no frena el resto
                     return
             if tope is not None and minimo is not None and minimo > tope:
                 return
-            desdes = list(range(50, min(total, TOPE_VTEX + 50), 50))
+            desdes = list(range(50, min(total, TOPE_VTEX), 50))  # la API no pasa de 2500
             for i in range(0, len(desdes), HILOS):
                 if len(vistos) >= MAX_PRODUCTOS:
                     break
                 tanda = desdes[i:i + HILOS]
-                lotes = list(ex.map(lambda d: _get(url(cid, d)), tanda))
+                lotes = list(ex.map(lambda d: pagina(cid, d), tanda))
                 minimos = [guardar(cid, l or []) for l in lotes]
                 if tope is not None and minimos and minimos[-1] is not None and minimos[-1] > tope:
                     break
@@ -237,6 +248,9 @@ class Vtex:
         with ThreadPoolExecutor(max_workers=HILOS) as ex:
             for c in (categorias or [{"id": ""}]):
                 una_categoria(c["id"], ex)
+        if not vistos and errores:
+            raise errores[0]  # no se pudo leer nada: ahí sí es un error
+        # Si fallaron algunas páginas sueltas, se sigue con lo que se pudo leer
         return list(vistos.values())
 
     @staticmethod

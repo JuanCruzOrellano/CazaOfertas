@@ -107,6 +107,7 @@ main{flex:1;height:100vh;overflow:auto}
 .tools{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
 .tools input,.tools select{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
 .tools input{flex:1;min-width:180px}
+.tools input[type=checkbox]{flex:none;min-width:0;padding:0;width:16px;height:16px}
 .alert{background:var(--warn-bg);color:var(--warn);padding:10px 14px;border-radius:8px;margin-top:14px}
 .status{color:var(--mute);font-size:13px;margin-top:10px}
 /* ---------- cards */
@@ -575,7 +576,7 @@ async function pintarMain(refrescar) {
         <option value="desc" ${S.orden==='desc'?'selected':''}>Mayor descuento</option>
         <option value="minimo" ${S.orden==='minimo'?'selected':''}>Solo buenos precios (historial)</option>
       </select>
-      ${productos.some(p=>p.mi_talle) ? `<label class="chk" style="white-space:nowrap;margin:0"><input type="checkbox" ${S.soloTalle?'checked':''} onchange="S.soloTalle=this.checked;pintarMain()"><span>Solo con mi talle</span></label>` : ''}</div>`
+      ${productos.some(p=>p.mi_talle) ? `<label style="display:inline-flex;align-items:center;gap:8px;white-space:nowrap;margin:0;cursor:pointer;font-size:14px;flex:none"><input type="checkbox" style="width:auto;margin:0" ${S.soloTalle?'checked':''} onchange="S.soloTalle=this.checked;pintarMain()">Solo con mi talle</label>` : ''}</div>`
       + (lista.length ? `<div class="grid">${lista.map(p=>card(p)).join('')}</div>`
         : `<div class="empty"><h3>Nada en tu rango ${m.last_check?'':'todavía'}</h3>${m.last_check?'Probá subir el precio máximo o revisar las categorías.':'La primera revisión está en curso.'}</div>`);
   }
