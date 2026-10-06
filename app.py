@@ -94,7 +94,8 @@ def ajustes():
             "telegram": {"conectado": bool(tg.get("chat_id")), "nombre": tg.get("nombre"),
                          "bot": tg.get("bot"), "activo": tg.get("activo", True)},
             "tiendas_comparar": db.get_setting("tiendas_comparar") or comparar.TIENDAS_DEFECTO,
-            "comparar_auto": db.get_setting("comparar_auto", True)}
+            "comparar_auto": db.get_setting("comparar_auto", True),
+            "tutorial_visto": db.get_setting("tutorial_visto", False)}
 
 
 def detalle_producto(q):
@@ -139,6 +140,34 @@ def eans_de(tienda, pid, link=None):
         return (it or {}).get("eans") or []
     except Exception:  # noqa: BLE001
         return []
+
+
+# Marcas con las que arranca alguien que instala la app por primera vez (una por rubro).
+MARCAS_INICIALES = [
+    {"name": "Nike", "base_url": "https://www.nike.com.ar", "max_price": 150000},
+    {"name": "Juleriaque", "base_url": "https://www.juleriaque.com.ar", "max_price": 90000},
+    {"name": "Ricky Sarkany", "base_url": "https://www.rickysarkany.com", "max_price": 120000},
+    {"name": "Frávega", "base_url": "https://www.fravega.com", "max_price": 200000},
+    {"name": "Puppis", "base_url": "https://www.puppis.com.ar", "max_price": 40000},
+]
+
+
+def sembrar_marcas():
+    """La primera vez que se abre la app, deja cargadas algunas marcas de ejemplo."""
+    if db.get_setting("marcas_sembradas"):
+        return
+    db.set_setting("marcas_sembradas", True)
+    if db.marcas():  # ya la venía usando: no se toca nada ni se muestra el tutorial
+        db.set_setting("tutorial_visto", True)
+        return
+    for m in MARCAS_INICIALES:
+        try:
+            db.guardar_marca({**m, "platform": "vtex", "categories": [], "avisar": None,
+                              "min_price": 0, "include_kw": "", "exclude_kw": "",
+                              "only_stock": True, "solo_mi_talle": True})
+        except Exception:  # noqa: BLE001
+            pass
+    revisar_en_fondo()
 
 
 def plataforma_de(tienda):
@@ -274,6 +303,9 @@ class Handler(BaseHTTPRequestHandler):
                 if "talles" in d:
                     db.set_setting("talles", d["talles"] or {})
                     db.recalcular_todo()
+                if "tutorial_visto" in d:
+                    db.set_setting("tutorial_visto", bool(d["tutorial_visto"]))
+                    return self._json({"ok": True})
                 if "comparar_auto" in d:
                     db.set_setting("comparar_auto", bool(d["comparar_auto"]))
                 if "tiendas_comparar" in d:
@@ -370,10 +402,9 @@ class Handler(BaseHTTPRequestHandler):
             d = self._body()
             if not d.get("max_price"):
                 return self._json({"error": "Poné un precio máximo."}, 400)
-            _, hay_que_revisar = db.guardar_marca(d, bid)
-            if hay_que_revisar:
-                revisar_en_fondo(bid)
-            self._json({"id": bid})
+            db.guardar_marca(d, bid)
+            revisar_en_fondo(bid)  # cualquier cambio en Editar vuelve a revisar la tienda
+            self._json({"id": bid, "revisando": True})
         except Exception as e:  # noqa: BLE001
             self._json({"error": str(e)}, 500)
 
@@ -497,6 +528,7 @@ def main():
         return
     threading.Thread(target=vigilante, args=(server,), daemon=True).start()
     preparar_windows()
+    sembrar_marcas()
     actualizador.buscar_en_fondo()
     parecidas.precalentar(db.marcas())
     if windows.ES_WINDOWS and actualizador.es_exe():

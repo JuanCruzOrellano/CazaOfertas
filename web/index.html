@@ -197,6 +197,30 @@ label.f span.h{font-weight:400;color:var(--mute);font-size:12px}
 .err{color:#c0392b;font-size:13px}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;display:none;z-index:20}
 @media (max-width:760px){aside{width:200px}.wrap{padding:18px 16px}.row{grid-template-columns:1fr}}
+.revb{position:fixed;top:14px;left:50%;transform:translate(-50%,-20px);opacity:0;pointer-events:none;
+  background:var(--panel,#fff);color:var(--ink,#333);border:1px solid var(--line,#e6e1da);border-radius:99px;
+  padding:9px 18px;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.12);display:flex;gap:10px;align-items:center;
+  transition:all .25s;z-index:200;white-space:nowrap}
+.revb.on{opacity:1;transform:translate(-50%,0)}
+.revb.ok{color:var(--ok,#2e8b57)}
+.revb .spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--line,#e6e1da);border-top-color:var(--accent,#d9774b);animation:girar .8s linear infinite}
+@keyframes girar{to{transform:rotate(360deg)}}
+.tut{max-width:620px;overflow:hidden}
+.tut .tpaso{padding:26px 30px 8px;min-height:360px;display:grid;align-content:start;gap:12px}
+.tut .tico{font-size:40px;line-height:1}
+.tut h2{font-size:22px;margin:0}
+.tut p{margin:0;color:var(--ink);font-size:15px;line-height:1.55}
+.tut ul{margin:0;padding-left:20px;display:grid;gap:6px;font-size:14.5px;line-height:1.5}
+.tut .tip{background:var(--chip);border-radius:10px;padding:10px 14px;font-size:13.5px;color:var(--mute)}
+.tut .demo{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--bg);display:grid;gap:8px;font-size:13.5px}
+.tut .demo .fila{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tut .demo .bellon{color:var(--accent);display:inline-flex}
+.tut .demo .bellon svg{fill:currentColor}
+.tut .demo .inp{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:4px 10px;min-width:90px}
+.tut footer{justify-content:space-between;align-items:center}
+.tut .dots{display:flex;gap:6px}
+.tut .dots i{width:8px;height:8px;border-radius:50%;background:var(--line);cursor:pointer}
+.tut .dots i.on{background:var(--accent);width:22px;border-radius:99px}
 </style>
 </head>
 <body>
@@ -207,12 +231,21 @@ label.f span.h{font-weight:400;color:var(--mute);font-size:12px}
     <button class="btn side-add" onclick="abrirMarca()">+ Agregar marca</button>
     <div style="display:flex;gap:8px">
       <button class="btn ghost" style="flex:1" id="btnTodo" onclick="revisar()">Revisar todo</button>
+      <button class="btn ghost" title="¿Cómo se usa?" onclick="abrirTutorial()">?</button>
       <button class="btn ghost" title="Ajustes" onclick="abrirAjustes()">⚙</button>
     </div>
     <small id="ultima"></small>
   </div>
 </aside>
 <main><div id="upd" class="upd" style="display:none"></div><div class="wrap" id="main"></div></main>
+
+<!-- Tutorial -->
+<div class="back" id="mTut"><div class="modal tut">
+  <div class="tpaso" id="tPaso"></div>
+  <footer><div class="dots" id="tDots"></div>
+    <div style="display:flex;gap:8px"><button class="btn" id="tAtras" onclick="pasoTut(-1)">Atrás</button>
+    <button class="btn pri" id="tSig" onclick="pasoTut(1)">Siguiente</button></div></footer>
+</div></div>
 
 <!-- Modal marca -->
 <div class="back" id="mMarca"><div class="modal">
@@ -228,8 +261,8 @@ label.f span.h{font-weight:400;color:var(--mute);font-size:12px}
       <div style="display:grid;gap:14px">
         <label class="f">Nombre<input type="text" id="fNombre" placeholder="Nike"></label>
         <div class="row">
-          <label class="f">Precio máximo general<span class="h">Para "En tu rango" y para las campanitas sin precio propio</span><input type="number" id="fMax" min="0" step="1000" placeholder="150000"></label>
-          <label class="f">Precio mínimo<span class="h">Opcional</span><input type="number" id="fMin" min="0" step="1000" placeholder="0"></label>
+          <label class="f">Precio máximo general<span class="h">Para "En tu rango" y para las campanitas sin precio propio</span><input type="text" inputmode="numeric" class="money" id="fMax" placeholder="$150.000"></label>
+          <label class="f">Precio mínimo<span class="h">Opcional</span><input type="text" inputmode="numeric" class="money" id="fMin" placeholder="$0"></label>
         </div>
         <div class="sec">
           <h4>¿Qué productos seguir?</h4>
@@ -320,6 +353,7 @@ label.f span.h{font-weight:400;color:var(--mute);font-size:12px}
 </div></div>
 
 <div class="toast" id="toast"></div>
+<div class="revb" id="revBanner"></div>
 
 <script>
 const $ = s => document.querySelector(s);
@@ -338,6 +372,21 @@ async function api(path, opt={}) {
   const j = await r.json().catch(()=>({error:'Respuesta inválida'}));
   if (!r.ok) throw new Error(j.error || 'Error');
   return j;
+}
+const num = v => Number(String(v ?? '').replace(/\D/g,'')) || 0;
+const fmt = n => n ? '$' + Number(n).toLocaleString('es-AR', {maximumFractionDigits:0}) : '';
+function bannerRevision(){
+  const b = $('#revBanner'); if (!b) return;
+  const act = S.marcas.filter(m => m.estado);
+  if (S.revisando || act.length || bannerRevision._forzar > Date.now()) {
+    const det = act.length === 1 ? `${esc(act[0].name)}: ${esc(String(act[0].estado).replace('Revisando… ','').replace('Revisando…',''))}` : (act.length > 1 ? `${act.length} tiendas` : '');
+    b.innerHTML = `<span class="spin"></span><b>Revisión en curso</b>${det ? ' · ' + det : ''}`;
+    b.className = 'revb on'; bannerRevision._activo = true;
+  } else if (bannerRevision._activo) {
+    bannerRevision._activo = false;
+    b.innerHTML = '✓ <b>Revisión terminada</b>'; b.className = 'revb on ok';
+    clearTimeout(b._t); b._t = setTimeout(() => b.className = 'revb', 3500);
+  }
 }
 function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',3200)}
 function hace(ts){ if(!ts) return 'nunca'; const m=Math.round((Date.now()/1000-ts)/60);
@@ -405,9 +454,10 @@ async function cargar() {
   $('#btnTodo').disabled = S.revisando;
   $('#btnTodo').textContent = S.revisando ? 'Revisando…' : 'Revisar todo';
   pintarNav();
+  bannerRevision();
   await pintarMain(antes && !S.revisando);
   clearTimeout(cargar._t);
-  cargar._t = setTimeout(cargar, S.revisando ? 2500 : 30000);
+  cargar._t = setTimeout(cargar, (S.revisando || S.marcas.some(m=>m.estado) || bannerRevision._forzar > Date.now()) ? 2000 : 30000);
 }
 
 function pintarNav() {
@@ -532,7 +582,7 @@ async function pintarMain(refrescar) {
   if (mantenerFoco) { const i=$('#q'); i.focus(); i.setSelectionRange(i.value.length,i.value.length); }
 }
 
-async function revisar(id){ try{ await api('/api/revisar',{method:'POST',body:{marca:id||null}}); toast('Revisando precios…'); cargar(); }catch(e){toast(e.message)} }
+async function revisar(id){ try{ await api('/api/revisar',{method:'POST',body:{marca:id||null}}); bannerRevision._forzar = Date.now() + 4000; bannerRevision(); cargar(); }catch(e){toast(e.message)} }
 async function vistas(id){ await api('/api/vistas',{method:'POST',body:{marca:id||null}}); cargar(); }
 
 /* ---------- formulario de marca */
@@ -549,7 +599,7 @@ function abrirMarca(id) {
   if (id) {
     const m = S.marcas.find(x=>x.id===id);
     $('#fUrl').value = m.base_url;
-    $('#fNombre').value = m.name; $('#fMax').value = m.max_price; $('#fMin').value = m.min_price||'';
+    $('#fNombre').value = m.name; $('#fMax').value = fmt(m.max_price); $('#fMin').value = fmt(m.min_price);
     $('#fInc').value = m.include_kw; $('#fExc').value = m.exclude_kw; $('#fStock').checked = !!m.only_stock; $('#fTalle').checked = m.solo_mi_talle !== 0;
     F.sel = new Set(m.categories.map(c=>c.id));
     F.avisar = m.avisar ? new Set(m.avisar.map(x => typeof x === 'string' ? x : x.id)) : null;
@@ -688,11 +738,11 @@ function pintarCats() {
   $('#fCats').querySelectorAll('[data-parcial]').forEach(e => e.indeterminate = true);
   $('#fSelChips').innerHTML = chips(F.sel, 'quitar', 'Toda la tienda', false);
   const ids = [...av].filter(s => F.byId[s]);
-  const general = Number($('#fMax').value) || 0;
+  const general = num($('#fMax').value);
   $('#fBellChips').innerHTML = ids.length ? ids.map(s => `<div class="bellrow">
       <span class="bn">${BELL}${esc(ruta(s))}</span>
       <span class="hasta">hasta $</span>
-      <input type="number" min="0" step="1000" data-precio="${esc(s)}" value="${F.precios[s] ?? ''}" placeholder="${general ? general.toLocaleString('es-AR') + ' (general)' : 'precio'}">
+      <input type="text" inputmode="numeric" class="money" data-precio="${esc(s)}" value="${fmt(F.precios[s])}" placeholder="${general ? fmt(general) + ' (general)' : 'precio'}">
       <button class="x" data-quitarbell="${esc(s)}" title="Quitar">✕</button></div>`).join('')
     : '<span class="selchip all">Ninguna: no te va a llegar ningún aviso de esta marca</span>';
 }
@@ -704,9 +754,12 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('change', e => { if (e.target.dataset && e.target.dataset.cat) toggleCat(e.target.dataset.cat); });
 document.addEventListener('input', e => {
+  if (e.target.classList && e.target.classList.contains('money')) {
+    const n = num(e.target.value); e.target.value = n ? fmt(n) : '';
+  }
   const s = e.target.dataset && e.target.dataset.precio;
-  if (s != null) { if (!F.avisar) F.avisar = avisos(); const v = Number(e.target.value); if (v > 0) F.precios[s] = v; else delete F.precios[s]; }
-  if (e.target.id === 'fMax') $('#fBellChips').querySelectorAll('[data-precio]').forEach(i => i.placeholder = (Number(e.target.value)||0).toLocaleString('es-AR') + ' (general)');
+  if (s != null) { if (!F.avisar) F.avisar = avisos(); const v = num(e.target.value); if (v > 0) F.precios[s] = v; else delete F.precios[s]; }
+  if (e.target.id === 'fMax') $('#fBellChips').querySelectorAll('[data-precio]').forEach(i => i.placeholder = fmt(num(e.target.value)) + ' (general)');
 });
 const claveDescarga = () => {
   const u = new Set([...(F.sel.size ? F.sel : new Set([''])), ...avisos()]);
@@ -745,14 +798,15 @@ async function guardarMarca() {
   const datos = {name:$('#fNombre').value, platform:F.platform, base_url:F.base_url,
     categories: sel.map(s => ({id:s, name: F.byId[s].name})),
     avisar: (F.avisar || Object.keys(F.precios).length) ? [...avisos()].filter(s => F.byId[s]).map(s => ({id:s, name: s ? F.byId[s].name : '', ...(F.precios[s] ? {max_price:F.precios[s]} : {})})) : null,
-    max_price:Number($('#fMax').value), min_price:Number($('#fMin').value)||0,
+    max_price:num($('#fMax').value), min_price:num($('#fMin').value),
     include_kw:$('#fInc').value, exclude_kw:$('#fExc').value, only_stock:$('#fStock').checked, solo_mi_talle:$('#fTalle').checked};
   if (!datos.max_price) { $('#fErr').textContent='Poné un precio máximo.'; return; }
   try {
     const j = F.id ? await api('/api/marca/'+F.id,{method:'PUT',body:datos}) : await api('/api/marca',{method:'POST',body:datos});
     if (F.id && F.tieneDatos) await api(`/api/marca/${F.id}/tipos`,{method:'POST',body:{ocultos:[...F.ocultos]}});
     cerrar('mMarca'); S.vista=j.id; S.q=''; S.tab = F.id?S.tab:'rango';
-    toast(F.id?'Cambios guardados':'Marca agregada. Revisando la tienda…'); cargar();
+    bannerRevision._forzar = Date.now() + 4000; bannerRevision();
+    toast(F.id?'Cambios guardados':'Marca agregada'); cargar();
   } catch(e){ $('#fErr').textContent=e.message; }
 }
 async function borrarMarca() {
@@ -856,13 +910,13 @@ async function pintarSeguidos(){
   let h = `<div class="head"><div><h1>⭐ Seguidos</h1><div class="meta">Productos puntuales que vigilás, con tu precio objetivo. Se revisan junto con tus marcas.</div></div>
     <div class="acts">${sinVer?`<button class="btn" onclick="vistas('seguidos')">Marcar avisos como vistos</button>`:''}</div></div>
     <div class="tools" style="margin-top:18px"><input id="segLink" placeholder="Pegá el link de un producto de cualquier tienda VTEX (termina en /p)">
-    <input id="segObj" type="number" placeholder="Precio objetivo" style="max-width:160px;flex:none"><button class="btn pri" onclick="seguirLink()">Seguir</button></div>`;
+    <input id="segObj" type="text" inputmode="numeric" class="money" placeholder="Precio objetivo" style="max-width:160px;flex:none"><button class="btn pri" onclick="seguirLink()">Seguir</button></div>`;
   h += seg.length ? `<div class="grid">${seg.map(s=>card(s)).join('')}</div>`
     : `<div class="empty"><h3>Todavía no seguís ningún producto</h3>Abrí cualquier producto y tocá <b>⭐ Seguir</b>, o pegá un link arriba.<br>Te avisa cuando llega a tu precio objetivo, cuando baja o cuando vuelve tu talle.</div>`;
   $('#main').innerHTML = h;
 }
 async function seguirLink(){
-  try { await api('/api/seguir',{method:'POST',body:{link:$('#segLink').value.trim(), objetivo:Number($('#segObj').value)||null}});
+  try { await api('/api/seguir',{method:'POST',body:{link:$('#segLink').value.trim(), objetivo:num($('#segObj').value)||null}});
     toast('Producto agregado a Seguidos'); cargar(); }
   catch(e){ toast(e.message); }
 }
@@ -903,13 +957,13 @@ function pintarDetalle(){
 function segHtml(){
   const s = D.seguido;
   if (s) return `<div class="row2">⭐ Lo seguís${s.objetivo?` · objetivo ${pesos(s.objetivo)}`:''}.
-    <input id="dObj" type="number" placeholder="Nuevo objetivo" value="${s.objetivo||''}"><button class="btn" onclick="seguirDet()">Cambiar</button>
+    <input id="dObj" type="text" inputmode="numeric" class="money" placeholder="Nuevo objetivo" value="${fmt(s.objetivo)}"><button class="btn" onclick="seguirDet()">Cambiar</button>
     <button class="btn danger" onclick="dejarDeSeguir(${s.id})">Dejar de seguir</button></div>`;
-  return `<div class="row2"><input id="dObj" type="number" placeholder="Precio objetivo (opcional)"><button class="btn pri" onclick="seguirDet()">⭐ Seguir</button>
+  return `<div class="row2"><input id="dObj" type="text" inputmode="numeric" class="money" placeholder="Precio objetivo (opcional)"><button class="btn pri" onclick="seguirDet()">⭐ Seguir</button>
     <span style="color:var(--mute);font-size:13px">Te avisa si llega a ese precio, si baja o si vuelve tu talle.</span></div>`;
 }
 async function seguirDet(){
-  const obj = Number($('#dObj').value) || null;
+  const obj = num($('#dObj').value) || null;
   const body = D._ref.seguido ? {link:D.link, objetivo:obj} : {marca:D._ref.marca, pid:D._ref.pid, objetivo:obj};
   try {
     if (D._ref.seguido && D.platform !== 'vtex') throw new Error('Para cambiar el objetivo, dejá de seguirlo y volvé a seguirlo.');
@@ -978,8 +1032,85 @@ function grafico(hist, actual){
 
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.back.on').forEach(b=>b.classList.remove('on'));
   if(e.key==='Enter' && document.activeElement.id==='fUrl') detectar(); });
+/* ---------- tutorial para la primera vez */
+const TUT = [
+  {ico:'🦅', t:'¡Bienvenido a CazaOfertas!', h:`
+    <p>La app vigila las <b>tiendas oficiales</b> de las marcas que te gustan y te avisa cuando algo que te interesa <b>baja de precio</b> o aparece <b>nuevo</b> dentro de lo que querés gastar.</p>
+    <ul><li>Vos ponés la tienda y tu presupuesto.</li><li>Ella revisa sola, aunque la tengas cerrada.</li><li>Te llega una notificación cuando hay algo bueno.</li></ul>
+    <div class="tip">Para que arranques con algo, ya te dejamos cargadas algunas tiendas de ejemplo de distintos rubros (Nike, Juleriaque, Ricky Sarkany, Frávega y Puppis). Editalas, borralas o sumá las tuyas.</div>
+    <div class="tip">Son 2 minutos. Podés volver a ver esto cuando quieras con el botón <b>?</b> abajo a la izquierda.</div>`},
+  {ico:'➕', t:'1. Agregá una marca', h:`
+    <p>Tocá <b>+ Agregar marca</b> y pegá el link de la tienda oficial, por ejemplo <b>www.nike.com.ar</b>. La app la reconoce sola.</p>
+    <div class="demo"><div class="fila">Link de la tienda <span class="inp">www.nike.com.ar</span></div>
+      <div class="fila">Precio máximo general <span class="inp">$150.000</span></div></div>
+    <p>El <b>precio máximo</b> es tu techo: vas a ver todo lo que cueste eso o menos. Si algo más caro baja y entra en ese precio, te enterás.</p>`},
+  {ico:'🗂️', t:'2. Elegí qué querés ver', h:`
+    <p>En el mismo formulario aparece el <b>árbol de categorías</b> de la tienda. Tildá solo lo que te interesa: por ejemplo <b>Calzado › Zapatillas</b>, o <b>Remeras</b>.</p>
+    <ul><li>Si no tildás nada, se mira toda la tienda.</li>
+      <li>Abajo, en <b>Tipos de producto</b>, podés ocultar cosas puntuales (ej. ojotas).</li>
+      <li>También podés poner <b>palabras</b> que tiene que tener o no tener el nombre.</li></ul>`},
+  {ico:'🔔', t:'3. Las campanitas: de qué te avisa', h:`
+    <p>Al lado de cada categoría hay una <b>campanita</b>. Prendé la de lo que te importa: solo de eso te van a llegar avisos.</p>
+    <div class="demo">
+      <div class="fila"><span class="bellon">${BELL}</span> Zapatillas <span style="color:var(--mute)">hasta</span> <span class="inp">$150.000</span></div>
+      <div class="fila"><span class="bellon">${BELL}</span> Remeras <span style="color:var(--mute)">hasta</span> <span class="inp">$30.000</span></div></div>
+    <p>Cada campanita puede tener <b>su propio precio</b>. Si la dejás vacía, usa el precio máximo general.</p>
+    <div class="tip">Cada vez que guardás un cambio, la tienda se revisa de nuevo y arriba aparece <b>"Revisión en curso"</b>.</div>`},
+  {ico:'✨', t:'4. Novedades y "En tu rango"', h:`
+    <p>Al elegir una marca a la izquierda vas a ver dos pestañas:</p>
+    <ul><li><b>Novedades</b>: lo que <b>bajó de precio</b>, <b>entró en tu rango</b>, es <b>nuevo</b> o <b>volvió a tener stock</b>.</li>
+      <li><b>En tu rango</b>: todo lo que hoy cuesta lo que querés pagar.</li></ul>
+    <p><b>Todas las novedades</b> junta lo de todas tus marcas en un solo lugar.</p>`},
+  {ico:'📉', t:'5. ¿Es una oferta de verdad?', h:`
+    <p>La app guarda el <b>historial de precios</b> de cada producto y te lo dice con una etiqueta:</p>
+    <ul><li><b>Precio mínimo</b>: nunca estuvo tan barato desde que lo seguimos.</li>
+      <li><b>Buen precio</b>: está por debajo de lo normal.</li>
+      <li><b>Inflado</b>: le subieron el precio antes de ponerle el descuento. ¡Ojo!</li>
+      <li><b>Ya estuvo más barato</b>: conviene esperar.</li></ul>
+    <p>Tocá cualquier producto para ver el <b>gráfico</b>, las <b>cuotas sin interés</b> y los talles con stock.</p>`},
+  {ico:'🔎', t:'6. Comparar, seguir y compartir', h:`
+    <p>Dentro de cada producto:</p>
+    <ul><li><b>Buscar en otras tiendas</b>: lo busca en otras tiendas (y en las parecidas, solas) y te dice dónde está más barato.</li>
+      <li><b>⭐ Seguir</b>: le ponés un <b>precio objetivo</b> y te avisa cuando llega. Lo ves en <b>Seguidos</b>.</li>
+      <li><b>Compartir</b> por WhatsApp o Telegram.</li></ul>`},
+  {ico:'⚙️', t:'7. Ajustes que conviene tocar', h:`
+    <ul><li><b>Mis talles</b>: tu número de calzado (también en centímetros) y tu talle de ropa. Así te avisa solo si <b>hay tu talle</b>.</li>
+      <li><b>Revisión automática</b>: cada cuánto mira las tiendas, aunque la app esté cerrada.</li>
+      <li><b>Modo evento</b>: para Hot Sale o Cyber Monday, revisa cada 15 minutos hasta la fecha que elijas.</li>
+      <li><b>Telegram</b>: para que los avisos te lleguen al celular.</li></ul>
+    <div class="tip">Tocá <b>Probar notificación de Windows</b> en Ajustes para ver cómo te van a llegar los avisos.</div>`},
+  {ico:'🎯', t:'¡Listo para cazar!', h:`
+    <p>Mirá las tiendas de ejemplo a la izquierda y ajustá el precio de cada una con <b>Editar</b>, o agregá las marcas que te gustan. La primera revisión puede tardar un ratito; después es mucho más rápida.</p>
+    <p>La app se <b>actualiza sola</b>: cuando haya una versión nueva te aparece un aviso arriba.</p>`, fin:true},
+];
+let TP = 0;
+function abrirTutorial(){ TP = 0; pintarTut(); $('#mTut').classList.add('on'); }
+function pintarTut(){
+  const p = TUT[TP];
+  $('#tPaso').innerHTML = `<div class="tico">${p.ico}</div><h2>${p.t}</h2>${p.h}`;
+  $('#tDots').innerHTML = TUT.map((_,i)=>`<i class="${i===TP?'on':''}" onclick="TP=${i};pintarTut()"></i>`).join('');
+  $('#tAtras').style.visibility = TP ? 'visible' : 'hidden';
+  $('#tSig').textContent = p.fin ? (S.marcas.length ? 'Empezar' : '+ Agregar mi primera marca') : 'Siguiente';
+}
+function pasoTut(d){
+  if (d > 0 && TUT[TP].fin) { terminarTut(!S.marcas.length); return; }
+  TP = Math.max(0, Math.min(TUT.length-1, TP+d)); pintarTut();
+}
+function terminarTut(agregar){
+  cerrar('mTut');
+  api('/api/ajustes',{method:'POST',body:{tutorial_visto:true}}).catch(()=>{});
+  if (agregar) abrirMarca();
+}
+$('#mTut').addEventListener('click', e => { if (e.target.id === 'mTut') terminarTut(false); });
+document.addEventListener('keydown', e => {
+  if (!$('#mTut').classList.contains('on')) return;
+  if (e.key === 'ArrowRight') pasoTut(1); else if (e.key === 'ArrowLeft') pasoTut(-1); else if (e.key === 'Escape') terminarTut(false);
+});
+
 setInterval(()=>fetch('/api/ping').catch(()=>{}), 20000); fetch('/api/ping');
-cargar();
+cargar().then(async () => {
+  try { const a = await api('/api/ajustes'); if (!a.tutorial_visto) abrirTutorial(); } catch(e) {}
+});
 </script>
 </body>
 </html>
