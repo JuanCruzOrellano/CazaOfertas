@@ -17,7 +17,8 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/129.0 Safari/537.36")
 PAUSA = 0.4  # segundos entre pedidos (Shopify)
 HILOS = 6    # páginas que se piden a la vez (VTEX)
-TOPE_VTEX = 2500  # VTEX no deja pasar de este número de producto en una búsqueda
+TOPE_VTEX = 2500
+MAX_PRODUCTOS = 8000  # tope por marca: más que esto es una tienda entera sin filtrar  # VTEX no deja pasar de este número de producto en una búsqueda
 
 
 class StoreError(Exception):
@@ -205,6 +206,8 @@ class Vtex:
                     if c["id"].startswith(cid or "/") and c["id"].count("/") - 1 == prof + 1]
 
         def una_categoria(cid, ex):
+            if len(vistos) >= MAX_PRODUCTOS:
+                return  # tienda enorme sin categorías elegidas: alcanza con lo más barato
             hdr = {}
             primero = _get(url(cid, 0), hdr)
             minimo = guardar(cid, primero or [])
@@ -214,12 +217,17 @@ class Vtex:
                 subs = hijos(cid)
                 if subs:
                     for s in subs:
-                        una_categoria(s, ex)
+                        try:
+                            una_categoria(s, ex)
+                        except StoreError:
+                            continue  # una subcategoría rota no frena el resto
                     return
             if tope is not None and minimo is not None and minimo > tope:
                 return
             desdes = list(range(50, min(total, TOPE_VTEX + 50), 50))
             for i in range(0, len(desdes), HILOS):
+                if len(vistos) >= MAX_PRODUCTOS:
+                    break
                 tanda = desdes[i:i + HILOS]
                 lotes = list(ex.map(lambda d: _get(url(cid, d)), tanda))
                 minimos = [guardar(cid, l or []) for l in lotes]

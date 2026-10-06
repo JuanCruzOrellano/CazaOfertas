@@ -144,9 +144,11 @@ def eans_de(tienda, pid, link=None):
 
 # Marcas con las que arranca alguien que instala la app por primera vez (una por rubro).
 MARCAS_INICIALES = [
-    {"name": "Nike", "base_url": "https://www.nike.com.ar", "max_price": 150000},
-    {"name": "Juleriaque", "base_url": "https://www.juleriaque.com.ar", "max_price": 90000},
-    {"name": "Frávega", "base_url": "https://www.fravega.com", "max_price": 200000},
+    {"name": "Nike", "base_url": "https://www.nike.com.ar", "max_price": 150000,
+     "categories": [{"id": "/2/4/", "name": "nike › calzado"}]},
+    {"name": "Juleriaque", "base_url": "https://www.juleriaque.com.ar", "max_price": 90000,
+     "categories": [{"id": "/100000001/", "name": "Fragancias"}]},
+    {"name": "Legacy", "base_url": "https://www.legacy.com.ar", "max_price": 80000},  # catálogo chico: toda la tienda
 ]
 
 
@@ -160,7 +162,7 @@ def sembrar_marcas():
         return
     for m in MARCAS_INICIALES:
         try:
-            db.guardar_marca({**m, "platform": "vtex", "categories": [], "avisar": None,
+            db.guardar_marca({"categories": [], **m, "platform": "vtex", "avisar": None,
                               "min_price": 0, "include_kw": "", "exclude_kw": "",
                               "only_stock": True, "solo_mi_talle": True})
         except Exception:  # noqa: BLE001
