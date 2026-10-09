@@ -267,6 +267,149 @@ details.avz[open] > summary::before{transform:rotate(90deg)}
 details.avz > summary small{font-weight:400;color:var(--mute);font-size:13px}
 details.avz > .dentro{padding:0 18px 16px;display:grid;gap:14px}
 .money.grande{font-size:20px;font-weight:700;padding:12px 14px !important;max-width:260px}
+
+/* ====== Estilo sobrio: neutros, un solo color de marca, sin estridencias ====== */
+:root{
+  --bg:#f6f6f4; --panel:#ffffff; --side:#ffffff; --side-ink:#1d1f23; --side-mute:#8b8e94;
+  --ink:#1d1f23; --mute:#6f7278; --line:#e8e8e4; --accent:#1d1f23; --brand:#9a4b30;
+  --sun:#f1f1ee; --sun-ink:#1d1f23; --ok:#2f6b4f; --ok-bg:#eef4f0; --warn:#8a6a2c; --warn-bg:#f8f5ee;
+  --new:#1d1f23; --new-bg:#f1f1ee; --chip:#f1f1ee; --shadow:0 1px 2px rgba(20,20,20,.04);
+}
+body{font-feature-settings:"tnum" 1}
+aside{background:var(--side);border-right:1px solid var(--line)}
+.logo{font-weight:650;letter-spacing:-.015em}
+.logo b{color:var(--brand)}
+.logo-img{width:46px;height:46px;filter:none}
+.navlist .grupo{font-weight:600;letter-spacing:.1em;font-size:11px;color:#a3a6ab}
+.nav{border-radius:8px;color:var(--side-ink)}
+.nav:hover{background:#f6f6f4}
+.nav.on{background:#f1f1ee;box-shadow:none}
+.nav.on .nm{font-weight:600}.nav.on .sub{font-weight:400}
+.nav .ico{display:flex;align-items:center;justify-content:center;color:var(--mute)}
+.nav.on .ico{color:var(--ink)}
+.badge{background:var(--ink);color:#fff;font-weight:600;font-size:11px}
+.dot{width:7px;height:7px;background:#c9ccc6}.dot.err{background:#b5654c}.dot.run{background:#a3a6ab}
+.side-foot{border-top:1px solid var(--line)}
+.btn{border-color:var(--line);font-weight:550;letter-spacing:-.005em}
+.btn:hover{filter:none;background:#f8f8f6}
+.btn.pri,.btn.side-add{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:none}
+.btn.pri:hover,.btn.side-add:hover{background:#33363c}
+.btn.ghost{background:#fff}
+.btn.danger{color:#9b3d2a;border-color:#ecd9d3}
+.head h1{font-weight:650;letter-spacing:-.025em;font-size:28px}
+.resumen{box-shadow:none;border-radius:12px}
+.resumen .k{color:var(--mute);font-size:13px;letter-spacing:.01em}
+.pill,.pill.av{background:#f1f1ee;color:var(--ink);border-radius:6px}
+.aviso{background:var(--warn-bg);color:#5d4a22;border-left:3px solid #c4a15e;border-radius:8px}
+.tabs{border-bottom:1px solid var(--line)}
+.tab{color:var(--mute);font-weight:550}
+.tab.on{color:var(--ink);border-color:var(--ink)}
+.explica{font-size:13.5px}
+.card{box-shadow:none;border:1px solid var(--line);border-radius:12px}
+.card:hover{border-color:#d6d6d1;transform:none;box-shadow:0 4px 14px rgba(20,20,20,.05)}
+.card.unseen{border-color:#cfcfc9;box-shadow:inset 3px 0 0 var(--brand)}
+.off{background:var(--ink);color:#fff;font-weight:600;font-size:11.5px;border-radius:5px}
+.tag,.vd{background:none !important;padding:0;font-size:11px;font-weight:650;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+.tag.entro_rango,.tag.bajo_mas,.tag.objetivo{color:var(--ok)}
+.tag.nuevo{color:var(--ink)}
+.vd.minimo,.vd.bueno{color:var(--ok)}
+.vd.inflado{color:#9b3d2a}
+.vd.ya_estuvo{color:var(--warn)}
+.card .price{font-weight:650}
+.mt{font-weight:550}
+.mt.no{color:var(--mute)}
+.soldout{color:var(--mute)}
+.empty{border:1px solid var(--line);border-style:solid}
+.upd{background:#f1f1ee;color:var(--ink);border-bottom:1px solid var(--line)}
+.upd .bar{background:#e2e2de}.upd .bar i{background:var(--ink)}
+.modal{border-radius:14px;box-shadow:0 24px 60px rgba(20,20,20,.18)}
+.modal header{font-weight:650;letter-spacing:-.01em}
+.back{background:rgba(20,22,26,.38)}
+.pasoF{border-radius:12px}
+.pasoF > .tit{font-weight:650;font-size:15.5px}
+.pasoF > .tit .n{background:var(--ink);font-weight:600;font-size:12.5px;width:24px;height:24px}
+.leyenda{background:#f6f6f4}
+.leyenda .cb{background:var(--ink);border-color:var(--ink)}
+.leyenda svg{fill:var(--ink)}
+.selchip{background:#f1f1ee;color:var(--ink);border:1px solid var(--line);font-weight:550}
+.selchip button{background:#dededa;color:var(--ink)}
+.selchip.bellchip{color:var(--ink);border-color:var(--line)}
+.selchip.bellchip button,.bellrow .x{background:#dededa;color:var(--ink)}
+.bellrow{border:1px solid var(--line);background:#fafaf8}
+.bellrow .bn{color:var(--ink)}
+.bell.on,.bell.par{color:var(--ink)}
+.tn:hover{background:#f1f1ee}
+.tn input,.tipogrid input,.chk input,.tools .solo input{accent-color:var(--ink)}
+.linkbtn{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+details.avz{border-radius:12px}
+.verd{border-radius:8px;font-size:14px}
+.verd.minimo,.verd.bueno{background:var(--ok-bg);color:#24533d}
+.verd.inflado{background:#f8efec;color:#7d3423}
+.verd.ya_estuvo{background:var(--warn-bg);color:#5d4a22}
+.verd.normal,.verd.nuevo{background:#f1f1ee;color:var(--mute)}
+.blk{border-radius:12px}
+.blk h4{font-weight:650;letter-spacing:.08em;font-size:11.5px}
+.tl span.mio{border-color:var(--ink);background:#f1f1ee}
+.cmp tr.mejor td{background:var(--ok-bg)}
+.toast{background:var(--ink);color:#fff;border-radius:8px}
+.revb{border-color:var(--line);box-shadow:0 6px 24px rgba(20,20,20,.08)}
+.revb .spin{border-top-color:var(--ink)}
+.revb.ok{color:var(--ok)}
+.tut .tico{font-size:11.5px;font-weight:650;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.tut .dots i.on{background:var(--ink)}
+.tut .demo .bellon{color:var(--ink)}
+.tut .tip{background:#f6f6f4;border-left:3px solid #d8d8d3;border-radius:6px}
+.chart text{fill:#8b8e94}
+
+/* tabla de categorías */
+.tsum{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.tsum > div{background:#fafaf8;padding:9px 12px;display:grid;gap:2px;min-width:0}
+.tsum span{font-size:11px;font-weight:650;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.tsum b{font-weight:550;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tabla-cats{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.tabla-cats #fCats{max-height:340px;overflow:auto}
+.tabla-cats .tn{display:grid;grid-template-columns:minmax(0,1fr) 96px 54px 84px 150px;align-items:center;gap:0;padding:0 12px;min-height:40px;border-top:1px solid #f0f0ed;border-radius:0}
+.tabla-cats #fCats .tn:first-child{border-top:0}
+.tabla-cats .tn:hover{background:#fafaf8}
+.tabla-cats .tn-h{min-height:34px;background:#fafaf8;border-top:0;border-bottom:1px solid var(--line);font-size:11px;font-weight:650;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.tabla-cats .tn-h:hover{background:#fafaf8}
+.tabla-cats .tn-todo .lb{font-weight:600}
+.tabla-cats .c-nom{display:flex;align-items:center;gap:2px;min-width:0}
+.tabla-cats .lb{cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.tabla-cats .tn.sel .lb{font-weight:600}
+.tabla-cats .c-n{text-align:right;padding-right:14px;color:var(--mute);font-size:12.5px;font-variant-numeric:tabular-nums}
+.tabla-cats .c-v,.tabla-cats .c-a{display:flex;justify-content:center}
+.tabla-cats .c-v input{width:17px;height:17px;margin:0;accent-color:var(--ink);cursor:pointer}
+.tabla-cats .c-p{display:flex;justify-content:flex-end}
+.tabla-cats .c-p input{width:140px;height:30px;box-sizing:border-box;background:#fff;border:1px solid #dcdcd7;border-radius:7px;padding:0 10px;font-size:13.5px;text-align:right;color:var(--ink)}
+.tabla-cats .c-p input:focus{outline:none;border-color:var(--ink)}
+.tabla-cats .tn-h .c-v,.tabla-cats .tn-h .c-a{display:flex;justify-content:center}
+.tabla-cats .tn-h .c-p{display:flex;justify-content:flex-end}
+.tabla-cats .tn-h .c-n{font-size:11px}
+.tabla-cats .her{font-size:12px;color:var(--mute)}
+.tabla-cats .car{width:22px;height:28px;display:inline-block}
+.sw{width:34px;height:20px;border-radius:99px;border:0;background:#dcdcd7;position:relative;padding:0;transition:background .15s;cursor:pointer}
+.sw i{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .15s}
+.sw.on{background:var(--ink)}.sw.on i{left:16px}
+.sw.par{background:#a9aaa6}
+
+.resumen3{margin-top:16px;display:grid;grid-template-columns:1.2fr 1.4fr .8fr;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.resumen3 > div{padding:14px 18px;min-width:0}
+.resumen3 > div + div{border-left:1px solid var(--line)}
+.resumen3 h5{margin:0 0 8px;font-size:11px;font-weight:650;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.resumen3 ul{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+.resumen3 li{display:flex;gap:10px;align-items:baseline;font-size:14px;min-width:0}
+.resumen3 li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.resumen3 li em{font-style:normal;font-variant-numeric:tabular-nums;color:var(--ink);font-weight:550;white-space:nowrap}
+.resumen3 .con-precio li{border-bottom:1px dashed #ececE8;padding-bottom:5px}
+.resumen3 .con-precio li:last-child{border-bottom:0;padding-bottom:0}
+.resumen3 li.vacio{color:var(--mute)}
+.resumen3 .pie{margin:10px 0 0;font-size:13px;color:var(--mute)}
+.resumen3 .pie b{color:var(--ink);font-weight:600}
+.resumen3 .grande{margin:0;font-size:15px;font-weight:550}
+.resumen3 small{display:block;margin-top:4px;font-size:12.5px;color:var(--mute)}
+.resumen3 small.mal{color:#9b3d2a}
+@media (max-width:900px){.resumen3{grid-template-columns:1fr}.resumen3 > div + div{border-left:0;border-top:1px solid var(--line)}}
 </style>
 </head>
 <body>
@@ -274,11 +417,11 @@ details.avz > .dentro{padding:0 18px 16px;display:grid;gap:14px}
   <div class="logo"><img src="/logo.png" alt="" class="logo-img"><span>Caza<b>Ofertas</b></span></div>
   <div class="navlist" id="nav"></div>
   <div class="side-foot">
-    <button class="btn side-add grande" onclick="abrirMarca()">＋ Agregar una marca</button>
-    <button class="btn ghost" id="btnTodo" onclick="revisar()" title="Mira todas tus tiendas ahora mismo">🔄 Revisar precios ahora</button>
+    <button class="btn side-add grande" onclick="abrirMarca()">+ Agregar una marca</button>
+    <button class="btn ghost" id="btnTodo" onclick="revisar()" title="Mira todas tus tiendas ahora mismo">Revisar precios ahora</button>
     <div class="fila">
-      <button class="btn ghost" onclick="abrirTutorial()" title="Cómo se usa la app">❓ Ayuda</button>
-      <button class="btn ghost" onclick="abrirAjustes()" title="Talles, avisos y más">⚙️ Ajustes</button>
+      <button class="btn ghost" onclick="abrirTutorial()" title="Cómo se usa la app">Ayuda</button>
+      <button class="btn ghost" onclick="abrirAjustes()" title="Talles, avisos y más">Ajustes</button>
     </div>
     <small id="ultima"></small>
   </div>
@@ -314,12 +457,13 @@ details.avz > .dentro{padding:0 18px 16px;display:grid;gap:14px}
         </div>
         <div class="pasoF">
           <div class="tit"><span class="n">3</span>¿Qué productos te interesan?</div>
-          <div class="leyenda"><span><i class="cb"></i> Tildá lo que querés <b>ver</b></span><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2Z"/></svg> Tocá la campanita en lo que querés que te <b>avise</b></span><span>Sin tildar nada = toda la tienda</span></div>
-          <div class="sumrow"><span class="sumlbl">Vas a ver</span><div class="selchips" id="fSelChips"></div></div>
-          <div class="sumrow"><span class="sumlbl">Te avisamos</span><div class="selchips" id="fBellChips"></div></div>
-          <input type="text" class="search" id="fCatQ" placeholder="🔍 Buscar categoría (ej. zapatillas, remeras)…" oninput="pintarCats()">
-          <div class="tree" id="fCats"></div>
-          <div class="ayuda">Cada campanita puede tener su propio precio máximo (por ejemplo, zapatillas hasta $150.000 y remeras hasta $30.000). Si lo dejás vacío, usa el del paso 2.</div>
+          <div class="ayuda">Marcá <b>Ver</b> en las categorías que querés mirar y <b>Avisarme</b> en las que querés recibir avisos. Cada aviso puede tener su propio precio máximo; si lo dejás vacío, usa el del paso 2.</div>
+          <div class="tsum" id="fSelChips"></div>
+          <input type="text" class="search" id="fCatQ" placeholder="Buscar categoría (ej. zapatillas, remeras)…" oninput="pintarCats()">
+          <div class="tabla-cats">
+            <div class="tn tn-h"><span>Categoría</span><span class="c-n">Productos</span><span class="c-v">Ver</span><span class="c-a">Avisarme</span><span class="c-p">Avisar hasta</span></div>
+            <div id="fCats"></div>
+          </div>
         </div>
         <details class="avz">
           <summary>Opciones avanzadas <small>(no hace falta tocarlas)</small></summary>
@@ -337,14 +481,14 @@ details.avz > .dentro{padding:0 18px 16px;display:grid;gap:14px}
               <label class="f">Ocultar si el nombre dice<span class="h">Palabras separadas por coma</span><input type="text" id="fExc" placeholder="ojotas, medias"></label>
             </div>
             <label class="chk"><input type="checkbox" id="fStock" checked> Ocultar los productos sin stock</label>
-            <label class="chk"><input type="checkbox" id="fTalle" checked><span>Avisarme solo si hay <b>mi talle</b> (tus talles se cargan en ⚙️ Ajustes)</span></label>
+            <label class="chk"><input type="checkbox" id="fTalle" checked><span>Avisarme solo si hay <b>mi talle</b> (tus talles se cargan en Ajustes)</span></label>
           </div>
         </details>
       </div>
     </div>
   </div>
   <footer>
-    <button class="btn danger" id="btnBorrar" style="margin-right:auto;display:none" onclick="borrarMarca()">🗑 Eliminar marca</button>
+    <button class="btn danger" id="btnBorrar" style="margin-right:auto;display:none" onclick="borrarMarca()">Eliminar marca</button>
     <button class="btn" onclick="cerrar('mMarca')">Cancelar</button>
     <button class="btn pri" id="btnGuardar" disabled onclick="guardarMarca()">Guardar</button>
   </footer>
@@ -352,10 +496,10 @@ details.avz > .dentro{padding:0 18px 16px;display:grid;gap:14px}
 
 <!-- Modal ajustes -->
 <div class="back" id="mAjustes"><div class="modal aj" style="max-width:680px">
-  <header>⚙️ Ajustes</header>
+  <header>Ajustes</header>
   <div class="mb">
     <div class="pasoF">
-      <div class="tit">👟 Mis talles</div>
+      <div class="tit">Mis talles</div>
       <div class="ayuda">Así la app te dice en cada producto si hay <b>tu talle</b>. Completá solo lo que uses; lo demás dejalo vacío.</div>
       <div class="row">
         <label class="f">Zapatillas: ¿en qué número?
@@ -372,7 +516,7 @@ details.avz > .dentro{padding:0 18px 16px;display:grid;gap:14px}
       </div>
     </div>
     <div class="pasoF">
-      <div class="tit">🔔 Avisos</div>
+      <div class="tit">Avisos</div>
       <label class="f">¿Cada cuánto revisamos tus tiendas?
         <span class="h">Funciona aunque tengas la app cerrada. Cuando haya algo nuevo te llega una notificación de Windows.</span>
         <select id="aHoras">
@@ -383,11 +527,11 @@ details.avz > .dentro{padding:0 18px 16px;display:grid;gap:14px}
       </label>
       <label class="chk" style="align-items:flex-start"><input type="checkbox" id="aEvento" style="margin-top:4px"><span><b>Modo ofertas especiales</b> (Hot Sale, Cyber Monday, Black Friday): revisar cada 15 minutos hasta el día que elijas.</span></label>
       <input type="date" id="aHasta" class="search" style="max-width:200px">
-      <button class="btn" style="justify-self:start" onclick="probarAviso()">🔔 Probar cómo llega un aviso</button>
+      <button class="btn" style="justify-self:start" onclick="probarAviso()">Probar cómo llega un aviso</button>
     </div>
     <div class="pasoF" id="aTg"></div>
     <details class="avz">
-      <summary>🏬 Comparar precios en otras tiendas <small>(avanzado)</small></summary>
+      <summary>Comparar precios en otras tiendas <small>(avanzado)</small></summary>
       <div class="dentro">
         <label class="chk" style="align-items:flex-start"><input type="checkbox" id="aAuto" style="margin-top:4px">
           <span><b>Buscar también en tiendas parecidas, automáticamente</b><br><span style="color:var(--mute);font-size:13px">Cuando tocás "¿Dónde está más barato?" en un producto, la app lo busca en tiendas del mismo estilo.</span></span></label>
@@ -405,7 +549,7 @@ details.avz > .dentro{padding:0 18px 16px;display:grid;gap:14px}
 <div class="back" id="mDet"><div class="modal" style="max-width:900px">
   <header id="dTit">Producto</header>
   <div class="mb" id="dBody"></div>
-  <footer><a class="btn" id="dIr" target="_blank" rel="noopener" style="text-decoration:none;margin-right:auto">🛒 Ver en la tienda</a><button class="btn pri" onclick="cerrar('mDet')">Cerrar</button></footer>
+  <footer><a class="btn" id="dIr" target="_blank" rel="noopener" style="text-decoration:none;margin-right:auto">Ver en la tienda</a><button class="btn pri" onclick="cerrar('mDet')">Cerrar</button></footer>
 </div></div>
 
 <div class="toast" id="toast"></div>
@@ -416,8 +560,8 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const cap = s => { s=String(s||'').replace(/-/g,' ').trim(); return s.charAt(0).toUpperCase()+s.slice(1); };
 const pesos = n => '$' + Math.round(n).toLocaleString('es-AR');
-const ETQ = {nuevo:'🆕 Producto nuevo', entro_rango:'⬇️ Bajó de precio', bajo_mas:'⬇️ Bajó todavía más', volvio_stock:'📦 Volvió a haber stock', objetivo:'🎯 Llegó a tu precio'};
-const VD = {minimo:'🏆 El precio más bajo', bueno:'👍 Buen precio', inflado:'⚠️ Descuento engañoso', ya_estuvo:'↺ Estuvo más barato antes'};
+const ETQ = {nuevo:'Producto nuevo', entro_rango:'Bajó de precio', bajo_mas:'Bajó todavía más', volvio_stock:'Volvió a haber stock', objetivo:'Llegó a tu precio'};
+const VD = {minimo:'El precio más bajo', bueno:'Buen precio', inflado:'Descuento engañoso', ya_estuvo:'Estuvo más barato antes'};
 // Errores técnicos de las tiendas, dichos en criollo
 function errorAmigable(e) {
   e = String(e || '');
@@ -448,7 +592,7 @@ function bannerRevision(){
     b.className = 'revb on'; bannerRevision._activo = true;
   } else if (bannerRevision._activo) {
     bannerRevision._activo = false;
-    b.innerHTML = '✓ <b>Revisión terminada</b>'; b.className = 'revb on ok';
+    b.innerHTML = '<b>Revisión terminada</b>'; b.className = 'revb on ok';
     clearTimeout(b._t); b._t = setTimeout(() => b.className = 'revb', 3500);
   }
 }
@@ -473,7 +617,7 @@ function pintarUpd() {
   } else if (U.error) {
     box.innerHTML = `<span>${esc(U.error)}</span><span class="sp"></span><button class="btn" onclick="actualizar()">Reintentar</button>`;
   } else {
-    box.innerHTML = `<span>🎉 Hay una versión nueva: <b>${esc(U.nueva)}</b> (tenés la ${esc(U.actual)})</span><span class="sp"></span>
+    box.innerHTML = `<span>Hay una versión nueva: <b>${esc(U.nueva)}</b> (tenés la ${esc(U.actual)})</span><span class="sp"></span>
       ${U.notas?`<button class="btn" onclick="alert(U.notas)">Qué cambió</button>`:''}
       <button class="btn pri" onclick="actualizar()">Actualizar</button>`;
   }
@@ -504,7 +648,7 @@ async function buscarAct(){
   try {
     const j = await api('/api/buscar_actualizacion',{method:'POST'});
     U = {...j, pagina:'https://github.com/JuanCruzOrellano/CazaOfertas/releases/latest'};
-    $('#aAct').textContent = j.error_busqueda ? j.error_busqueda : (j.nueva ? 'Hay una versión nueva: '+j.nueva : 'Estás al día ✓');
+    $('#aAct').textContent = j.error_busqueda ? j.error_busqueda : (j.nueva ? 'Hay una versión nueva: '+j.nueva : 'Estás al día ');
     pintarUpd();
   } catch(e){ $('#aAct').textContent = e.message; }
 }
@@ -516,7 +660,7 @@ async function cargar() {
   try { S.seguidos = (await api('/api/seguidos')).seguidos; } catch(e) { S.seguidos = []; }
   $('#ultima').textContent = 'Última revisión: ' + hace(j.ultima_revision || Math.max(0,...S.marcas.map(m=>m.last_check||0)));
   $('#btnTodo').disabled = S.revisando;
-  $('#btnTodo').textContent = S.revisando ? '⏳ Revisando…' : '🔄 Revisar precios ahora';
+  $('#btnTodo').textContent = S.revisando ? 'Revisando…' : 'Revisar precios ahora';
   pintarNav();
   bannerRevision();
   await pintarMain(antes && !S.revisando);
@@ -529,10 +673,10 @@ function pintarNav() {
   const seg = S.seguidos || [];
   const segSin = seg.reduce((a,s)=>a+(s.sin_ver||0),0);
   let h = `<div class="grupo">Inicio</div>
-    <button class="nav ${S.vista==='todas'?'on':''}" onclick="ir('todas')"><span class="ico">🔔</span><span class="nm">Novedades<div class="sub">De todas mis marcas</div></span>${tot?`<span class="badge" title="${tot} sin ver">${tot}</span>`:''}</button>
-    <button class="nav ${S.vista==='seguidos'?'on':''}" onclick="ir('seguidos')"><span class="ico">⭐</span><span class="nm">Productos que sigo<div class="sub">${seg.length ? seg.length + ' producto' + (seg.length===1?'':'s') : 'Ninguno todavía'}</div></span>${segSin?`<span class="badge">${segSin}</span>`:''}</button>
+    <button class="nav ${S.vista==='todas'?'on':''}" onclick="ir('todas')"><span class="ico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></span><span class="nm">Novedades<div class="sub">De todas mis marcas</div></span>${tot?`<span class="badge" title="${tot} sin ver">${tot}</span>`:''}</button>
+    <button class="nav ${S.vista==='seguidos'?'on':''}" onclick="ir('seguidos')"><span class="ico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z"/></svg></span><span class="nm">Productos que sigo<div class="sub">${seg.length ? seg.length + ' producto' + (seg.length===1?'':'s') : 'Ninguno todavía'}</div></span>${segSin?`<span class="badge">${segSin}</span>`:''}</button>
     <div class="grupo">Mis marcas</div>`;
-  if (!S.marcas.length) h += `<div class="sub" style="padding:4px 12px;color:var(--side-mute)">Todavía no agregaste marcas.<br>Tocá <b>＋ Agregar una marca</b> abajo.</div>`;
+  if (!S.marcas.length) h += `<div class="sub" style="padding:4px 12px;color:var(--side-mute)">Todavía no agregaste marcas.<br>Tocá <b>+ Agregar una marca</b> abajo.</div>`;
   for (const m of S.marcas) {
     const cls = m.estado ? 'run' : (m.last_error ? 'err' : '');
     const est = m.estado ? 'Revisando ahora…' : (m.last_error ? 'No se pudo revisar la última vez' : 'Todo bien');
@@ -565,9 +709,9 @@ function card(p, ev) {
       ${ev && S.vista==='todas'?`<div class="brand">${esc(ev.brand_name)}</div>`:''}
       <div class="name">${esc(p.name)}</div>
       <div class="price">${pesos(precio)}${old?`<span class="old">${pesos(old)}</span>`:''}</div>
-      ${mt?`<div class="mt ${mt.disponible?'':'no'}">${mt.disponible?'✓ Hay tu talle ('+esc(mt.talles.join(', '))+')':'✗ No hay tu talle'}</div>`:''}
+      ${mt?`<div class="mt ${mt.disponible?'':'no'}">${mt.disponible?'Hay tu talle ('+esc(mt.talles.join(', '))+')':'No hay tu talle'}</div>`:''}
       ${p.cuotas && p.cuotas.n>1?`<div class="cuo">${p.cuotas.n} cuotas sin interés</div>`:''}
-      ${p.objetivo?`<div class="cuo">🎯 Objetivo: ${pesos(p.objetivo)}</div>`:''}
+      ${p.objetivo?`<div class="cuo">Objetivo: ${pesos(p.objetivo)}</div>`:''}
       ${ev?`<div class="when">${cap(hace(ev.created_at))}${(ev.ok ?? ev.in_range) ? '' : ' · ya no está en tu presupuesto'}</div>`:''}
       ${!disp && !mt?'<div class="soldout">Sin stock</div>':''}
     </div></div>`;
@@ -581,14 +725,14 @@ async function pintarMain(refrescar) {
     main.innerHTML = `<div class="empty" style="margin-top:60px"><img src="/logo.png" alt="" style="width:120px;margin-bottom:10px"><h3>Agregá tu primera marca</h3>
       Pegá el link de la tienda (por ejemplo <b>nike.com.ar</b>) y decí cuánto querés gastar.<br>
       La app te muestra todo lo que entra en tu presupuesto y te avisa cuando algo baja.<br><br>
-      <button class="btn pri grande" onclick="abrirMarca()">＋ Agregar una marca</button></div>`;
+      <button class="btn pri grande" onclick="abrirMarca()">+ Agregar una marca</button></div>`;
     return;
   }
   if (S.vista === 'seguidos') { return pintarSeguidos(); }
   let head;
   if (S.vista === 'todas') {
-    head = `<div class="head"><div><h1>🔔 Novedades</h1><div class="meta">Lo que bajó de precio, volvió a tener stock o apareció nuevo en tus marcas. Lo más nuevo está arriba.</div></div>
-      <div class="acts"><button class="btn" onclick="vistas()">✓ Ya las vi todas</button></div></div><div style="height:18px"></div>`;
+    head = `<div class="head"><div><h1>Novedades</h1><div class="meta">Lo que bajó de precio, volvió a tener stock o apareció nuevo en tus marcas. Lo más nuevo está arriba.</div></div>
+      <div class="acts"><button class="btn" onclick="vistas()">Ya las vi todas</button></div></div><div style="height:18px"></div>`;
   } else {
     let tiposTxt = '';
     if ((m.tipos_ocultos||[]).length && m.last_check) {
@@ -598,23 +742,26 @@ async function pintarMain(refrescar) {
     }
     const nombreCat = c => esc(c.name.split(' › ').slice(-2).map(cap).join(' › '));
     const avs = m.avisar == null ? null : m.avisar.map(x => typeof x === 'string' ? {id:x, name:x} : x);
-    const cats = m.categories.length ? m.categories.map(c=>`<span class="pill">${nombreCat(c)}</span>`).join('') : '<span class="pill">Toda la tienda</span>';
-    let avisoTxt;
-    if (avs == null) avisoTxt = `De lo mismo que ves, hasta <b>${pesos(m.max_price)}</b>`;
-    else if (!avs.length) avisoTxt = '<span style="color:var(--mute)">No te avisamos de nada de esta marca</span>';
-    else avisoTxt = avs.map(x => `<span class="pill av">🔔 ${x.id ? nombreCat(x) : 'Toda la tienda'} · hasta ${pesos(x.max_price || m.max_price)}</span>`).join('');
+    const verLista = (m.categories.length ? m.categories.map(nombreCat) : ['Toda la tienda'])
+      .map(t => `<li><span>${t}</span></li>`).join('');
+    let avisoLista;
+    if (avs == null) avisoLista = `<li><span>Lo mismo que ves</span><em>${pesos(m.max_price)}</em></li>`;
+    else if (!avs.length) avisoLista = '<li class="vacio">Sin avisos para esta marca</li>';
+    else avisoLista = avs.map(x => `<li><span>${x.id ? nombreCat(x) : 'Toda la tienda'}</span><em>${pesos(x.max_price || m.max_price)}</em></li>`).join('');
+    const estado = m.estado ? esc(m.estado) : (m.last_check ? cap(hace(m.last_check)) : 'Todavía no se revisó');
+    const estadoSub = m.estado ? '' : (m.last_error ? '<small class="mal">La última revisión falló</small>' : (m.last_check ? '<small>Sin problemas</small>' : ''));
     head = `<div class="head"><div><h1>${esc(m.name)}</h1>
       <div class="meta"><a href="${esc(m.base_url)}" target="_blank" rel="noopener" style="color:var(--mute)">${esc(m.base_url.replace(/^https?:\/\/(www\.)?/,''))} ↗</a></div></div>
-      <div class="acts"><button class="btn" onclick="abrirMarca(${m.id})">✏️ Cambiar qué busco</button>
-      <button class="btn pri" ${S.revisando||m.estado?'disabled':''} onclick="revisar(${m.id})">${m.estado?'⏳ Revisando…':'🔄 Revisar ahora'}</button></div></div>
-      <div class="resumen">
-        <div class="fila"><span class="k">👀 Te mostramos</span><span class="v">${cats} hasta <b>${pesos(m.max_price)}</b>${m.min_price?` (desde ${pesos(m.min_price)})`:''}${tiposTxt}</span></div>
-        <div class="fila"><span class="k">🔔 Te avisamos de</span><span class="v">${avisoTxt}</span></div>
-        <div class="fila"><span class="k">🕒 Última revisión</span><span class="v">${m.estado ? esc(m.estado) : (m.last_check ? hace(m.last_check) : 'Todavía no se revisó')}</span></div>
+      <div class="acts"><button class="btn" onclick="abrirMarca(${m.id})">Cambiar qué busco</button>
+      <button class="btn pri" ${S.revisando||m.estado?'disabled':''} onclick="revisar(${m.id})">${m.estado?'Revisando…':'Revisar ahora'}</button></div></div>
+      <div class="resumen3">
+        <div><h5>Qué te mostramos</h5><ul>${verLista}</ul><p class="pie">Hasta <b>${pesos(m.max_price)}</b>${m.min_price?` · desde ${pesos(m.min_price)}`:''}${tiposTxt}</p></div>
+        <div><h5>De qué te avisamos</h5><ul class="con-precio">${avisoLista}</ul></div>
+        <div><h5>Última revisión</h5><p class="grande">${estado}</p>${estadoSub}</div>
       </div>
-      ${m.last_error && !m.estado?`<div class="aviso"><span style="font-size:20px">⚠️</span><div><b>No pudimos revisar esta tienda la última vez</b>${esc(errorAmigable(m.last_error))}${m.last_check?' Lo que ves abajo es de la revisión anterior.':''}</div></div>`:''}
-      <div class="tabs"><button class="tab ${S.tab==='nov'?'on':''}" onclick="S.tab='nov';pintarMain()">🔔 Novedades<span class="n">${m.sin_ver||''}</span></button>
-      <button class="tab ${S.tab==='rango'?'on':''}" onclick="S.tab='rango';pintarMain()">🛍️ Todo en mi presupuesto<span class="n">${m.en_rango}</span></button></div>
+      ${m.last_error && !m.estado?`<div class="aviso"><div><b>No pudimos revisar esta tienda la última vez</b>${esc(errorAmigable(m.last_error))}${m.last_check?' Lo que ves abajo es de la revisión anterior.':''}</div></div>`:''}
+      <div class="tabs"><button class="tab ${S.tab==='nov'?'on':''}" onclick="S.tab='nov';pintarMain()">Novedades<span class="n">${m.sin_ver||''}</span></button>
+      <button class="tab ${S.tab==='rango'?'on':''}" onclick="S.tab='rango';pintarMain()">Todo en mi presupuesto<span class="n">${m.en_rango}</span></button></div>
       <div class="explica">${S.tab==='nov' ? 'Lo que cambió desde que lo empezamos a mirar: bajas de precio, productos nuevos y stock que volvió.' : `Todos los productos que hoy cuestan ${pesos(m.max_price)} o menos.`}</div>`;
   }
   const mantenerFoco = document.activeElement && document.activeElement.id === 'q';
@@ -624,11 +771,11 @@ async function pintarMain(refrescar) {
     const sinVer = novedades.filter(n=>!n.seen).length;
     if (!novedades.length) {
       const primera = m && !m.last_check;
-      body = `<div class="empty"><h3>${primera?'⏳ Estamos revisando la tienda por primera vez…':'Todavía no hay novedades'}</h3>
+      body = `<div class="empty"><h3>${primera?'Estamos revisando la tienda por primera vez…':'Todavía no hay novedades'}</h3>
         ${primera?'Puede tardar unos minutos. Cuando termine, vas a ver los productos en "Todo en mi presupuesto".':'Cuando algo baje de precio o aparezca un producto nuevo, lo vas a ver acá y te va a llegar un aviso.'}
         ${m && !primera?`<br><br><button class="btn pri" onclick="S.tab='rango';pintarMain()">Ver los ${m.en_rango} productos en mi presupuesto</button>`:''}</div>`;
     } else {
-      body = (S.vista!=='todas' && sinVer?`<div class="tools"><span style="color:var(--mute)">${sinVer} sin ver</span><button class="btn" onclick="vistas(${m.id})">✓ Ya las vi</button></div>`:'')
+      body = (S.vista!=='todas' && sinVer?`<div class="tools"><span style="color:var(--mute)">${sinVer} sin ver</span><button class="btn" onclick="vistas(${m.id})">Ya las vi</button></div>`:'')
         + `<div class="grid">${novedades.map(n=>card(n,n)).join('')}</div>`;
     }
   } else {
@@ -640,7 +787,7 @@ async function pintarMain(refrescar) {
     if (S.orden==='precio_desc') lista.sort((a,b)=>precioDe(b)-precioDe(a));
     if (S.orden==='minimo') lista = lista.filter(p=>p.veredicto && ['minimo','bueno'].includes(p.veredicto.tipo));
     if (S.soloTalle) lista = lista.filter(p=>p.mi_talle && p.mi_talle.disponible);
-    body = `<div class="tools"><input id="q" placeholder="🔍 Buscar por nombre (ej. air max)" value="${esc(S.q)}" oninput="S.q=this.value;pintarMain()">
+    body = `<div class="tools"><input id="q" placeholder="Buscar por nombre (ej. air max)" value="${esc(S.q)}" oninput="S.q=this.value;pintarMain()">
       <label class="orden">Ordenar:<select onchange="S.orden=this.value;pintarMain()">
         <option value="precio" ${S.orden==='precio'?'selected':''}>Más baratos primero</option>
         <option value="precio_desc" ${S.orden==='precio_desc'?'selected':''}>Más caros primero</option>
@@ -649,7 +796,7 @@ async function pintarMain(refrescar) {
       </select></label>
       ${productos.some(p=>p.mi_talle) ? `<label class="solo"><input type="checkbox" ${S.soloTalle?'checked':''} onchange="S.soloTalle=this.checked;pintarMain()">Solo los que tienen mi talle</label>` : ''}</div>`
       + (lista.length ? `<div class="grid">${lista.map(p=>card(p)).join('')}</div>`
-        : `<div class="empty"><h3>${m.last_check?'No hay productos para mostrar':'⏳ Todavía estamos revisando la tienda'}</h3>${m.last_check?(S.q||S.soloTalle||S.orden==='minimo'?'Probá sacar el filtro o la búsqueda.':'Probá subir tu precio máximo o elegir otras categorías con <b>✏️ Cambiar qué busco</b>.'):'La primera revisión está en curso.'}</div>`);
+        : `<div class="empty"><h3>${m.last_check?'No hay productos para mostrar':'Todavía estamos revisando la tienda'}</h3>${m.last_check?(S.q||S.soloTalle||S.orden==='minimo'?'Probá sacar el filtro o la búsqueda.':'Probá subir tu precio máximo o elegir otras categorías con <b>Cambiar qué busco</b>.'):'La primera revisión está en curso.'}</div>`);
   }
   main.innerHTML = head + body;
   if (mantenerFoco) { const i=$('#q'); i.focus(); i.setSelectionRange(i.value.length,i.value.length); }
@@ -765,7 +912,7 @@ function alternar(set, id, todo, agrupar = true) {
     if (agrupar) compactar(set, todo);
   }
 }
-function toggleCat(id) { alternar(F.sel, id, false); pintarCats(); pintarTipos(); }
+function toggleCat(id) { if (id === '') F.sel.clear(); else alternar(F.sel, id, false); pintarCats(); pintarTipos(); }
 function toggleBell(id) {
   if (!F.avisar) F.avisar = avisos();
   const antes = new Set(F.avisar), precios = {...F.precios};
@@ -787,54 +934,58 @@ function ruta(id) {
   while (n && n.id) { partes.unshift(n.label); n = F.byId[n.parent]; }
   return partes.join(' › ');
 }
+function filaCat(n, depth, av, extra = '') {
+  const c = n.id === '' ? null : F.conteos[n.id];
+  const ver = n.id === '' ? F.sel.size === 0 : en(F.sel, n.id);
+  const verPar = n.id !== '' && parcialEn(F.sel, n.id);
+  const bOn = en(av, n.id), bPar = parcialEn(av, n.id);
+  const general = num($('#fMax').value);
+  let precio = '';
+  if (av.has(n.id)) precio = `<input type="text" inputmode="numeric" class="money" data-precio="${esc(n.id)}" value="${fmt(F.precios[n.id])}" placeholder="${general ? fmt(general) : 'precio'}">`;
+  else if (bOn) precio = '<span class="her">incluida</span>';
+  return `<div class="tn ${ver?'sel':''} ${c===0?'vacia':''} ${n.id===''?'tn-todo':''}">
+      <div class="c-nom" style="padding-left:${depth*18}px">${extra}<span class="lb" data-catclick="${esc(n.id)}">${esc(n.label)}</span></div>
+      <span class="c-n">${c!=null?c.toLocaleString('es-AR'):''}</span>
+      <span class="c-v"><input type="checkbox" data-cat="${esc(n.id)}" ${ver?'checked':''} ${verPar?'data-parcial="1"':''} title="Ver ${esc(ruta(n.id))}"></span>
+      <span class="c-a"><button class="sw ${bOn?'on':''} ${bPar?'par':''}" data-bell="${esc(n.id)}" title="${bOn?'Dejar de avisarme':'Avisarme'} de ${esc(ruta(n.id))}"><i></i></button></span>
+      <span class="c-p">${precio}</span>
+    </div>`;
+}
 function nodoHtml(n, depth, q, av) {
   const coincide = !q || ruta(n.id).toLowerCase().includes(q);
   const abierto = q ? true : F.open.has(n.id);
   const hijos = abierto ? n.kids.map(k => nodoHtml(k, depth+1, coincide ? '' : q, av)).join('') : '';
   if (q && !coincide && !hijos) return '';
-  const c = F.conteos[n.id];
-  const bOn = en(av, n.id), bPar = parcialEn(av, n.id);
-  return `<div class="tn ${en(F.sel,n.id)?'sel':''} ${c===0?'vacia':''}" style="padding-left:${depth*20}px">
-      <button class="car ${n.kids.length?'':'vac'}" data-abrir="${esc(n.id)}" title="${abierto?'Cerrar':'Abrir'}">${abierto?'▾':'▸'}</button>
-      <button class="bell ${bOn?'on':''} ${bPar?'par':''}" data-bell="${esc(n.id)}" title="${bOn?'No avisarme de':'Avisarme de'} novedades de ${esc(ruta(n.id))}">${BELL}</button>
-      <label><input type="checkbox" data-cat="${esc(n.id)}" ${en(F.sel,n.id)?'checked':''} ${parcialEn(F.sel,n.id)?'data-parcial="1"':''}>
-      <span class="lb">${esc(n.label)}</span>${c!=null?`<span class="cnt">${c.toLocaleString('es-AR')}</span>`:''}</label></div>` + hijos;
-}
-function chips(set, quitar, vacio, conBell) {
-  const ids = [...set].filter(s => F.byId[s]);
-  if (!ids.length) return `<span class="selchip all">${vacio}</span>`;
-  return ids.map(s => `<span class="selchip ${conBell?'bellchip':''}">${conBell?BELL:''}${esc(ruta(s))}${F.conteos[s]!=null?` <small style="opacity:.8;font-weight:400">${F.conteos[s].toLocaleString('es-AR')}</small>`:''}${quitar?`<button data-${quitar}="${esc(s)}" title="Quitar">✕</button>`:''}</span>`).join('');
+  const car = `<button class="car ${n.kids.length?'':'vac'}" data-abrir="${esc(n.id)}" title="${abierto?'Cerrar':'Abrir'}">${abierto?'▾':'▸'}</button>`;
+  return filaCat(n, depth, av, car) + hijos;
 }
 function pintarCats() {
   const q = $('#fCatQ').value.trim().toLowerCase();
   const av = avisos();
+  const todo = q ? '' : filaCat(F.byId[''], 0, av, '<span class="car vac"></span>');
   const html = F.roots.map(n => nodoHtml(n, 0, q, av)).join('');
-  $('#fCats').innerHTML = html || '<div style="padding:10px;color:var(--mute)">No hay categorías con ese nombre.</div>';
+  $('#fCats').innerHTML = (todo + html) || '<div style="padding:12px;color:var(--mute)">No hay categorías con ese nombre.</div>';
   $('#fCats').querySelectorAll('[data-parcial]').forEach(e => e.indeterminate = true);
-  $('#fSelChips').innerHTML = chips(F.sel, 'quitar', 'Toda la tienda (no tildaste nada)', false);
-  const ids = [...av].filter(s => F.byId[s]);
-  const general = num($('#fMax').value);
-  $('#fBellChips').innerHTML = ids.length ? ids.map(s => `<div class="bellrow">
-      <span class="bn">${BELL}${esc(ruta(s))}</span>
-      <span class="hasta">hasta</span>
-      <input type="text" inputmode="numeric" class="money" data-precio="${esc(s)}" value="${fmt(F.precios[s])}" placeholder="${general ? fmt(general) + ' (general)' : 'precio'}">
-      <button class="x" data-quitarbell="${esc(s)}" title="Quitar">✕</button></div>`).join('')
-    : '<span class="selchip all">Nada: no te va a llegar ningún aviso de esta marca</span>';
+  const verTxt = F.sel.size ? [...F.sel].filter(x=>F.byId[x]).map(ruta).join(', ') : 'toda la tienda';
+  const ids = [...av].filter(x => F.byId[x]);
+  const avTxt = ids.length ? ids.map(ruta).join(', ') : 'nada';
+  $('#fSelChips').innerHTML = `<div><span>Vas a ver</span><b>${esc(verTxt)}</b></div><div><span>Te avisamos de</span><b>${esc(avTxt)}</b></div>`;
 }
 document.addEventListener('click', e => {
   const ab = e.target.closest('[data-abrir]'); if (ab) { abrirNodo(ab.dataset.abrir); return; }
   const be = e.target.closest('[data-bell]'); if (be) { toggleBell(be.dataset.bell); return; }
   const qu = e.target.closest('[data-quitar]'); if (qu) { toggleCat(qu.dataset.quitar); return; }
   const qb = e.target.closest('[data-quitarbell]'); if (qb) { toggleBell(qb.dataset.quitarbell); return; }
+  const cc = e.target.closest('[data-catclick]'); if (cc) { toggleCat(cc.dataset.catclick); return; }
 });
-document.addEventListener('change', e => { if (e.target.dataset && e.target.dataset.cat) toggleCat(e.target.dataset.cat); });
+document.addEventListener('change', e => { if (e.target.dataset && e.target.dataset.cat != null) toggleCat(e.target.dataset.cat); });
 document.addEventListener('input', e => {
   if (e.target.classList && e.target.classList.contains('money')) {
     const n = num(e.target.value); e.target.value = n ? fmt(n) : '';
   }
   const s = e.target.dataset && e.target.dataset.precio;
   if (s != null) { if (!F.avisar) F.avisar = avisos(); const v = num(e.target.value); if (v > 0) F.precios[s] = v; else delete F.precios[s]; }
-  if (e.target.id === 'fMax') $('#fBellChips').querySelectorAll('[data-precio]').forEach(i => i.placeholder = fmt(num(e.target.value)) + ' (general)');
+  if (e.target.id === 'fMax') $('#fCats').querySelectorAll('[data-precio]').forEach(i => i.placeholder = fmt(num(e.target.value)));
 });
 const claveDescarga = () => {
   const u = new Set([...(F.sel.size ? F.sel : new Set([''])), ...avisos()]);
@@ -950,10 +1101,10 @@ async function eqCalzado(){
 }
 function pintarTg(){
   const tg = AJ.telegram || {};
-  $('#aTg').innerHTML = tg.conectado ? `<div class="tit">📱 Avisos al celular (Telegram)</div>
-      <div>✅ Conectado con <b>${esc(tg.nombre||'')}</b> por el bot @${esc(tg.bot||'')}. Te llega cada novedad con foto, precio y link.</div>
+  $('#aTg').innerHTML = tg.conectado ? `<div class="tit">Avisos al celular (Telegram)</div>
+      <div>Conectado con <b>${esc(tg.nombre||'')}</b> por el bot @${esc(tg.bot||'')}. Te llega cada novedad con foto, precio y link.</div>
       <div class="row2"><button class="btn" onclick="tgProbar()">Mandar prueba</button><button class="btn danger" onclick="tgDesconectar()">Desconectar</button></div>`
-    : `<div class="tit">📱 Avisos al celular (Telegram) <small style="font-weight:400;color:var(--mute);font-size:13px">opcional</small></div>
+    : `<div class="tit">Avisos al celular (Telegram) <small style="font-weight:400;color:var(--mute);font-size:13px">opcional</small></div>
       <div class="ayuda">Si usás Telegram, te podemos mandar los avisos al celular. Son 3 pasos:</div>
       <div class="paso">1. En Telegram buscá <b>@BotFather</b>, mandale <b>/newbot</b>, elegí un nombre y copiá el <b>token</b> que te da.<br>
       2. Pegalo acá abajo.<br>3. Abrí tu bot nuevo, tocá <b>Iniciar</b> y después <b>Conectar</b>.</div>
@@ -983,14 +1134,14 @@ async function probarAviso(){ await api('/api/probar_aviso',{method:'POST'}); to
 async function pintarSeguidos(){
   const seg = S.seguidos || [];
   const sinVer = seg.reduce((a,s)=>a+(s.sin_ver||0),0);
-  let h = `<div class="head"><div><h1>⭐ Productos que sigo</h1><div class="meta">Productos puntuales que querés comprar. Te avisamos cuando llegan a tu precio, bajan o vuelve tu talle.</div></div>
-    <div class="acts">${sinVer?`<button class="btn" onclick="vistas('seguidos')">✓ Ya vi los avisos</button>`:''}</div></div>
+  let h = `<div class="head"><div><h1>Productos que sigo</h1><div class="meta">Productos puntuales que querés comprar. Te avisamos cuando llegan a tu precio, bajan o vuelve tu talle.</div></div>
+    <div class="acts">${sinVer?`<button class="btn" onclick="vistas('seguidos')">Ya vi los avisos</button>`:''}</div></div>
     <div class="resumen" style="margin-bottom:18px"><div style="font-weight:700">Seguir un producto nuevo</div>
-    <div style="color:var(--mute);font-size:13.5px">La forma más fácil: abrí cualquier producto de tus marcas y tocá <b>⭐ Seguir</b>. O pegá acá el link de un producto:</div>
+    <div style="color:var(--mute);font-size:13.5px">La forma más fácil: abrí cualquier producto de tus marcas y tocá <b>Seguir</b>. O pegá acá el link de un producto:</div>
     <div class="tools" style="margin:0"><input id="segLink" placeholder="Link del producto (ej. https://www.nike.com.ar/…/p)">
-    <input id="segObj" type="text" inputmode="numeric" class="money" placeholder="Tu precio (opcional)" style="max-width:190px;flex:none"><button class="btn pri" onclick="seguirLink()">⭐ Seguir</button></div></div>`;
+    <input id="segObj" type="text" inputmode="numeric" class="money" placeholder="Tu precio (opcional)" style="max-width:190px;flex:none"><button class="btn pri" onclick="seguirLink()">Seguir</button></div></div>`;
   h += seg.length ? `<div class="grid">${seg.map(s=>card(s)).join('')}</div>`
-    : `<div class="empty"><h3>Todavía no seguís ningún producto</h3>Cuando veas algo que te guste, abrilo y tocá <b>⭐ Seguir</b>.</div>`;
+    : `<div class="empty"><h3>Todavía no seguís ningún producto</h3>Cuando veas algo que te guste, abrilo y tocá <b>Seguir</b>.</div>`;
   $('#main').innerHTML = h;
 }
 async function seguirLink(){
@@ -1020,28 +1171,28 @@ function pintarDetalle(){
     <div style="display:grid;gap:12px;align-content:start">
       <div><h2>${esc(p.name)}</h2><div style="color:var(--mute);font-size:13px">${esc(cap(p.tipo||''))}${p.ref?' · Código '+esc(p.ref):''}</div></div>
       <div class="pr">${pesos(precio)}${off?`<s>${pesos(p.list_price)}</s> <span class="off" style="position:static">-${off}%</span>`:''}</div>
-      ${mt?`<div class="mt ${mt.disponible?'':'no'}" style="font-size:15px">${mt.disponible?'✓ Hay tu talle ('+esc(mt.talles.join(', '))+')':'✗ No hay tu talle'+(mt.talles.length?' ('+esc(mt.talles.join(', '))+')':'')}${p.precio_ef && p.precio_ef!==p.price && mt.disponible?' · este es el precio de tu talle':''}</div>`:''}
-      ${p.cuotas && p.cuotas.n>1?`<div>💳 <b>${p.cuotas.n} cuotas sin interés</b> de ${pesos(p.cuotas.valor)}</div>`:''}
+      ${mt?`<div class="mt ${mt.disponible?'':'no'}" style="font-size:15px">${mt.disponible?'Hay tu talle ('+esc(mt.talles.join(', '))+')':'No hay tu talle'+(mt.talles.length?' ('+esc(mt.talles.join(', '))+')':'')}${p.precio_ef && p.precio_ef!==p.price && mt.disponible?' · este es el precio de tu talle':''}</div>`:''}
+      ${p.cuotas && p.cuotas.n>1?`<div><b>${p.cuotas.n} cuotas sin interés</b> de ${pesos(p.cuotas.valor)}</div>`:''}
       ${v?`<div class="verd ${v.tipo}">${VD[v.tipo]?'<b>'+VD[v.tipo]+'</b> · ':''}${esc(v.texto)}</div>`:''}
-      <div class="row2"><a class="btn pri" href="${esc(p.link)}" target="_blank" rel="noopener" style="text-decoration:none">🛒 Ver en la tienda</a>
-        <button class="btn" onclick="document.getElementById('dSegBlk').scrollIntoView({behavior:'smooth'})">⭐ Seguir</button>
+      <div class="row2"><a class="btn pri" href="${esc(p.link)}" target="_blank" rel="noopener" style="text-decoration:none">Ver en la tienda</a>
+        <button class="btn" onclick="document.getElementById('dSegBlk').scrollIntoView({behavior:'smooth'})">Seguir</button>
         <button class="btn" onclick="compartir('wa')">Compartir por WhatsApp</button></div>
     </div></div>
-    <div class="blk"><h4>💰 ¿Dónde está más barato?</h4><div id="dCmp"><button class="btn" onclick="compararAhora()">🔎 Buscarlo en otras tiendas</button> <span style="color:var(--mute);font-size:13px">Tarda unos segundos.</span></div></div>
-    ${talles?`<div class="blk"><h4>📏 Talles</h4><div class="tl">${talles}</div><div style="font-size:12.5px;color:var(--mute)">Tachado = no hay stock. Remarcado = tu talle.${mt?'':' Cargá tus talles en ⚙️ Ajustes.'}</div></div>`:''}
-    <div class="blk"><h4>📉 Cómo cambió el precio</h4>${grafico(p.historial, precio)}</div>
-    <div class="blk" id="dSegBlk"><h4>⭐ Seguir este producto</h4><div id="dSeg">${segHtml()}</div></div>
-    <div class="blk"><h4>📤 Compartir</h4><div class="row2">
+    <div class="blk"><h4>¿Dónde está más barato?</h4><div id="dCmp"><button class="btn" onclick="compararAhora()">Buscarlo en otras tiendas</button> <span style="color:var(--mute);font-size:13px">Tarda unos segundos.</span></div></div>
+    ${talles?`<div class="blk"><h4>Talles</h4><div class="tl">${talles}</div><div style="font-size:12.5px;color:var(--mute)">Tachado = no hay stock. Remarcado = tu talle.${mt?'':' Cargá tus talles en Ajustes.'}</div></div>`:''}
+    <div class="blk"><h4>Cómo cambió el precio</h4>${grafico(p.historial, precio)}</div>
+    <div class="blk" id="dSegBlk"><h4>Seguir este producto</h4><div id="dSeg">${segHtml()}</div></div>
+    <div class="blk"><h4>Compartir</h4><div class="row2">
       <button class="btn" onclick="compartir('wa')">WhatsApp</button><button class="btn" onclick="compartir('copiar')">Copiar texto</button>
       ${p.tiene_telegram?`<button class="btn" onclick="compartir('tg')">Mandar a mi Telegram</button>`:''}</div></div>`;
 }
 function segHtml(){
   const s = D.seguido;
-  if (s) return `<div class="row2">⭐ Lo seguís${s.objetivo?` · objetivo ${pesos(s.objetivo)}`:''}.
+  if (s) return `<div class="row2">Lo seguís${s.objetivo?` · objetivo ${pesos(s.objetivo)}`:''}.
     <input id="dObj" type="text" inputmode="numeric" class="money" placeholder="Nuevo objetivo" value="${fmt(s.objetivo)}"><button class="btn" onclick="seguirDet()">Cambiar</button>
     <button class="btn danger" onclick="dejarDeSeguir(${s.id})">Dejar de seguir</button></div>`;
   return `<div style="color:var(--mute);font-size:13.5px">Si querés, poné el precio al que lo comprarías. Te avisamos cuando llegue, cuando baje o cuando vuelva tu talle.</div>
-    <div class="row2"><input id="dObj" type="text" inputmode="numeric" class="money" placeholder="Ej. $80.000 (opcional)"><button class="btn pri" onclick="seguirDet()">⭐ Seguir</button></div>`;
+    <div class="row2"><input id="dObj" type="text" inputmode="numeric" class="money" placeholder="Ej. $80.000 (opcional)"><button class="btn pri" onclick="seguirDet()">Seguir</button></div>`;
 }
 async function seguirDet(){
   const obj = num($('#dObj').value) || null;
@@ -1054,17 +1205,17 @@ async function seguirDet(){
 }
 async function dejarDeSeguir(id){ await api('/api/dejar_de_seguir',{method:'POST',body:{id}}); D.seguido=null; $('#dSeg').innerHTML=segHtml(); cargar(); if (D._ref.seguido) cerrar('mDet'); }
 async function compararAhora(){
-  $('#dCmp').innerHTML = '<span style="color:var(--mute)">⏳ Buscando en otras tiendas… (puede tardar unos segundos)</span>';
+  $('#dCmp').innerHTML = '<span style="color:var(--mute)">Buscando en otras tiendas… (puede tardar unos segundos)</span>';
   try {
     const {filas} = await api('/api/comparar',{method:'POST',body:{ref:D.ref, tienda:D.tienda, pid:D.pid, link:D.link}});
     const yo = precioDe(D);
     const ok = filas.filter(f=>f.estado==='ok');
     const mejor = ok.find(f=>f.disponible);
-    let h = `<table class="cmp"><tr><td class="n">Esta tienda</td><td>${pesos(yo)}</td><td>${D.mi_talle?(D.mi_talle.disponible?'✓ tu talle':'✗ sin tu talle'):''}</td><td></td></tr>`;
+    let h = `<table class="cmp"><tr><td class="n">Esta tienda</td><td>${pesos(yo)}</td><td>${D.mi_talle?(D.mi_talle.disponible?'tu talle':'sin tu talle'):''}</td><td></td></tr>`;
     for (const f of ok) {
       const dif = f.precio - yo;
       h += `<tr class="${f===mejor && f.precio<yo?'mejor':''}"><td class="n">${esc(f.tienda)}${f.auto?' <span class="chip" title="Tienda parecida encontrada automáticamente">parecida</span>':''}</td><td>${pesos(f.precio)} <span style="color:${dif<0?'var(--ok)':'var(--mute)'};font-size:12px">${dif<0?'('+pesos(-dif)+' menos)':dif>0?'(+'+pesos(dif)+')':''}</span></td>
-        <td>${f.mi_talle?(f.mi_talle.disponible?'✓ tu talle':'✗ sin tu talle'):(f.disponible?'Con stock':'Sin stock')}</td><td><a href="${esc(f.link)}" target="_blank" rel="noopener">Ver</a></td></tr>`;
+        <td>${f.mi_talle?(f.mi_talle.disponible?'tu talle':'sin tu talle'):(f.disponible?'Con stock':'Sin stock')}</td><td><a href="${esc(f.link)}" target="_blank" rel="noopener">Ver</a></td></tr>`;
     }
     h += '</table>';
     const no = filas.filter(f=>f.estado!=='ok').map(f=>f.tienda);
@@ -1075,7 +1226,7 @@ async function compararAhora(){
 }
 function textoCompartir(){
   const p = D, precio = precioDe(p);
-  let t = `🦅 ${p.name} a ${pesos(precio)}`;
+  let t = `${p.name} a ${pesos(precio)}`;
   if (p.list_price > precio + 1) t += ` (antes ${pesos(p.list_price)})`;
   if (p.cuotas && p.cuotas.n>1) t += ` · ${p.cuotas.n} cuotas sin interés`;
   return t + `\n${p.link}`;
@@ -1104,7 +1255,7 @@ function grafico(hist, actual){
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Historial de precio">
     <line x1="${L}" x2="${W-R}" y1="${Y(hi)}" y2="${Y(hi)}" stroke="var(--line)"/><line x1="${L}" x2="${W-R}" y1="${Y(lo)}" y2="${Y(lo)}" stroke="var(--line)"/>
     <text x="${L-8}" y="${Y(hi)+4}" text-anchor="end">${pesos(hi)}</text><text x="${L-8}" y="${Y(lo)+4}" text-anchor="end">${pesos(lo)}</text>
-    <path d="${d}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="${d}" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round"/>
     <circle cx="${X(minPt.t)}" cy="${Y(minP)}" r="5" fill="var(--ok)"/><text x="${X(minPt.t)+8}" y="${Y(minP)-6}" style="fill:var(--ok);font-weight:700">mín ${pesos(minP)}</text>
     <circle cx="${X(pts[pts.length-1].t)}" cy="${Y(pts[pts.length-1].p)}" r="4" fill="var(--accent)"/>
     <text x="${L}" y="${H-6}">${fecha(t0)}</text><text x="${W-R}" y="${H-6}" text-anchor="end">hoy · ${dias} día${dias===1?'':'s'} de historial</text>
@@ -1115,60 +1266,60 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySele
   if(e.key==='Enter' && document.activeElement.id==='fUrl') detectar(); });
 /* ---------- tutorial para la primera vez */
 const TUT = [
-  {ico:'🦅', t:'¡Bienvenido a CazaOfertas!', h:`
+  {ico:'', t:'¡Bienvenido a CazaOfertas!', h:`
     <p>La app vigila las <b>tiendas oficiales</b> de las marcas que te gustan y te avisa cuando algo que te interesa <b>baja de precio</b> o aparece <b>nuevo</b> dentro de lo que querés gastar.</p>
     <ul><li>Vos ponés la tienda y tu presupuesto.</li><li>Ella revisa sola, aunque la tengas cerrada.</li><li>Te llega una notificación cuando hay algo bueno.</li></ul>
     <div class="tip">Para que arranques con algo, ya te dejamos cargadas algunas tiendas de ejemplo de distintos rubros (Nike, Juleriaque y Legacy). Editalas, borralas o sumá las tuyas.</div>
-    <div class="tip">Son 2 minutos. Podés volver a verlo cuando quieras con el botón <b>❓ Ayuda</b>, abajo a la izquierda.</div>`},
-  {ico:'➕', t:'1. Agregá una marca', h:`
-    <p>Tocá <b>＋ Agregar una marca</b> y pegá el link de la tienda oficial, por ejemplo <b>nike.com.ar</b>. La app la reconoce sola.</p>
+    <div class="tip">Son 2 minutos. Podés volver a verlo cuando quieras con el botón <b>Ayuda</b>, abajo a la izquierda.</div>`},
+  {ico:'', t:'1. Agregá una marca', h:`
+    <p>Tocá <b>+ Agregar una marca</b> y pegá el link de la tienda oficial, por ejemplo <b>nike.com.ar</b>. La app la reconoce sola.</p>
     <div class="demo"><div class="fila">Link de la tienda <span class="inp">www.nike.com.ar</span></div>
       <div class="fila">¿Hasta cuánto querés gastar? <span class="inp">$150.000</span></div></div>
     <p>El <b>precio máximo</b> es tu techo: vas a ver todo lo que cueste eso o menos. Si algo más caro baja y entra en ese precio, te enterás.</p>`},
-  {ico:'🗂️', t:'2. Elegí qué querés ver', h:`
+  {ico:'', t:'2. Elegí qué querés ver', h:`
     <p>En el paso 3 del formulario aparecen las <b>categorías</b> de la tienda. Tildá solo lo que te interesa: por ejemplo <b>Calzado › Zapatillas</b>, o <b>Remeras</b>.</p>
     <ul><li>Si no tildás nada, se mira toda la tienda.</li>
       <li>En <b>Opciones avanzadas</b> hay más filtros, pero no hace falta tocarlos.</li></ul>`},
-  {ico:'🔔', t:'3. Las campanitas: de qué te avisa', h:`
+  {ico:'', t:'3. Las campanitas: de qué te avisa', h:`
     <p>Al lado de cada categoría hay una <b>campanita</b>. Prendé la de lo que te importa: solo de eso te van a llegar avisos.</p>
     <div class="demo">
       <div class="fila"><span class="bellon">${BELL}</span> Zapatillas <span style="color:var(--mute)">hasta</span> <span class="inp">$150.000</span></div>
       <div class="fila"><span class="bellon">${BELL}</span> Remeras <span style="color:var(--mute)">hasta</span> <span class="inp">$30.000</span></div></div>
     <p>Cada campanita puede tener <b>su propio precio</b>. Si la dejás vacía, usa el precio del paso 2.</p>
     <div class="tip">Cada vez que guardás un cambio, la tienda se revisa de nuevo y arriba aparece <b>"Revisión en curso"</b>.</div>`},
-  {ico:'✨', t:'4. Dónde mirar', h:`
+  {ico:'', t:'4. Dónde mirar', h:`
     <p>Al elegir una marca a la izquierda vas a ver dos pestañas:</p>
-    <ul><li><b>🔔 Novedades</b>: lo que <b>bajó de precio</b>, es <b>nuevo</b> o <b>volvió a tener stock</b>.</li>
-      <li><b>🛍️ Todo en mi presupuesto</b>: todo lo que hoy cuesta lo que querés pagar.</li></ul>
-    <p>Arriba a la izquierda, <b>🔔 Novedades</b> junta lo de todas tus marcas en un solo lugar.</p>
-    <div class="tip">Para cambiar el precio o las categorías de una marca, tocá <b>✏️ Cambiar qué busco</b>.</div>`},
-  {ico:'📉', t:'5. ¿Es una oferta de verdad?', h:`
+    <ul><li><b>Novedades</b>: lo que <b>bajó de precio</b>, es <b>nuevo</b> o <b>volvió a tener stock</b>.</li>
+      <li><b>Todo en mi presupuesto</b>: todo lo que hoy cuesta lo que querés pagar.</li></ul>
+    <p>Arriba a la izquierda, <b>Novedades</b> junta lo de todas tus marcas en un solo lugar.</p>
+    <div class="tip">Para cambiar el precio o las categorías de una marca, tocá <b>Cambiar qué busco</b>.</div>`},
+  {ico:'', t:'5. ¿Es una oferta de verdad?', h:`
     <p>La app guarda el <b>historial de precios</b> de cada producto y te lo dice con una etiqueta:</p>
-    <ul><li><b>🏆 El precio más bajo</b>: nunca estuvo tan barato desde que lo miramos.</li>
-      <li><b>👍 Buen precio</b>: está por debajo de lo normal.</li>
-      <li><b>⚠️ Descuento engañoso</b>: le subieron el precio antes de ponerle el descuento. ¡Ojo!</li>
-      <li><b>↺ Estuvo más barato antes</b>: conviene esperar.</li></ul>
+    <ul><li><b>El precio más bajo</b>: nunca estuvo tan barato desde que lo miramos.</li>
+      <li><b>Buen precio</b>: está por debajo de lo normal.</li>
+      <li><b>Descuento engañoso</b>: le subieron el precio antes de ponerle el descuento. ¡Ojo!</li>
+      <li><b>Estuvo más barato antes</b>: conviene esperar.</li></ul>
     <p>Tocá cualquier producto para ver el <b>gráfico</b>, las <b>cuotas sin interés</b> y los talles con stock.</p>`},
-  {ico:'🔎', t:'6. Comparar, seguir y compartir', h:`
+  {ico:'', t:'6. Comparar, seguir y compartir', h:`
     <p>Dentro de cada producto:</p>
-    <ul><li><b>💰 ¿Dónde está más barato?</b>: lo busca en otras tiendas y te dice dónde sale menos.</li>
-      <li><b>⭐ Seguir</b>: le ponés el precio al que lo comprarías y te avisa cuando llega. Lo ves en <b>⭐ Productos que sigo</b>.</li>
+    <ul><li><b>¿Dónde está más barato?</b>: lo busca en otras tiendas y te dice dónde sale menos.</li>
+      <li><b>Seguir</b>: le ponés el precio al que lo comprarías y te avisa cuando llega. Lo ves en <b>Productos que sigo</b>.</li>
       <li><b>Compartir</b> por WhatsApp o Telegram.</li></ul>`},
-  {ico:'⚙️', t:'7. Ajustes que conviene tocar', h:`
+  {ico:'', t:'7. Ajustes que conviene tocar', h:`
     <ul><li><b>Mis talles</b>: tu número de calzado (también en centímetros) y tu talle de ropa. Así te avisa solo si <b>hay tu talle</b>.</li>
       <li><b>Cada cuánto revisamos</b>: la app mira tus tiendas sola, aunque esté cerrada.</li>
       <li><b>Modo ofertas especiales</b>: para Hot Sale o Cyber Monday, revisa cada 15 minutos hasta la fecha que elijas.</li>
       <li><b>Telegram</b>: para que los avisos te lleguen al celular.</li></ul>
-    <div class="tip">En Ajustes tocá <b>🔔 Probar cómo llega un aviso</b> para ver cómo te van a llegar.</div>`},
-  {ico:'🎯', t:'¡Listo para cazar!', h:`
-    <p>Mirá las tiendas de ejemplo a la izquierda y ajustá el precio de cada una con <b>✏️ Cambiar qué busco</b>, o agregá las marcas que te gustan. La primera revisión puede tardar un ratito; después es mucho más rápida.</p>
+    <div class="tip">En Ajustes tocá <b>Probar cómo llega un aviso</b> para ver cómo te van a llegar.</div>`},
+  {ico:'', t:'¡Listo para cazar!', h:`
+    <p>Mirá las tiendas de ejemplo a la izquierda y ajustá el precio de cada una con <b>Cambiar qué busco</b>, o agregá las marcas que te gustan. La primera revisión puede tardar un ratito; después es mucho más rápida.</p>
     <p>La app se <b>actualiza sola</b>: cuando haya una versión nueva te aparece un aviso arriba.</p>`, fin:true},
 ];
 let TP = 0;
 function abrirTutorial(){ TP = 0; pintarTut(); $('#mTut').classList.add('on'); }
 function pintarTut(){
   const p = TUT[TP];
-  $('#tPaso').innerHTML = `<div class="tico">${p.ico}</div><h2>${p.t}</h2>${p.h}`;
+  $('#tPaso').innerHTML = `<div class="tico">${TP===0 ? 'Bienvenida' : (p.fin ? 'Listo' : 'Paso ' + TP + ' de ' + (TUT.length-2))}</div><h2>${p.t.replace(/^\d+\.\s*/,'')}</h2>${p.h}`;
   $('#tDots').innerHTML = TUT.map((_,i)=>`<i class="${i===TP?'on':''}" onclick="TP=${i};pintarTut()"></i>`).join('');
   $('#tAtras').style.visibility = TP ? 'visible' : 'hidden';
   $('#tSig').textContent = p.fin ? (S.marcas.length ? 'Empezar' : '+ Agregar mi primera marca') : 'Siguiente';
