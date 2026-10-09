@@ -47,8 +47,8 @@ def precio(n):
 
 
 ETIQUETAS = {
-    "nuevo": "Nuevo en tu rango",
-    "entro_rango": "Bajó y entró en tu rango",
+    "nuevo": "Producto nuevo en tu presupuesto",
+    "entro_rango": "Bajó de precio y ya entra en tu presupuesto",
     "bajo_mas": "Bajó todavía más",
     "volvio_stock": "Volvió a tener stock",
 }

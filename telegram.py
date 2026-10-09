@@ -59,8 +59,8 @@ def enviar(cfg, texto, foto=None):
 
 
 ETIQUETAS = {
-    "nuevo": "🆕 Nuevo en tu rango",
-    "entro_rango": "📉 Bajó y entró en tu rango",
+    "nuevo": "🆕 Producto nuevo en tu presupuesto",
+    "entro_rango": "📉 Bajó de precio y ya entra en tu presupuesto",
     "bajo_mas": "📉 Bajó todavía más",
     "volvio_stock": "✅ Volvió el stock",
     "objetivo": "🎯 Llegó a tu precio objetivo",

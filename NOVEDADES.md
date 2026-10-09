@@ -1,8 +1,9 @@
-## Novedades de la 1.6.7
+## Novedades de la 1.7.0: interfaz más clara
 
-- **"En tu rango" muestra todos los productos**, tengan o no tu talle. Los que tienen tu talle llevan la marca verde ✓ y los que no, ✗.
-- **"Solo con mi talle" es ahora una casilla aparte**: se puede combinar con cualquier orden (más baratos, más caros, mayor descuento…).
-- Los **avisos** siguen siendo solo de productos con tu talle (si tenés esa opción activada en la marca).
-- Si una tienda falla en algunas páginas (por ejemplo "error 500" cuando está saturada), la app reintenta con más paciencia y sigue con lo que pudo leer, en vez de cortar toda la revisión.
-- Arreglado: la casilla "Solo con mi talle" se veía desarmada.
-- Arreglado: en "En tu rango" aparecían productos más caros que tu precio máximo (cuando tu talle costaba más que otros talles).
+- **Menú de la izquierda ordenado**: "Novedades", "Productos que sigo" y tus marcas, con botones que dicen lo que hacen (Revisar precios ahora, Ayuda, Ajustes).
+- **Cada marca tiene un resumen en palabras**: qué te mostramos, de qué te avisamos y cuándo se revisó.
+- **Pestañas con nombres claros**: "Novedades" y "Todo en mi presupuesto", cada una con una explicación.
+- **Agregar/editar una marca en 3 pasos**: qué tienda, hasta cuánto gastar y qué productos. Los filtros avanzados quedaron guardados aparte.
+- **Ajustes más simples**: talles, avisos y Telegram; la comparación de tiendas pasó a "avanzado".
+- **Ficha del producto**: lo importante arriba (precio, tu talle, si es buena oferta, botón a la tienda).
+- **Errores explicados en criollo** en vez de mensajes técnicos.
