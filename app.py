@@ -25,6 +25,7 @@ import talles  # noqa: E402
 import telegram  # noqa: E402
 import ventana  # noqa: E402
 import parecidas  # noqa: E402
+import promos  # noqa: E402
 from version import APP_VERSION  # noqa: E402
 
 PUERTO = int(os.environ.get("CAZAOFERTAS_PUERTO", "8767"))
@@ -63,8 +64,27 @@ def revisar_en_fondo(bid=None):
     return True
 
 
+def en_silencio():
+    """¿Estamos en el horario en que el usuario no quiere notificaciones?"""
+    s = db.get_setting("silencio") or {}
+    if not s.get("activo"):
+        return False
+    h, desde, hasta = time.localtime().tm_hour, int(s.get("desde", 23)), int(s.get("hasta", 8))
+    return (h >= desde or h < hasta) if desde > hasta else (desde <= h < hasta)
+
+
 def avisar(novedades, toast=True):
-    """Manda las novedades: notificación de Windows y/o Telegram."""
+    """Manda las novedades: notificación de Windows y/o Telegram.
+    En el horario de silencio se guardan y llegan todas juntas cuando termina."""
+    if toast and en_silencio():
+        if novedades:
+            pend = db.get_setting("avisos_pendientes") or []
+            db.set_setting("avisos_pendientes", (pend + list(novedades))[-50:])
+        return
+    pend = (db.get_setting("avisos_pendientes") or []) if toast else []
+    if pend:
+        db.set_setting("avisos_pendientes", [])
+    novedades = pend + list(novedades or [])
     if not novedades:
         return
     if toast:
@@ -95,7 +115,9 @@ def ajustes():
                          "bot": tg.get("bot"), "activo": tg.get("activo", True)},
             "tiendas_comparar": db.get_setting("tiendas_comparar") or comparar.TIENDAS_DEFECTO,
             "comparar_auto": db.get_setting("comparar_auto", True),
-            "tutorial_visto": db.get_setting("tutorial_visto", False)}
+            "tutorial_visto": db.get_setting("tutorial_visto", False),
+            "tema": db.get_setting("tema", "clasico"),
+            "silencio": db.get_setting("silencio") or {"activo": False, "desde": 23, "hasta": 8}}
 
 
 def detalle_producto(q):
@@ -239,6 +261,8 @@ class Handler(BaseHTTPRequestHandler):
                             "pagina": actualizador.PAGINA})
             elif ruta == "/api/sugerir_tiendas":
                 self._json({"sugeridas": sugeridas(), "auto": db.get_setting("comparar_auto", True)})
+            elif ruta == "/api/promos":
+                self._json(promos.para_app(db.get_setting("mis_medios", [])))
             elif ruta == "/api/ping":
                 ultimo_ping[0] = time.time()
                 self._json({"ok": True, "app": "cazaofertas", "version": VERSION, "app_version": APP_VERSION})
@@ -303,6 +327,16 @@ class Handler(BaseHTTPRequestHandler):
                 if "talles" in d:
                     db.set_setting("talles", d["talles"] or {})
                     db.recalcular_todo()
+                if "silencio" in d:
+                    sl = d["silencio"] or {}
+                    db.set_setting("silencio", {"activo": bool(sl.get("activo")),
+                                                "desde": int(sl.get("desde", 23)) % 24,
+                                                "hasta": int(sl.get("hasta", 8)) % 24})
+                if "mis_medios" in d:
+                    db.set_setting("mis_medios", [str(x)[:30] for x in (d["mis_medios"] or [])][:40])
+                if "tema" in d:
+                    db.set_setting("tema", str(d["tema"])[:20])
+                    return self._json({"ok": True})
                 if "tutorial_visto" in d:
                     db.set_setting("tutorial_visto", bool(d["tutorial_visto"]))
                     return self._json({"ok": True})
@@ -452,6 +486,7 @@ def modo_revisar():
     if ev.get("activo") and ev.get("hasta", 0) <= time.time():
         programacion()  # terminó el evento: vuelve a la frecuencia normal
     db.revisar_todas(avisar)
+    avisar([])  # si terminó el horario de silencio, manda lo que quedó guardado
 
 
 def preparar_windows():

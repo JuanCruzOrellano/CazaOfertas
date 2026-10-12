@@ -293,7 +293,9 @@ class Store:
         cfg = self.cfg_talles()
         d["mi_talle"] = T.mi_talle({"talles": d.get("talles"), "tipo": d.get("tipo"), "name": d.get("name"),
                                     "cats_nombres": d.get("cats_nombres")}, cfg)
-        d["veredicto"] = self.veredicto(tienda, d["pid"], d.get("precio_ef") or d.get("price"))
+        hist = self.historial(tienda, d["pid"])
+        d["veredicto"] = analizar_historial(hist, d.get("precio_ef") or d.get("price"))
+        d["mini"] = [h["price"] for h in hist[-20:] if h.get("price")]  # para el mini gráfico de la tarjeta
         return d
 
     # ---------- historial de precios

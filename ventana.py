@@ -72,6 +72,30 @@ def _poner_icono(ico):
         _log(f"icono: {e}")
 
 
+def _tam_guardado(datos):
+    """Tamaño con el que se cerró la ventana la última vez (o el de siempre)."""
+    try:
+        import json
+        with open(os.path.join(datos, "ventana.json"), encoding="utf-8") as f:
+            t = json.load(f)
+        ancho, alto = int(t["ancho"]), int(t["alto"])
+        if 700 <= ancho <= 4000 and 450 <= alto <= 3000:
+            return ancho, alto
+    except Exception:  # noqa: BLE001
+        pass
+    return 1280, 850
+
+
+def _guardar_tam(datos, w):
+    try:
+        import json
+        if datos and w.width and w.height:
+            with open(os.path.join(datos, "ventana.json"), "w", encoding="utf-8") as f:
+                json.dump({"ancho": int(w.width), "alto": int(w.height)}, f)
+    except Exception:  # noqa: BLE001
+        pass
+
+
 def abrir(url, ico=None, datos=None):
     """Abre la ventana y espera a que el usuario la cierre.
     Devuelve False si no se pudo abrir (y entonces se usa Edge)."""
@@ -91,7 +115,8 @@ def abrir(url, ico=None, datos=None):
             webview.settings["OPEN_EXTERNAL_LINKS_IN_BROWSER"] = True
         except Exception:  # noqa: BLE001
             pass
-        w = webview.create_window("CazaOfertas", url, width=1280, height=850,
+        tam = _tam_guardado(datos)
+        w = webview.create_window("CazaOfertas", url, width=tam[0], height=tam[1],
                                   min_size=(900, 600), background_color="#F7F5F2",
                                   text_select=True)
         _ventana[0] = w
@@ -101,6 +126,10 @@ def abrir(url, ico=None, datos=None):
         if ES_WINDOWS:
             opciones["gui"] = "edgechromium"
         threading.Thread(target=_poner_icono, args=(ico,), daemon=True).start()
+        try:
+            w.events.closing += lambda: _guardar_tam(datos, w)
+        except Exception:  # noqa: BLE001
+            pass
         webview.start(**opciones)
         return True
     except Exception as e:  # noqa: BLE001

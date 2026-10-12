@@ -1,0 +1,421 @@
+{
+ "version": 1,
+ "actualizado": "2026-10-09",
+ "nota": "Promos de bancos y billeteras y calendario de eventos. Se edita en GitHub y le llega a todos. dias: 0=domingo ... 6=sábado.",
+ "medios": [
+  {
+   "id": "galicia",
+   "nombre": "Galicia",
+   "tipo": "banco"
+  },
+  {
+   "id": "galicia_eminent",
+   "nombre": "Galicia Éminent",
+   "tipo": "banco"
+  },
+  {
+   "id": "santander",
+   "nombre": "Santander",
+   "tipo": "banco"
+  },
+  {
+   "id": "bbva",
+   "nombre": "BBVA",
+   "tipo": "banco"
+  },
+  {
+   "id": "macro",
+   "nombre": "Macro",
+   "tipo": "banco"
+  },
+  {
+   "id": "nacion",
+   "nombre": "Banco Nación",
+   "tipo": "banco"
+  },
+  {
+   "id": "provincia",
+   "nombre": "Banco Provincia",
+   "tipo": "banco"
+  },
+  {
+   "id": "ciudad",
+   "nombre": "Banco Ciudad",
+   "tipo": "banco"
+  },
+  {
+   "id": "icbc",
+   "nombre": "ICBC",
+   "tipo": "banco"
+  },
+  {
+   "id": "credicoop",
+   "nombre": "Credicoop",
+   "tipo": "banco"
+  },
+  {
+   "id": "patagonia",
+   "nombre": "Patagonia",
+   "tipo": "banco"
+  },
+  {
+   "id": "brubank",
+   "nombre": "Brubank",
+   "tipo": "banco"
+  },
+  {
+   "id": "mercadopago",
+   "nombre": "Mercado Pago",
+   "tipo": "billetera"
+  },
+  {
+   "id": "modo",
+   "nombre": "MODO",
+   "tipo": "billetera"
+  },
+  {
+   "id": "naranjax",
+   "nombre": "Naranja X",
+   "tipo": "billetera"
+  },
+  {
+   "id": "uala",
+   "nombre": "Ualá",
+   "tipo": "billetera"
+  },
+  {
+   "id": "yoy",
+   "nombre": "YOY",
+   "tipo": "billetera"
+  },
+  {
+   "id": "personalpay",
+   "nombre": "Personal Pay",
+   "tipo": "billetera"
+  }
+ ],
+ "promos": [
+  {
+   "medio": "mercadopago",
+   "tiendas": [
+    "nike.com.ar"
+   ],
+   "descuento": 20,
+   "tipo": "reintegro",
+   "tope": 15000,
+   "desde": "2026-10-09",
+   "hasta": "2026-10-18",
+   "texto": "20% de reintegro pagando con Cuotas sin Tarjeta de Mercado Pago",
+   "canal": "online",
+   "fuente": "nike.com.ar/promociones"
+  },
+  {
+   "medio": "galicia",
+   "descuento": 20,
+   "tipo": "descuento",
+   "tope": 40000,
+   "tope_txt": "por mes",
+   "dias": [
+    5,
+    6
+   ],
+   "desde": "2026-10-01",
+   "hasta": "2026-12-31",
+   "texto": "20% los viernes y sábados",
+   "tiendas": [
+    "dexter.com.ar"
+   ],
+   "fuente": "cuidaelmango.com/promociones/dexter"
+  },
+  {
+   "medio": "galicia_eminent",
+   "descuento": 25,
+   "tipo": "descuento",
+   "tope": 50000,
+   "tope_txt": "por mes",
+   "dias": [
+    5,
+    6
+   ],
+   "desde": "2026-10-01",
+   "hasta": "2026-12-31",
+   "texto": "25% los viernes y sábados",
+   "tiendas": [
+    "dexter.com.ar"
+   ],
+   "fuente": "cuidaelmango.com/promociones/dexter"
+  },
+  {
+   "medio": "naranjax",
+   "descuento": 20,
+   "tipo": "reintegro",
+   "tope": 30000,
+   "dias": [
+    1,
+    2
+   ],
+   "desde": "2026-10-05",
+   "hasta": "2026-10-27",
+   "texto": "20% de reintegro los lunes y martes con Naranja X crédito",
+   "tiendas": [
+    "dexter.com.ar"
+   ],
+   "fuente": "cuidaelmango.com/promociones/dexter"
+  },
+  {
+   "medio": "bbva",
+   "descuento": 20,
+   "tipo": "descuento",
+   "dias": [
+    2
+   ],
+   "desde": "2026-10-01",
+   "hasta": "2026-10-31",
+   "texto": "20% los martes",
+   "tiendas": [
+    "dexter.com.ar"
+   ],
+   "fuente": "cuidaelmango.com/promociones/dexter"
+  },
+  {
+   "medio": "yoy",
+   "descuento": 20,
+   "tipo": "reintegro",
+   "dias": [
+    5,
+    6
+   ],
+   "desde": "2026-10-01",
+   "hasta": "2026-10-31",
+   "texto": "20% de reintegro los viernes y sábados",
+   "tiendas": [
+    "dexter.com.ar"
+   ],
+   "fuente": "cuidaelmango.com/promociones/dexter"
+  },
+  {
+   "medio": "ciudad",
+   "descuento": 15,
+   "tipo": "reintegro",
+   "dias": [
+    2
+   ],
+   "desde": "2026-10-01",
+   "hasta": "2026-10-31",
+   "texto": "15% de reintegro los martes",
+   "tiendas": [
+    "dexter.com.ar"
+   ],
+   "fuente": "cuidaelmango.com/promociones/dexter"
+  },
+  {
+   "medio": "patagonia",
+   "descuento": 25,
+   "tipo": "descuento",
+   "dias": [
+    4
+   ],
+   "desde": "2026-10-01",
+   "hasta": "2026-10-31",
+   "texto": "25% los jueves (clientes Singular)",
+   "tiendas": [
+    "dexter.com.ar"
+   ],
+   "fuente": "cuidaelmango.com/promociones/dexter"
+  },
+  {
+   "medio": "credicoop",
+   "descuento": 15,
+   "tipo": "descuento",
+   "desde": "2026-10-14",
+   "hasta": "2026-10-16",
+   "texto": "15% sin tope",
+   "tiendas": [
+    "dexter.com.ar"
+   ],
+   "fuente": "cuidaelmango.com/promociones/dexter"
+  },
+  {
+   "medio": "galicia",
+   "rubros": [
+    "deportes"
+   ],
+   "descuento": 20,
+   "tipo": "descuento",
+   "tope": 30000,
+   "fechas": [
+    "2026-10-10",
+    "2026-10-11",
+    "2026-10-17",
+    "2026-10-18"
+   ],
+   "texto": "20% en ropa deportiva los fines de semana",
+   "canal": "locales y comercios adheridos",
+   "fuente": "mdzol.com (promos Día de la Madre)"
+  },
+  {
+   "medio": "galicia_eminent",
+   "rubros": [
+    "deportes"
+   ],
+   "descuento": 25,
+   "tipo": "descuento",
+   "tope": 50000,
+   "fechas": [
+    "2026-10-10",
+    "2026-10-11",
+    "2026-10-17",
+    "2026-10-18"
+   ],
+   "texto": "25% en ropa deportiva los fines de semana",
+   "canal": "locales y comercios adheridos",
+   "fuente": "mdzol.com (promos Día de la Madre)"
+  },
+  {
+   "medio": "galicia",
+   "rubros": [
+    "belleza",
+    "farmacia"
+   ],
+   "descuento": 10,
+   "tipo": "descuento",
+   "tope": 30000,
+   "fechas": [
+    "2026-10-10",
+    "2026-10-11",
+    "2026-10-17",
+    "2026-10-18"
+   ],
+   "texto": "10% en perfumerías los fines de semana",
+   "canal": "locales y comercios adheridos",
+   "fuente": "mdzol.com (promos Día de la Madre)"
+  },
+  {
+   "medio": "galicia_eminent",
+   "rubros": [
+    "belleza",
+    "farmacia"
+   ],
+   "descuento": 15,
+   "tipo": "descuento",
+   "tope": 50000,
+   "fechas": [
+    "2026-10-10",
+    "2026-10-11",
+    "2026-10-17",
+    "2026-10-18"
+   ],
+   "texto": "15% en perfumerías los fines de semana",
+   "canal": "locales y comercios adheridos",
+   "fuente": "mdzol.com (promos Día de la Madre)"
+  },
+  {
+   "medio": "nacion",
+   "rubros": [
+    "deportes",
+    "calzado",
+    "moda",
+    "belleza"
+   ],
+   "descuento": 30,
+   "tipo": "descuento",
+   "tope": 35000,
+   "desde": "2026-10-12",
+   "hasta": "2026-10-18",
+   "texto": "30% pagando con BNA+ MODO",
+   "canal": "locales y comercios adheridos",
+   "fuente": "mdzol.com (promos Día de la Madre)"
+  },
+  {
+   "medio": "provincia",
+   "rubros": [
+    "deportes",
+    "calzado",
+    "moda",
+    "belleza"
+   ],
+   "descuento": 30,
+   "tipo": "reintegro",
+   "tope": 40000,
+   "fechas": [
+    "2026-10-09",
+    "2026-10-10",
+    "2026-10-16",
+    "2026-10-17"
+   ],
+   "texto": "30% de reintegro (viernes y sábados)",
+   "canal": "locales y comercios adheridos",
+   "fuente": "mdzol.com (promos Día de la Madre)"
+  },
+  {
+   "medio": "macro",
+   "rubros": [
+    "calzado",
+    "moda",
+    "belleza"
+   ],
+   "descuento": 20,
+   "tipo": "descuento",
+   "desde": "2026-10-08",
+   "hasta": "2026-10-10",
+   "texto": "20% sin tope pagando con MODO",
+   "canal": "locales y comercios adheridos",
+   "fuente": "mdzol.com (promos Día de la Madre)"
+  },
+  {
+   "medio": "bbva",
+   "tiendas": [
+    "dexter.com.ar",
+    "moov.com.ar",
+    "rickysarkany.com",
+    "lacoste.com.ar"
+   ],
+   "descuento": 30,
+   "tipo": "reintegro",
+   "desde": "2026-10-15",
+   "hasta": "2026-10-17",
+   "texto": "30% de reintegro sin tope en marcas adheridas",
+   "canal": "locales y comercios adheridos",
+   "fuente": "mdzol.com (promos Día de la Madre)"
+  }
+ ],
+ "eventos": [
+  {
+   "nombre": "CyberMonday",
+   "desde": "2025-11-03",
+   "hasta": "2025-11-05"
+  },
+  {
+   "nombre": "Black Friday",
+   "desde": "2025-11-28",
+   "hasta": "2025-11-30"
+  },
+  {
+   "nombre": "Hot Sale",
+   "desde": "2026-05-11",
+   "hasta": "2026-05-13"
+  },
+  {
+   "nombre": "CyberMonday",
+   "desde": "2026-11-02",
+   "hasta": "2026-11-04"
+  },
+  {
+   "nombre": "Black Friday",
+   "desde": "2026-11-27",
+   "hasta": "2026-11-29"
+  },
+  {
+   "nombre": "Hot Sale",
+   "desde": "2027-05-10",
+   "hasta": "2027-05-12",
+   "estimado": true
+  },
+  {
+   "nombre": "CyberMonday",
+   "desde": "2027-11-01",
+   "hasta": "2027-11-03",
+   "estimado": true
+  }
+ ]
+}

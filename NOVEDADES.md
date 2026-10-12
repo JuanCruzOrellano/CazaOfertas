@@ -1,12 +1,10 @@
-## Novedades de la 1.7.2: interfaz más clara y sobria
+## Novedades de la 1.10.0
 
-- **Menú de la izquierda ordenado**: "Novedades", "Productos que sigo" y tus marcas, con botones que dicen lo que hacen (Revisar precios ahora, Ayuda, Ajustes).
-- **Cada marca tiene un resumen en palabras**: qué te mostramos, de qué te avisamos y cuándo se revisó.
-- **Pestañas con nombres claros**: "Novedades" y "Todo en mi presupuesto", cada una con una explicación.
-- **Agregar/editar una marca en 3 pasos**: qué tienda, hasta cuánto gastar y qué productos. Los filtros avanzados quedaron guardados aparte.
-- **Ajustes más simples**: talles, avisos y Telegram; la comparación de tiendas pasó a "avanzado".
-- **Ficha del producto**: lo importante arriba (precio, tu talle, si es buena oferta, botón a la tienda).
-- **Errores explicados en criollo** en vez de mensajes técnicos.
-- **Estilo sobrio**: sin emojis, colores neutros y un solo color de acento; íconos de línea discretos.
-- **Categorías en forma de tabla**: cada fila tiene la categoría, cuántos productos hay, si la querés ver, si te avisa (interruptor) y hasta qué precio.
-- **Resumen de cada marca en tres columnas**: qué te mostramos, de qué te avisamos (con el precio de cada aviso) y la última revisión.
+- **Horario de silencio**: en Ajustes → Avisos podés elegir que no te lleguen notificaciones de noche; lo de ese horario te llega todo junto a la mañana.
+- **Recuerda dónde estabas**: al abrir la app vuelve a la marca y pestaña que tenías, y la ventana al mismo tamaño.
+- **Mini gráfico en cada producto**: una línea finita que muestra si el precio viene bajando o subiendo.
+- **Logo de cada tienda** en la lista de marcas.
+- **Carga más suave**: tarjetas grises mientras busca y un fundido corto al cambiar de marca o pestaña.
+- **Deshacer al eliminar una marca**: tenés unos segundos para arrepentirte.
+- **Fecha exacta** al pasar el mouse por "hace 2 h".
+- **Atajos**: Ctrl+F para buscar y Ctrl+R para revisar precios.

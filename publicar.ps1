@@ -51,7 +51,14 @@ $Archivos = Get-ChildItem -Path $Dir -Recurse -File -Force | Where-Object {
 $Tree = @()
 foreach ($f in $Archivos) {
   $rel = $f.FullName.Substring($Dir.Length + 1).Replace('\', '/')
-  $b64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes($f.FullName))
+  $bytes = [IO.File]::ReadAllBytes($f.FullName)
+  # Nunca subir claves: si un archivo tiene un token de GitHub adentro, se saltea
+  $texto = [Text.Encoding]::UTF8.GetString($bytes)
+  if ($texto -match '(github_pat_|ghp_|gho_)[A-Za-z0-9_]{20,}') {
+    Write-Host "  SALTEADO $rel (tiene un token de GitHub adentro; no se sube por seguridad)" -ForegroundColor Yellow
+    continue
+  }
+  $b64 = [Convert]::ToBase64String($bytes)
   $blob = GH POST '/git/blobs' @{ content = $b64; encoding = 'base64' }
   $Tree += @{ path = $rel; mode = '100644'; type = 'blob'; sha = $blob.sha }
   Write-Host "  subido $rel"
